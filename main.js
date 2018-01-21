@@ -60,7 +60,9 @@ var stopEvent = null;
 	process.on( "SIGINT" , async function () {
 		await require( "./server/slackManager.js" ).postError( "main.js crashed !!" );
 		GenericUtils.killAllPYProcess();
-		process.exit( 1 );
+		setTimeout( function() {
+			process.exit( 1 );
+		} , 3000 );
 	});
 
 	console.log( "SERVER READY" );

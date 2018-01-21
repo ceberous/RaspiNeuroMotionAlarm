@@ -1,4 +1,4 @@
-
+require("shelljs/global");
 const spawn = require( "child_process" ).spawn;
 const ps = require( "ps-node" );
 const path = require( "path" );
@@ -77,6 +77,7 @@ function KILL_ALL_PY_PROCESS() {
 			});
 		}
 		catch(err){
+			exec( "pkill -9 python" , { silent: true ,  async: false } );
 			console.log(err);
 		}
 	});
