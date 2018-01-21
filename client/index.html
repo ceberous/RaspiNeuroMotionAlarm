@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Tenvis Notifier Controller</title>
+    <script src="http://code.jquery.com/jquery-3.1.1.min.js" integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+</head>
+<body>
+
+    <h1>Tenvis Notifier Controller</h1>
+
+    <button id="btnON" style="height:500px;width:500px;font-size:100px;" >Turn ON</button>
+    <button id="btnOFF" style="height:500px;width:500px;font-size:100px;" >Turn OFF</button>
+
+    <br><br>
+
+    <form id="wForm">
+        Minimum Seconds of Continuous Motion<br>
+        <input id="arg1F" type="text" name="arg1"><br>
+        Total Motion Events Acceptable Before Alert:<br>
+        <input id="arg2F" type="text" name="arg2"><br>
+        Minimum Time of Motion Before Alert:<br>
+        <input id="arg3F" type="text" name="arg3"><br>
+        Cooloff Period Duration:<br>
+        <input id="arg4F" type="text" name="arg4"><br>
+    </form>
+
+    <br><br>
+
+    <button id="submitForm" style="height:100px;width:400px;font-size:30px;" >Update Arguments</button>
+
+    <script type="text/javascript">
+
+        $(document).ready( function() {
+
+            $('#btnON').hide();
+            $('#btnOFF').hide();
+
+            $.ajax({ 
+                type: "GET",
+                dataType: "json",
+                url: "http://0.0.0.0:6161/state",
+                success: function(data){
+                    alert(data.state);
+                    if( data.state === "off" ) {
+                        $('#btnON').show();
+                    }
+                    else {
+                        $('#btnOFF').show();
+                    }
+
+                    $("#arg1F").attr( "placeholder" , data.arg1 ).val("").focus().blur();
+                    $("#arg2F").attr( "placeholder" , data.arg2 ).val("").focus().blur();
+                    $("#arg3F").attr( "placeholder" , data.arg3 ).val("").focus().blur();
+                    $("#arg4F").attr( "placeholder" , data.arg4 ).val("").focus().blur();
+
+                }
+            });
+
+        });
+
+        $('#btnON').click(function(){
+
+            $.ajax({ 
+                type: "GET",
+                dataType: "json",
+                url: "http://0.0.0.0:6161/turnon",
+                success: function(data){
+                    $('#btnON').hide();
+                    $('#btnOFF').show();        
+                    //alert(data.state)
+                }
+            });         
+         
+        });
+
+        $('#btnOFF').click(function(){ 
+
+            $.ajax({ 
+                type: "GET",
+                dataType: "json",
+                url: "http://0.0.0.0:6161/turnoff",
+                success: function(data){
+                    $('#btnOFF').hide();
+                    $('#btnON').show();                     
+                    //alert(data.state)
+                }
+            });          
+         
+        });
+
+        $('#submitForm').click(function(){ 
+
+            var dataOBJ = $("#wForm").serialize();
+            console.log(dataOBJ);
+
+            $.ajax({ 
+                type: "post",
+                dataType: "json",
+                data: dataOBJ,
+                url: "http://0.0.0.0:6161/setargs",
+                success: function(data){
+                    $("#arg1F").attr( "placeholder" , data.arg1 ).val("").focus().blur();
+                    $("#arg2F").attr( "placeholder" , data.arg2 ).val("").focus().blur();
+                    $("#arg3F").attr( "placeholder" , data.arg3 ).val("").focus().blur();
+                    $("#arg4F").attr( "placeholder" , data.arg4 ).val("").focus().blur();           
+                }
+            });          
+         
+        });
+
+        
+
+    </script>
+
+</body>
+</html>
