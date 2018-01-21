@@ -18,6 +18,7 @@ sys.path.append( securityDetailsPath )
 import securityDetails
 
 slack_client = SlackClient( securityDetails.slack_token )
+
 def send_slack_error( wErrString ):
 	try:
 		slack_client.api_call(
@@ -27,6 +28,7 @@ def send_slack_error( wErrString ):
 		)
 	except:
 		print( "failed to send slack error message" )
+
 def send_slack_message( wMsgString ):
 	try:
 		slack_client.api_call(
@@ -84,7 +86,7 @@ class TenvisVideo():
 		self.totalMotion = 0
 				
 		self.w_Capture = cv2.VideoCapture( 0 )
-		signal.pause()
+		#signal.pause()
 		self.motionTracking()
 
 	def sendEmail( self , alertLevel , msg ):
@@ -228,5 +230,11 @@ class TenvisVideo():
 		self.cleanup();
 
 
-
-TenvisVideo()
+while True:
+	try:
+		TenvisVideo()
+		send_slack_message( "newMotion.py started" )
+	except:
+		send_slack_error( "newMotion.py closed unexpectedly" )
+		continue()
+	time.sleep( 3 )

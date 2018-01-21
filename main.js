@@ -38,16 +38,29 @@ var stopEvent = null;
 		console.log( "\thttp://localhost:" + wPORT.toString() );
 	});
 
+	var wNow = new Date();
+	var wYear = wNow.getYear();
+	var wMonth = wNow.getMonth();
+	const startDateOBJ = new Date( wYear , wMonth , wDate , startTime.hour );
+	const endDateOBJ = new Date( wYear , wMonth , wDate , stopTIme.hour );
+	if ( wNow >= startDateOBJ && wNow <= endDateOBJ ) {
+		console.log( "we restarted in the middle of the schedule , restarting newMotion.py" );
+		GenericUtils.restartPYProcess();
+		require( "./server/slackManager.js" ).post( "newMotion.py restarted from crash" );
+	}
+
 	startEvent = schedule.scheduleJob( startTime , function(){
 		console.log( "scheduled start" );
 		const cur_state = GenericUtils.getState();
 		if ( !cur_state.state ) { GenericUtils.startPYProcess(); } 
 		else { GenericUtils.restartPYProcess(); }
+		require( "./server/slackManager.js" ).post( "newMotion.py scheduled start" );
 	});
 
 	stopEvent = schedule.scheduleJob( stopTime , function(){
 		console.log( "scheduled stop" );
 		GenericUtils.killAllPYProcess();
+		require( "./server/slackManager.js" ).post( "newMotion.py scheduled stop" );
 	});
 
 	process.on( "unhandledRejection" , function( reason , p ) {
