@@ -183,9 +183,10 @@ class TenvisVideo():
 				
 				if self.startMotionTime is None:
 					print "setting new motion record"
+					send_slack_message( "setting new motion record" )
 					self.startMotionTime = datetime.now()
 
-			cv2.putText( frame , "Room Status: {}".format(text) , ( 10 , 20 ) , cv2.FONT_HERSHEY_SIMPLEX , 0.5 , (0, 0, 255) , 2 )
+			#cv2.putText( frame , "Room Status: {}".format(text) , ( 10 , 20 ) , cv2.FONT_HERSHEY_SIMPLEX , 0.5 , (0, 0, 255) , 2 )
 
 			if text == "Motion":
 				motionCounter += 1
@@ -217,7 +218,8 @@ class TenvisVideo():
 					self.totalMotion = 0
 					self.sentEmailTime = now
 				elif eS >= self.totalTimeAcceptableCoolOff:
-					print "event outside of cooldown window .... reseting .... " 
+					print "event outside of cooldown window .... reseting .... "
+					send_slack_message( "event outside of cooldown window .... reseting .... " )
 					self.cachedMotionEvent = None
 					self.totalMotion = 0
 
