@@ -38,15 +38,15 @@ var stopEvent = null;
 		console.log( "\thttp://localhost:" + wPORT.toString() );
 	});
 
-	var wNow = new Date();
-	var wYear = wNow.getYear();
-	var wMonth = wNow.getMonth();
-	const startDateOBJ = new Date( wYear , wMonth , wDate , startTime.hour );
-	const endDateOBJ = new Date( wYear , wMonth , wDate , stopTIme.hour );
-	if ( wNow >= startDateOBJ && wNow <= endDateOBJ ) {
-		console.log( "we restarted in the middle of the schedule , restarting newMotion.py" );
+	var now = new Date();
+    var day = now.getDay();
+    var hours = now.getHours();
+	if( startTime.hour <= hours <= stopTime.hour ) {
+		//if( hours !== s || now.getMinutes() <= 30 ) {
+
+		//}
 		GenericUtils.restartPYProcess();
-		require( "./server/slackManager.js" ).post( "newMotion.py restarted from crash" );
+		require( "./server/slackManager.js" ).post( "main.js restarted , newMotion.py needs launched , starting" );
 	}
 
 	startEvent = schedule.scheduleJob( startTime , function(){

@@ -51,7 +51,7 @@ module.exports.childPIDLookup = CHILD_PID_LOOKUP;
 // https://stackoverflow.com/questions/12871740/how-to-detach-a-spawned-child-process-in-a-node-js-script
 // https://stackoverflow.com/questions/696839/how-do-i-write-a-bash-script-to-restart-a-process-if-it-dies
 function START_PY_PROCESS() {
-	wChild = spawn( "python" , [ lCode1 , arg1 , arg2 , arg3 , arg4 ] , { detached: true, stdio: [ 'ignore', out, err ] } );
+	wChild = spawn( "python" , [ lCode1 , arg1 , arg2 , arg3 , arg4 ] , { detached: true, stdio: [ 'ignore', 'ignore', 'ignore' ] } );
 	console.log( "launched pyscript" );
 	CHILD_PID_LOOKUP();
 	

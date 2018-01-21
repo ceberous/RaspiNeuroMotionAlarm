@@ -9,7 +9,7 @@ import smtplib
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEText import MIMEText
 from datetime import datetime , timedelta
-from time import localtime, strftime
+from time import localtime, strftime , sleep
 from pytz import timezone
 eastern_tz = timezone( "US/Eastern" )
 
@@ -232,9 +232,8 @@ class TenvisVideo():
 
 while True:
 	try:
+		send_slack_message( "python --> newMotion.py started" )
 		TenvisVideo()
-		send_slack_message( "newMotion.py started" )
 	except:
 		send_slack_error( "newMotion.py closed unexpectedly" )
-		continue()
-	time.sleep( 3 )
+	sleep( 5 )
