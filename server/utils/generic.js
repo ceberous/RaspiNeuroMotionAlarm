@@ -6,7 +6,7 @@ const path = require( "path" );
 var arg1 = 3 	// = Minimum Seconds of Continuous Motion
 var arg2 = 1 	// = Total Motion Events Acceptable Before Alert
 var arg3 = 3 	// = Minimum Time of Motion Before Alert
-var arg4 = 20 	// = Cooloff Period Duration
+var arg4 = 10 	// = Cooloff Period Duration
 const lCode1 = path.join( __dirname , "../../py_scripts" , "newMotion.py" );
 console.log( lCode1 );
 var wState = false;

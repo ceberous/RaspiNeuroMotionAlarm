@@ -62,7 +62,7 @@ class TenvisVideo():
 		self.currentMotionTime = None
 		self.cachedMotionEvent = None
 		self.sentEmailTime = None
-		self.emailCoolOff = 150
+		self.emailCoolOff = 300
 
 		try:
 			self.minMotionSeconds = int( sys.argv[1] )
@@ -86,6 +86,9 @@ class TenvisVideo():
 		self.coolOffTime = 3
 		self.elapsedTime = 0
 		self.totalMotion = 0
+		self.motionCounter = 0
+		self.motion = False
+		self.min_motion_frames = 8
 				
 		self.w_Capture = cv2.VideoCapture( 0 )
 		#signal.pause()
@@ -108,8 +111,8 @@ class TenvisVideo():
 			server = smtplib.SMTP( "smtp.gmail.com" , 587 )
 			server.ehlo()
 			server.starttls()
-			server.login( securityDetails.fromGmail , securityDetails.gmailPass  )
-			server.sendmail( securityDetails.fromGmail , securityDetails.toEmail , eMSG.as_string() )
+			server.login( FROM , securityDetails.gmailPass  )
+			server.sendmail( FROM , TO , eMSG.as_string() )
 			server.close()
 			print( "sent email" )
 		except:
@@ -130,9 +133,6 @@ class TenvisVideo():
 
 		min_area = 1000
 		delta_thresh = 5
-
-		motionCounter = 0
-		min_motion_frames = 8
 
 		while( self.w_Capture.isOpened() ):
 
@@ -168,38 +168,21 @@ class TenvisVideo():
 				( cnts , _ ) = cv2.findContours( thresh.copy() , cv2.RETR_EXTERNAL , cv2.CHAIN_APPROX_SIMPLE )
 
 			for c in cnts:
-
 				if cv2.contourArea( c ) < min_area:
 					continue
+				else:
+					self.motion = True
+					self.motionCounter += 1
+					if self.startMotionTime is None:
+						print "setting new motion record"
+						send_slack_message( "setting new motion record" )
+						self.startMotionTime = datetime.now()
 
-				if self.sentEmailTime is not None:
-					cT = datetime.now()
-					eT = cT - self.sentEmailTime
-					eT = int( eT.total_seconds() )
-					if eT < self.emailCoolOff:
-						continue
-					else:
-						self.sentEmailTime = None
-
-				text = "Motion"
-				
-				if self.startMotionTime is None:
-					print "setting new motion record"
-					send_slack_message( "setting new motion record" )
-					self.startMotionTime = datetime.now()
-
-			#cv2.putText( frame , "Room Status: {}".format(text) , ( 10 , 20 ) , cv2.FONT_HERSHEY_SIMPLEX , 0.5 , (0, 0, 255) , 2 )
-
-			if text == "Motion":
-				motionCounter += 1
-
-				if motionCounter >= min_motion_frames:
-					self.currentMotionTime = datetime.now()
-					self.elapsedTime =  self.currentMotionTime - self.startMotionTime
-					self.elapsedTime = int(self.elapsedTime.total_seconds())
-					motionCounter = 0
-					
-			else:
+			if self.motionCounter >= self.min_motion_frames:
+				self.currentMotionTime = datetime.now()
+				self.elapsedTime =  self.currentMotionTime - self.startMotionTime
+				self.elapsedTime = int(self.elapsedTime.total_seconds())
+				print "elapsed Time = " + str( self.elapsedTime )
 				motionCounter = 0
 
 			if self.elapsedTime >= self.coolOffTime:
@@ -219,25 +202,22 @@ class TenvisVideo():
 					self.sendEmail( self.totalMotion , "Haley is Moving" )
 					self.totalMotion = 0
 					self.sentEmailTime = now
+					self.startMotionTime = None
 				elif eS >= self.totalTimeAcceptableCoolOff:
 					print "event outside of cooldown window .... reseting .... "
 					send_slack_message( "event outside of cooldown window .... reseting .... " )
 					self.cachedMotionEvent = None
 					self.totalMotion = 0
 
-			#cv2.imshow( "frame" , frame )
-			#cv2.imshow( "Thresh" , thresh )
-			#cv2.imshow( "Frame Delta" , frameDelta )
-			#if cv2.waitKey( 1 ) & 0xFF == ord( "q" ):
-				#break		
+			cv2.imshow( "frame" , frame )
+			cv2.imshow( "Thresh" , thresh )
+			cv2.imshow( "Frame Delta" , frameDelta )
+			if cv2.waitKey( 1 ) & 0xFF == ord( "q" ):
+				break		
 
 		self.cleanup();
 
 
-while True:
-	try:
-		send_slack_message( "python --> newMotion.py started" )
-		TenvisVideo()
-	except:
-		send_slack_error( "newMotion.py closed unexpectedly" )
-	sleep( 5 )
+
+send_slack_message( "python --> newMotion.py started" )
+TenvisVideo()
