@@ -5,9 +5,7 @@ import os
 import signal
 import imutils
 from slackclient import SlackClient
-import smtplib
-from email.MIMEMultipart import MIMEMultipart
-from email.MIMEText import MIMEText
+import yagmail
 from datetime import datetime , timedelta
 from time import localtime, strftime , sleep
 from pytz import timezone
@@ -16,6 +14,7 @@ eastern_tz = timezone( "US/Eastern" )
 securityDetailsPath = os.path.abspath( os.path.join( __file__ , ".." , ".." ) )
 sys.path.append( securityDetailsPath )
 import securityDetails
+yagmail.register( securityDetails.fromGmail , securityDetails.gmailPass )
 
 slack_client = SlackClient( securityDetails.slack_token )
 
@@ -98,24 +97,13 @@ class TenvisVideo():
 		wTimeMsg = wNow + "\n\n" + msg
 		send_slack_message( "Motion @@ " + wNow )
 
-		eMSG = MIMEMultipart()
-		eMSG['From'] = securityDetails.fromGmail
-		eMSG['To'] = securityDetails.toEmail
-		eMSG['Subject'] = alertLevel
-		eMSG.attach( MIMEText( wTimeMsg ) )
-
 		try:
-			server = smtplib.SMTP( "smtp.gmail.com" , 587 )
-			server.ehlo()
-			server.starttls()
-			server.login( securityDetails.fromGmail , securityDetails.gmailPass  )
-			server.sendmail( securityDetails.fromGmail , securityDetails.toEmail , eMSG.as_string() )
-			server.close()
+			yagmail.SMTP( securityDetails.fromGmail ).send( securityDetails.toEmail , str( alertLevel ) , "Motion @@ " + wNow )
 			print( "sent email" )
-		except:
+		except Exception as e:
+			print e
 			print( "failed to send email" )
 			send_slack_error( "failed to send email" )
-
 
 	def cleanup( self ):
 		self.w_Capture.release()
