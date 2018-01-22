@@ -14,7 +14,8 @@ eastern_tz = timezone( "US/Eastern" )
 securityDetailsPath = os.path.abspath( os.path.join( __file__ , ".." , ".." ) )
 sys.path.append( securityDetailsPath )
 import securityDetails
-yagmail.register( securityDetails.fromGmail , securityDetails.gmailPass )
+#yagmail.register( securityDetails.fromGmail , securityDetails.gmailPass )
+yag = yagmail.SMTP( securityDetails.fromGmail , securityDetails.gmailPass )
 
 slack_client = SlackClient( securityDetails.slack_token )
 
@@ -98,7 +99,7 @@ class TenvisVideo():
 		send_slack_message( "Motion @@ " + wNow )
 
 		try:
-			yagmail.SMTP( securityDetails.fromGmail ).send( securityDetails.toEmail , str( alertLevel ) , "Motion @@ " + wNow )
+			yag.send( securityDetails.toEmail , str( alertLevel ) , "Motion @@ " + wNow )
 			print( "sent email" )
 		except Exception as e:
 			print e
@@ -222,10 +223,15 @@ class TenvisVideo():
 		self.cleanup();
 
 
+
+send_slack_message( "python --> newMotion.py started" )
+TenvisVideo()
+'''
 while True:
 	try:
 		send_slack_message( "python --> newMotion.py started" )
 		TenvisVideo()
 	except:
 		send_slack_error( "newMotion.py closed unexpectedly" )
-	sleep( 5 )
+		sleep( 5 )
+'''
