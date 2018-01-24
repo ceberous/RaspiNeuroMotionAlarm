@@ -6,7 +6,7 @@ const path = require( "path" );
 var arg1 = 3 	// = Minimum Seconds of Continuous Motion
 var arg2 = 1 	// = Total Motion Events Acceptable Before Alert
 var arg3 = 3 	// = Minimum Time of Motion Before Alert
-var arg4 = 10 	// = Cooloff Period Duration
+var arg4 = 8 	// = Cooloff Period Duration
 const lCode1 = path.join( __dirname , "../../py_scripts" , "newMotion.py" );
 console.log( lCode1 );
 var wState = false;
@@ -71,6 +71,7 @@ function START_PY_PROCESS() {
 module.exports.startPYProcess = START_PY_PROCESS;
 
 function KILL_ALL_PY_PROCESS() {
+	exec( "sudo pkill -9 python" , { silent: true ,  async: false } );
 	wPIDResultSet.forEach(function( item , index ) {
 		try {
 			ps.kill( item , function( err ){
@@ -83,7 +84,7 @@ function KILL_ALL_PY_PROCESS() {
 			});
 		}
 		catch(err){
-			exec( "pkill -9 python" , { silent: true ,  async: false } );
+			exec( "sudo pkill -9 python" , { silent: true ,  async: false } );
 			console.log(err);
 		}
 	});

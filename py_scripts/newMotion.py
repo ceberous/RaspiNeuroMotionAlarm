@@ -11,14 +11,23 @@ from time import localtime, strftime , sleep
 from pytz import timezone
 eastern_tz = timezone( "US/Eastern" )
 
+def signal_handler( signal , frame ):
+	wStr1 = "newMotion.py closed , Signal = " + str( signal )
+	print( wStr1 )
+	send_slack_error( wStr1 )
+	sys.exit(0)
+signal.signal( signal.SIGABRT , signal_handler )
+signal.signal( signal.SIGFPE , signal_handler )
+signal.signal( signal.SIGILL , signal_handler )
+signal.signal( signal.SIGSEGV , signal_handler )
+signal.signal( signal.SIGTERM , signal_handler )
+signal.signal( signal.SIGINT , signal_handler )
+
 securityDetailsPath = os.path.abspath( os.path.join( __file__ , ".." , ".." ) )
 sys.path.append( securityDetailsPath )
 import securityDetails
-#yagmail.register( securityDetails.fromGmail , securityDetails.gmailPass )
-yag = yagmail.SMTP( securityDetails.fromGmail , securityDetails.gmailPass )
 
 slack_client = SlackClient( securityDetails.slack_token )
-
 def send_slack_error( wErrString ):
 	try:
 		slack_client.api_call(
@@ -39,18 +48,22 @@ def send_slack_message( wMsgString ):
 	except:
 		print( "failed to send slack message" )		
 
-def signal_handler( signal , frame ):
-	wStr1 = "newMotion.py closed , Signal = " + str( signal )
-	print( wStr1 )
-	send_slack_error( wStr1 )
-	sys.exit(0)
+#yagmail.register( securityDetails.fromGmail , securityDetails.gmailPass )
+yag = yagmail.SMTP( securityDetails.fromGmail , securityDetails.gmailPass )
+def send_email( alertLevel , msg ):
 
-signal.signal( signal.SIGABRT , signal_handler )
-signal.signal( signal.SIGFPE , signal_handler )
-signal.signal( signal.SIGILL , signal_handler )
-signal.signal( signal.SIGSEGV , signal_handler )
-signal.signal( signal.SIGTERM , signal_handler )
-signal.signal( signal.SIGINT , signal_handler )
+	wTN = datetime.now( eastern_tz )
+	wNow = wTN.strftime( "%Y-%m-%d %H:%M:%S" )
+	wTimeMsg = wNow + "\n\n" + msg
+	send_slack_message( "Motion @@ " + wNow )
+
+	try:
+		yag.send( securityDetails.toEmail , str( alertLevel ) , "Motion @@ " + wNow )
+		print( "sent email" )
+	except Exception as e:
+		print e
+		print( "failed to send email" )
+		send_slack_error( "failed to send email" )
 
 class TenvisVideo():
 
@@ -79,7 +92,7 @@ class TenvisVideo():
 		try:
 			self.totalTimeAcceptableCoolOff = int( sys.argv[4] )
 		except:
-			self.totalTimeAcceptableCoolOff = 10
+			self.totalTimeAcceptableCoolOff = 8
 		
 		print "starting with " + str( self.minMotionSeconds ) + " " + str(self.totalMotionAcceptable) + " " + str(self.totalTimeAcceptable) + " " + str(self.totalTimeAcceptableCoolOff)
 
@@ -91,29 +104,13 @@ class TenvisVideo():
 		#signal.pause()
 		self.motionTracking()
 
-	def sendEmail( self , alertLevel , msg ):
-
-		wTN = datetime.now( eastern_tz )
-		wNow = wTN.strftime( "%Y-%m-%d %H:%M:%S" )
-		wTimeMsg = wNow + "\n\n" + msg
-		send_slack_message( "Motion @@ " + wNow )
-
-		try:
-			yag.send( securityDetails.toEmail , str( alertLevel ) , "Motion @@ " + wNow )
-			print( "sent email" )
-		except Exception as e:
-			print e
-			print( "failed to send email" )
-			send_slack_error( "failed to send email" )
-
 	def cleanup( self ):
 		self.w_Capture.release()
 		cv2.destroyAllWindows()
 		send_slack_error( "newMotion.py --> cleanup()" )
 
 	def motionTracking( self ):
-		print "started motionTracking()"
-		
+
 		avg = None
 		firstFrame = None
 
@@ -129,8 +126,7 @@ class TenvisVideo():
 			text = "No Motion"
 
 			if not grabbed:
-				continue
-				#break
+				break
 
 			frame = imutils.resize( frame , width = 500 )
 			gray = cv2.cvtColor( frame , cv2.COLOR_BGR2GRAY )
@@ -149,12 +145,12 @@ class TenvisVideo():
 
 			thresh = cv2.threshold( frameDelta , delta_thresh , 255 , cv2.THRESH_BINARY )[1]
 			thresh = cv2.dilate( thresh , None , iterations=2 )
-
+			
 			try:
 				# New api call is different
 				( image , cnts , _ ) = cv2.findContours( thresh.copy() , cv2.RETR_EXTERNAL , cv2.CHAIN_APPROX_SIMPLE )
 			except:
-				( cnts , _ ) = cv2.findContours( thresh.copy() , cv2.RETR_EXTERNAL , cv2.CHAIN_APPROX_SIMPLE )
+				(cnts, _) = cv2.findContours( thresh.copy() , cv2.RETR_EXTERNAL , cv2.CHAIN_APPROX_SIMPLE )
 
 			for c in cnts:
 
@@ -164,7 +160,7 @@ class TenvisVideo():
 				if self.sentEmailTime is not None:
 					cT = datetime.now()
 					eT = cT - self.sentEmailTime
-					eT = int( eT.total_seconds() )
+					eT = int(eT.total_seconds())
 					if eT < self.emailCoolOff:
 						continue
 					else:
@@ -177,19 +173,21 @@ class TenvisVideo():
 					send_slack_message( "setting new motion record" )
 					self.startMotionTime = datetime.now()
 
-			#cv2.putText( frame , "Room Status: {}".format(text) , ( 10 , 20 ) , cv2.FONT_HERSHEY_SIMPLEX , 0.5 , (0, 0, 255) , 2 )
-
 			if text == "Motion":
+
 				motionCounter += 1
 
 				if motionCounter >= min_motion_frames:
+
 					self.currentMotionTime = datetime.now()
 					self.elapsedTime =  self.currentMotionTime - self.startMotionTime
 					self.elapsedTime = int(self.elapsedTime.total_seconds())
+
 					motionCounter = 0
 					
 			else:
 				motionCounter = 0
+
 
 			if self.elapsedTime >= self.coolOffTime:
 				self.cachedMotionEvent = self.startMotionTime
@@ -202,10 +200,10 @@ class TenvisVideo():
 				eT = now - self.cachedMotionEvent
 				eS = int( eT.total_seconds() )
 				if eS >= self.totalTimeAcceptable and eS <= self.totalTimeAcceptableCoolOff:
-					print eS
-					print "we need to alert"
+					#print eS
+					#print "we need to alert"
 					self.cachedMotionEvent = None
-					self.sendEmail( self.totalMotion , "Haley is Moving" )
+					send_email( self.totalMotion , "Haley is Moving" )
 					self.totalMotion = 0
 					self.sentEmailTime = now
 				elif eS >= self.totalTimeAcceptableCoolOff:
@@ -214,24 +212,12 @@ class TenvisVideo():
 					self.cachedMotionEvent = None
 					self.totalMotion = 0
 
-			#cv2.imshow( "frame" , frame )
-			#cv2.imshow( "Thresh" , thresh )
-			#cv2.imshow( "Frame Delta" , frameDelta )
-			#if cv2.waitKey( 1 ) & 0xFF == ord( "q" ):
-				#break		
+			# cv2.imshow( "frame" , frame )
+			# cv2.imshow( "Thresh" , thresh )
+			# cv2.imshow( "Frame Delta" , frameDelta )
+			# if cv2.waitKey( 1 ) & 0xFF == ord( "q" ):
+			# 	break
 
-		self.cleanup();
+		self.cleanup()
 
-
-
-send_slack_message( "python --> newMotion.py started" )
 TenvisVideo()
-'''
-while True:
-	try:
-		send_slack_message( "python --> newMotion.py started" )
-		TenvisVideo()
-	except:
-		send_slack_error( "newMotion.py closed unexpectedly" )
-		sleep( 5 )
-'''
