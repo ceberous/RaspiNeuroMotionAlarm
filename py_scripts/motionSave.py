@@ -1,3 +1,4 @@
+import thread
 import numpy as np
 import cv2
 import sys
@@ -23,6 +24,11 @@ signal.signal( signal.SIGSEGV , signal_handler )
 signal.signal( signal.SIGTERM , signal_handler )
 signal.signal( signal.SIGINT , signal_handler )
 
+videoPath = os.path.abspath( os.path.join( __file__ , ".." , ".." , "videos" ) )
+try: 
+	os.makedirs( videoPath )
+except OSError:
+	pass
 securityDetailsPath = os.path.abspath( os.path.join( __file__ , ".." , ".." ) )
 sys.path.append( securityDetailsPath )
 import securityDetails
@@ -76,6 +82,8 @@ class TenvisVideo():
 		self.cachedMotionEvent = None
 		self.sentEmailTime = None
 		self.emailCoolOff = 150
+		self.elapsedTimeFromLastEmail = 150
+		self.currentMotion = False
 
 		self.FRAME_POOL = [ None ]*1800
 
@@ -101,15 +109,46 @@ class TenvisVideo():
 		self.coolOffTime = 3
 		self.elapsedTime = 0
 		self.totalMotion = 0
-				
+
+		self.video_index = 0
+
 		self.w_Capture = cv2.VideoCapture( 0 )
-		#signal.pause()
 		self.motionTracking()
 
 	def cleanup( self ):
 		self.w_Capture.release()
 		cv2.destroyAllWindows()
 		send_slack_error( "newMotion.py --> cleanup()" )
+
+	def write_video( self ):
+		# https://www.programcreek.com/python/example/72134/cv2.VideoWriter
+		# https://video.stackexchange.com/questions/7903/how-to-losslessly-encode-a-jpg-image-sequence-to-a-video-in-ffmpeg
+		print "starting to write video"
+		wTMP_COPY = self.FRAME_POOL
+		
+		# try: 
+		# 	os.makedirs( videoImagesPath )
+		# except OSError:
+		# 	pass
+		# # save each frame as an image
+		# for i , frame in enumerate( wTMP_COPY ):
+		# 	w_name_1 = str( i )
+		# 	w_name_1 = w_name_1.zfill( 4 )
+		# 	#cv2.imwrite( os.path.join( videoImagesPath , "frame%d.jpg" % i ) , frame )
+		# 	cv2.imwrite( os.path.join( videoImagesPath , "frame%s.jpg" % w_name_1 ) , frame )
+
+		fourcc = cv2.VideoWriter_fourcc( *"mp4v" )
+		w_path = os.path.join( videoImagesPath , "latestMotion%d.mp4" % self.video_index )
+		print w_path
+		
+		videoWriter = cv2.VideoWriter( w_path , fourcc , 30 , ( 500 , 500 ) )		
+		for i , frame in enumerate( wTMP_COPY ):
+			videoWriter.write( frame )
+		videoWriter.release()
+
+		self.video_index += 1
+		wTMP_COPY = None
+		print "done writing video"
 
 	def motionTracking( self ):
 
@@ -147,88 +186,64 @@ class TenvisVideo():
 
 			thresh = cv2.threshold( frameDelta , delta_thresh , 255 , cv2.THRESH_BINARY )[1]
 			thresh = cv2.dilate( thresh , None , iterations=2 )
-			
-			# try:
-			# 	# New api call is different
-			# 	( image , cnts , _ ) = cv2.findContours( thresh.copy() , cv2.RETR_EXTERNAL , cv2.CHAIN_APPROX_SIMPLE )
-			# except:
-			(cnts, _) = cv2.findContours( thresh.copy() , cv2.RETR_EXTERNAL , cv2.CHAIN_APPROX_SIMPLE )
 
+			( cnts , _ ) = cv2.findContours( thresh.copy() , cv2.RETR_EXTERNAL , cv2.CHAIN_APPROX_SIMPLE )
 			for c in cnts:
-
 				if cv2.contourArea( c ) < min_area:
+					motionCounter = 0
 					continue
+				self.currentMotion = True
 
-				if self.sentEmailTime is not None:
-					cT = datetime.now()
-					eT = cT - self.sentEmailTime
-					eT = int(eT.total_seconds())
-					if eT < self.emailCoolOff:
-						continue
-					else:
-						self.sentEmailTime = None
 
-				text = "Motion"
-				
-				if self.startMotionTime is None:
-					print "setting new motion record"
-					wTN = datetime.now( eastern_tz )
-					wNow = wTN.strftime( "%Y-%m-%d %H:%M:%S" )
-					send_slack_message( "motion record @@ " + wNow )
-					self.startMotionTime = datetime.now()
-
-			if text == "Motion":
+			if self.currentMotion == True:
 
 				motionCounter += 1
 
 				if motionCounter >= min_motion_frames:
-
-					self.currentMotionTime = datetime.now()
-					self.elapsedTime =  self.currentMotionTime - self.startMotionTime
-					self.elapsedTime = int(self.elapsedTime.total_seconds())
-
+					print "setting new motion record"
+					send_slack_message( "motion record @@ " + wNowString )
+					self.totalMotion += 1
 					motionCounter = 0
-					
-			else:
-				motionCounter = 0
+					wNow = datetime.now( eastern_tz )
+					self.previousMotionTime = ( 0 , self.currentMotionTime )[ self.currentMotionTime is None ]
+					self.currentMotionTime = wNow
+					self.elapsedTime = ( self.currentMotionTime - self.startMotionTime )
+					self.elapsedTime = int( self.elapsedTime.total_seconds() )
+					if self.sentEmailTime is not None:
+						self.elapsedTimeFromLastEmail = ( self.currentMotionTime - self.sentEmailTime )
+						self.elapsedTimeFromLastEmail = int( self.elapsedTimeFromLastEmail.total_seconds() )
+					self.nowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )
 
+				if self.elapsedTimeFromLastEmail < self.emailCoolOff:
+					continue
 
-			if self.elapsedTime >= self.coolOffTime:
-				self.cachedMotionEvent = self.startMotionTime
-				self.totalMotion = self.totalMotion + 1
-				self.startMotionTime = None
-				self.elapsedTime = 0
+				if self.totalMotion >= self.totalMotionAcceptable:
 
-			if self.totalMotion >= self.totalMotionAcceptable:
-				now = datetime.now( eastern_tz )
-				wNow = now.strftime( "%Y-%m-%d %H:%M:%S" )
-				print "totalMotion >= totalMotionAcceptable"
-				print wNow
-				send_slack_message( "totalMotion >= totalMotionAcceptable @@ " + wNow )
-				eT = now - self.cachedMotionEvent
-				eS = int( eT.total_seconds() )
-				if eS >= self.totalTimeAcceptable and eS <= self.totalTimeAcceptableCoolOff:
-					#print eS
-					#print "we need to alert"
-					self.cachedMotionEvent = None
-					send_email( self.totalMotion , "Haley is Moving" )
-					self.totalMotion = 0
-					self.sentEmailTime = now
-				elif eS >= self.totalTimeAcceptableCoolOff:
-					print "event outside of cooldown window .... reseting .... "
-					send_slack_message( "event outside of cooldown window .... reseting .... " )
-					self.cachedMotionEvent = None
-					self.totalMotion = 0
-
+					print "totalMotion >= totalMotionAcceptable"
+					send_slack_message( "totalMotion >= totalMotionAcceptable @@ " + self.nowString )
+					if self.elapsedTime <= self.totalTimeAcceptableCoolOff:
+						#print eS
+						#print "we need to alert"
+						self.cachedMotionEvent = None
+						send_email( self.totalMotion , "Haley is Moving" )
+						self.totalMotion = 0
+						self.sentEmailTime = self.currentMotionTime
+						write_thread = threading.Thread( target=self.write_video , args=[] )
+						write_thread.start()
+					elif elapsedSeconds >= self.totalTimeAcceptableCoolOff:
+						print "event outside of cooldown window .... reseting .... "
+						send_slack_message( "event outside of cooldown window .... reseting .... " )
+						self.cachedMotionEvent = None
+						self.totalMotion = 0
 
 			self.FRAME_POOL.insert( 0 , frame )
 			self.FRAME_POOL.pop()
 
-			# cv2.imshow( "frame" , frame )
-			# cv2.imshow( "Thresh" , thresh )
-			# cv2.imshow( "Frame Delta" , frameDelta )
-			# if cv2.waitKey( 1 ) & 0xFF == ord( "q" ):
-			# 	break
+			cv2.imshow( "frame" , frame )
+			cv2.imshow( "Thresh" , thresh )
+			cv2.imshow( "Frame Delta" , frameDelta )
+			if cv2.waitKey( 1 ) & 0xFF == ord( "q" ):
+				break
 
 		self.cleanup()
 
