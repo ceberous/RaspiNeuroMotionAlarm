@@ -85,12 +85,16 @@ class TenvisVideo():
 		self.last_email_time = None
 
 		self.MIN_MOTION_FRAMES = 4
-
-		wSYS_LEN = len( sys.argv )
-		self.MIN_MOTION_SECONDS = ( int( sys.argv[1] ) , 1 )[ wSYS_LEN > 1 ]
-		self.MOTION_EVENTS_ACCEPTABLE = ( int( sys.argv[2] ) , 2 )[ wSYS_LEN > 2 ]
-		self.MIN_TIME_ACCEPTABLE = ( int( sys.argv[3] ) , 3 )[ wSYS_LEN > 3 ] 
-		self.TIME_COOLOFF = ( int( sys.argv[4] ) , 8 )[ wSYS_LEN > 4 ]
+		try:
+			self.MIN_MOTION_SECONDS = int( sys.argv[1] )
+			self.MOTION_EVENTS_ACCEPTABLE = int( sys.argv[2] )
+			self.MIN_TIME_ACCEPTABLE = int( sys.argv[3] )
+			self.TIME_COOLOFF = int( sys.argv[4] )
+		except:
+			self.MIN_MOTION_SECONDS = 1
+			self.MOTION_EVENTS_ACCEPTABLE = 2
+			self.MIN_TIME_ACCEPTABLE = 2
+			self.TIME_COOLOFF = 8
 
 		print "MIN_MOTION_SECONDS === " + str( self.MIN_MOTION_SECONDS )
 		print "MOTION_EVENTS_ACCEPTABLE === " + str( self.MOTION_EVENTS_ACCEPTABLE )
