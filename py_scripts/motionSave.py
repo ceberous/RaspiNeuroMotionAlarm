@@ -213,6 +213,7 @@ class TenvisVideo():
 
 			if self.totalMotion > 1:
 				print "this is the motion event we care about ???"
+				self.totalMotion = 0
 
 			# if self.totalMotion >= self.totalMotionAcceptable:
 
