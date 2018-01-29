@@ -84,6 +84,7 @@ class TenvisVideo():
 		self.video_index = 0
 		self.last_email_time = None
 
+		self.EMAIL_COOLOFF = 150
 		self.MIN_MOTION_FRAMES = 4
 		try:
 			self.MIN_MOTION_SECONDS = int( sys.argv[1] )
@@ -153,7 +154,7 @@ class TenvisVideo():
 			if self.last_email_time is not None:
 				wNow = datetime.now( eastern_tz )
 				self.elapsedTimeFromLastEmail = int( ( wNow - self.last_email_time ).total_seconds() )
-				if self.elapsedTimeFromLastEmail < self.emailCoolOff:
+				if self.elapsedTimeFromLastEmail < self.EMAIL_COOLOFF:
 					print "inside email cooloff - passing"
 					continue
 
