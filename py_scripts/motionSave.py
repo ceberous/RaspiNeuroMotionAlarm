@@ -166,7 +166,7 @@ class TenvisVideo():
 
 			if self.sentEmailTime is not None:
 				wNow = datetime.now( eastern_tz )
-				self.elapsedTimeFromLastEmail = int( ( wNow - self.sentEmailTime ) ).total_seconds() )
+				self.elapsedTimeFromLastEmail = int( ( wNow - self.sentEmailTime ).total_seconds() )
 				if self.elapsedTimeFromLastEmail < self.emailCoolOff:
 					print "inside email cooloff - passing"
 					continue
