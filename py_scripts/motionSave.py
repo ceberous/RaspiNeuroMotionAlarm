@@ -95,7 +95,6 @@ class TenvisVideo():
 			self.MOTION_EVENTS_ACCEPTABLE = 2
 			self.MIN_TIME_ACCEPTABLE = 2
 			self.TIME_COOLOFF = 8
-
 		print "MIN_MOTION_SECONDS === " + str( self.MIN_MOTION_SECONDS )
 		print "MOTION_EVENTS_ACCEPTABLE === " + str( self.MOTION_EVENTS_ACCEPTABLE )
 		print "MIN_TIME_ACCEPTABLE === " + str( self.MIN_TIME_ACCEPTABLE )
@@ -210,20 +209,21 @@ class TenvisVideo():
 				# Check Time Difference with Last Event 
 				if self.EVENT_POOL[ 8 ] is not None:
 					wElapsedTime_1 = int( ( wNow - self.EVENT_POOL[ 8 ] ).total_seconds() )
-					print "( Tier - 0 ) Elapsed Time === " + str( wElapsedTime_1 )
+					print "\n( Tier - 0 ) Elapsed Time === " + str( wElapsedTime_1 )
 					if wElapsedTime_1 >= self.MIN_TIME_ACCEPTABLE and wElapsedTime_1 <= self.TIME_COOLOFF:
 						print "Motion Event within Custom Time Range"
 						print "ALERT !!!!"
+						self.last_email_time = wNow
 					else:
 						print "event outside of cooldown window .... reseting .... "
 						#send_slack_message( self.nowString + " === event outside of cooldown window .... reseting .... " )
 
 
-				for i , val in enumerate( self.EVENT_POOL ):
-					if val is not None:
-						print str(i) + " === " + val.strftime( "%Y-%m-%d %H:%M:%S" )
-					else:
-						print "None"
+				# for i , val in enumerate( self.EVENT_POOL ):
+				# 	if val is not None:
+				# 		print str(i) + " === " + val.strftime( "%Y-%m-%d %H:%M:%S" )
+				# 	else:
+				# 		print "None"
 
 
 			# self.FRAME_POOL.insert( 0 , frame )
