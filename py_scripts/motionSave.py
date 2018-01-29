@@ -84,7 +84,8 @@ class TenvisVideo():
 		self.video_index = 0
 		self.last_email_time = None
 
-		self.EMAIL_COOLOFF = 150
+		#self.EMAIL_COOLOFF = 150
+		self.EMAIL_COOLOFF = 30
 		self.MIN_MOTION_FRAMES = 4
 		try:
 			self.MIN_MOTION_SECONDS = int( sys.argv[1] )
@@ -158,6 +159,7 @@ class TenvisVideo():
 					wSleepDuration = ( self.EMAIL_COOLOFF - self.elapsedTimeFromLastEmail )
 					print "inside email cooloff - sleeping( " + str( wSleepDuration ) + " )"
 					sleep( wSleepDuration )
+					self.last_email_time = None
 					continue
 
 			( grabbed , frame ) = self.w_Capture.read()
@@ -217,6 +219,8 @@ class TenvisVideo():
 						print "Motion Event within Custom Time Range"
 						print "ALERT !!!!"
 						self.last_email_time = wNow
+						write_thread = threading.Thread( target=self.write_video , args=[] )
+						write_thread.start()
 					else:
 						print "event outside of cooldown window .... reseting .... "
 						#send_slack_message( self.nowString + " === event outside of cooldown window .... reseting .... " )
@@ -229,8 +233,8 @@ class TenvisVideo():
 				# 		print "None"
 
 
-			# self.FRAME_POOL.insert( 0 , frame )
-			# self.FRAME_POOL.pop()
+			self.FRAME_POOL.insert( 0 , frame )
+			self.FRAME_POOL.pop()
 
 			cv2.imshow( "frame" , frame )
 			cv2.imshow( "Thresh" , thresh )
