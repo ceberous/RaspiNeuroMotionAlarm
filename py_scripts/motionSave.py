@@ -86,33 +86,15 @@ class TenvisVideo():
 
 		self.MIN_MOTION_FRAMES = 4
 
-		self.MIN_MOTION_SECONDS = ( 1 , int( sys.argv[1] )[ sys.argv[1] is None ]
-		self.MOTION_EVENTS_ACCEPTABLE = 2
-		self.TIME_ACCEPTABLE = 3
-		self.TIME_COOLOFF = 8
+		self.MIN_MOTION_SECONDS = ( int( sys.argv[1] ) , 1 )[ sys.argv[1] is None ]
+		self.MOTION_EVENTS_ACCEPTABLE = ( int( sys.argv[2] ) , 2 )[ sys.argv[2] is None ]
+		self.MIN_TIME_ACCEPTABLE = ( int( sys.argv[3] ) , 3 )[ sys.argv[3] is None ] 
+		self.TIME_COOLOFF = ( int( sys.argv[4] ) , 8 )[ sys.argv[4] is None ]
 
-		print str( self.MIN_MOTION_SECONDS )
-
-		# try:
-		# 	self.MIN_MOTION_SECONDS = int( sys.argv[1] )
-		# except:
-			
-		# try:
-		# 	self.MOTION_EVENTS_ACCEPTABLE = int( sys.argv[2] )
-		# except:
-			
-		# try:
-		# 	self.totalTimeAcceptable = int( sys.argv[3] )
-		# except:
-			
-		# try:
-		# 	self.totalTimeAcceptableCoolOff = int( sys.argv[4] )
-		# except:
-		# 	self.totalTimeAcceptableCoolOff = 8
-		
-		# print "starting with " + str( self.MIN_MOTION_SECONDS ) + " " + str( self.MOTION_EVENTS_ACCEPTABLE ) + " " + str(self.totalTimeAcceptable) + " " + str(self.totalTimeAcceptableCoolOff)
-
-
+		print "MIN_MOTION_SECONDS === " + str( self.MIN_MOTION_SECONDS )
+		print "MOTION_EVENTS_ACCEPTABLE === " + str( self.MOTION_EVENTS_ACCEPTABLE )
+		print "MIN_TIME_ACCEPTABLE === " + str( self.MIN_TIME_ACCEPTABLE )
+		print "TIME_COOLOFF === " + str( self.TIME_COOLOFF )
 
 		self.w_Capture = cv2.VideoCapture( 0 )
 		self.motionTracking()
@@ -220,41 +202,24 @@ class TenvisVideo():
 				self.EVENT_POOL.append( wNow )
 				self.EVENT_POOL.pop( 0 )
 
+				# Check Time Difference with Last Event 
+				if self.EVENT_POOL[ 8 ] is not None:
+					wElapsedTime_1 = int( ( wNow - self.EVENT_POOL[ 8 ] ).total_seconds() )
+					print "( Tier - 0 ) Elapsed Time === " + str( wElapsedTime_1 )
+					if wElapsedTime_1 >= self.MIN_TIME_ACCEPTABLE and wElapsedTime_1 <= self.TIME_COOLOFF:
+						print "Motion Event within Custom Time Range"
+						print "ALERT !!!!"
+					else:
+						print "event outside of cooldown window .... reseting .... "
+						#send_slack_message( self.nowString + " === event outside of cooldown window .... reseting .... " )
+
+
 				for i , val in enumerate( self.EVENT_POOL ):
 					if val is not None:
 						print str(i) + " === " + val.strftime( "%Y-%m-%d %H:%M:%S" )
 					else:
 						print "None"
 
-			# if self.totalMotion >= self.totalMotionAcceptable:
-
-			# 	wNow = datetime.now( eastern_tz )
-			# 	self.nowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )
-			# 	send_slack_message( self.nowString + " === totalMotion >= totalMotionAcceptable @@" )
-			# 	print "totalMotion >= totalMotionAcceptable"
-
-			# 	if self.previousMotionTime is None:
-			# 		self.previousMotionTime = wNow
-			# 	else:
-			# 		self.previousMotionTime = self.currentMotionTime
-			# 	self.elapsedTime = ( self.currentMotionTime - self.previousMotionTime )
-			# 	self.elapsedTime = int( self.elapsedTime.total_seconds() )
-			# 	self.currentMotionTime = wNow
-
-			# 	if self.elapsedTime <= self.totalTimeAcceptableCoolOff:
-			# 		send_email( self.totalMotion , "Haley is Moving" )
-			# 		self.totalMotion = 0
-			# 		self.sentEmailTime = self.currentMotionTime
-			# 		self.currentMotion = False
-			# 		#write_thread = threading.Thread( target=self.write_video , args=[] )
-			# 		#write_thread.start()
-			# 	elif self.elapsedTime >= self.totalTimeAcceptableCoolOff:
-			# 		wNow = datetime.now( eastern_tz )
-			# 		self.nowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )
-			# 		send_slack_message( self.nowString + " === event outside of cooldown window .... reseting .... " )
-			# 		print "event outside of cooldown window .... reseting .... "
-			# 		self.cachedMotionEvent = None
-			# 		self.totalMotion = 0
 
 			# self.FRAME_POOL.insert( 0 , frame )
 			# self.FRAME_POOL.pop()
