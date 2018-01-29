@@ -86,10 +86,11 @@ class TenvisVideo():
 
 		self.MIN_MOTION_FRAMES = 4
 
-		self.MIN_MOTION_SECONDS = ( int( sys.argv[1] ) , 1 )[ sys.argv[1] is None ]
-		self.MOTION_EVENTS_ACCEPTABLE = ( int( sys.argv[2] ) , 2 )[ sys.argv[2] is None ]
-		self.MIN_TIME_ACCEPTABLE = ( int( sys.argv[3] ) , 3 )[ sys.argv[3] is None ] 
-		self.TIME_COOLOFF = ( int( sys.argv[4] ) , 8 )[ sys.argv[4] is None ]
+		wSYS_LEN = len( sys.argv )
+		self.MIN_MOTION_SECONDS = ( int( sys.argv[1] ) , 1 )[ wSYS_LEN > 1 ]
+		self.MOTION_EVENTS_ACCEPTABLE = ( int( sys.argv[2] ) , 2 )[ wSYS_LEN > 2 ]
+		self.MIN_TIME_ACCEPTABLE = ( int( sys.argv[3] ) , 3 )[ wSYS_LEN > 3 ] 
+		self.TIME_COOLOFF = ( int( sys.argv[4] ) , 8 )[ wSYS_LEN > 4 ]
 
 		print "MIN_MOTION_SECONDS === " + str( self.MIN_MOTION_SECONDS )
 		print "MOTION_EVENTS_ACCEPTABLE === " + str( self.MOTION_EVENTS_ACCEPTABLE )
