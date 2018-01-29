@@ -155,7 +155,9 @@ class TenvisVideo():
 				wNow = datetime.now( eastern_tz )
 				self.elapsedTimeFromLastEmail = int( ( wNow - self.last_email_time ).total_seconds() )
 				if self.elapsedTimeFromLastEmail < self.EMAIL_COOLOFF:
-					print "inside email cooloff - passing"
+					wSleepDuration = ( self.EMAIL_COOLOFF - self.elapsedTimeFromLastEmail )
+					print "inside email cooloff - sleeping( " + str( wSleepDuration ) + " )"
+					sleep( wSleepDuration )
 					continue
 
 			( grabbed , frame ) = self.w_Capture.read()
