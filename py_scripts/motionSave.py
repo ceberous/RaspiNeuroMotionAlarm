@@ -86,6 +86,7 @@ class TenvisVideo():
 		self.currentMotion = False
 
 		self.FRAME_POOL = [ None ]*1800
+		self.EVENT_POOL = [ None ]*10
 
 		try:
 			self.minMotionSeconds = int( sys.argv[1] )
@@ -163,6 +164,13 @@ class TenvisVideo():
 
 		while( self.w_Capture.isOpened() ):
 
+			if self.sentEmailTime is not None:
+				wNow = datetime.now( eastern_tz )
+				self.elapsedTimeFromLastEmail = int( ( wNow - self.sentEmailTime ) ).total_seconds() )
+				if self.elapsedTimeFromLastEmail < self.emailCoolOff:
+					print "inside email cooloff - passing"
+					continue
+
 			( grabbed , frame ) = self.w_Capture.read()
 			text = "No Motion"
 
@@ -193,51 +201,48 @@ class TenvisVideo():
 					motionCounter = 0
 					continue
 				self.currentMotion = True
-
-
-			if self.currentMotion == True:
-
 				motionCounter += 1
 
-				if motionCounter >= min_motion_frames:
-					print "setting new motion record"
-					send_slack_message( "motion record @@ " + wNowString )
-					self.totalMotion += 1
-					motionCounter = 0
-					wNow = datetime.now( eastern_tz )
-					self.previousMotionTime = ( 0 , self.currentMotionTime )[ self.currentMotionTime is None ]
-					self.currentMotionTime = wNow
-					self.elapsedTime = ( self.currentMotionTime - self.startMotionTime )
-					self.elapsedTime = int( self.elapsedTime.total_seconds() )
-					if self.sentEmailTime is not None:
-						self.elapsedTimeFromLastEmail = ( self.currentMotionTime - self.sentEmailTime )
-						self.elapsedTimeFromLastEmail = int( self.elapsedTimeFromLastEmail.total_seconds() )
-					self.nowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )
+			if motionCounter >= min_motion_frames:
+				wNow = datetime.now( eastern_tz )
+				self.nowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )
+				send_slack_message( self.nowString + " === motion record" )
+				print "setting new motion record"
+				self.totalMotion += 1
+				motionCounter = 0
 
-				if self.elapsedTimeFromLastEmail < self.emailCoolOff:
-					continue
+			# if self.totalMotion >= self.totalMotionAcceptable:
 
-				if self.totalMotion >= self.totalMotionAcceptable:
+			# 	wNow = datetime.now( eastern_tz )
+			# 	self.nowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )
+			# 	send_slack_message( self.nowString + " === totalMotion >= totalMotionAcceptable @@" )
+			# 	print "totalMotion >= totalMotionAcceptable"
 
-					print "totalMotion >= totalMotionAcceptable"
-					send_slack_message( "totalMotion >= totalMotionAcceptable @@ " + self.nowString )
-					if self.elapsedTime <= self.totalTimeAcceptableCoolOff:
-						#print eS
-						#print "we need to alert"
-						self.cachedMotionEvent = None
-						send_email( self.totalMotion , "Haley is Moving" )
-						self.totalMotion = 0
-						self.sentEmailTime = self.currentMotionTime
-						write_thread = threading.Thread( target=self.write_video , args=[] )
-						write_thread.start()
-					elif elapsedSeconds >= self.totalTimeAcceptableCoolOff:
-						print "event outside of cooldown window .... reseting .... "
-						send_slack_message( "event outside of cooldown window .... reseting .... " )
-						self.cachedMotionEvent = None
-						self.totalMotion = 0
+			# 	if self.previousMotionTime is None:
+			# 		self.previousMotionTime = wNow
+			# 	else:
+			# 		self.previousMotionTime = self.currentMotionTime
+			# 	self.elapsedTime = ( self.currentMotionTime - self.previousMotionTime )
+			# 	self.elapsedTime = int( self.elapsedTime.total_seconds() )
+			# 	self.currentMotionTime = wNow
 
-			self.FRAME_POOL.insert( 0 , frame )
-			self.FRAME_POOL.pop()
+			# 	if self.elapsedTime <= self.totalTimeAcceptableCoolOff:
+			# 		send_email( self.totalMotion , "Haley is Moving" )
+			# 		self.totalMotion = 0
+			# 		self.sentEmailTime = self.currentMotionTime
+			# 		self.currentMotion = False
+			# 		#write_thread = threading.Thread( target=self.write_video , args=[] )
+			# 		#write_thread.start()
+			# 	elif self.elapsedTime >= self.totalTimeAcceptableCoolOff:
+			# 		wNow = datetime.now( eastern_tz )
+			# 		self.nowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )
+			# 		send_slack_message( self.nowString + " === event outside of cooldown window .... reseting .... " )
+			# 		print "event outside of cooldown window .... reseting .... "
+			# 		self.cachedMotionEvent = None
+			# 		self.totalMotion = 0
+
+			# self.FRAME_POOL.insert( 0 , frame )
+			# self.FRAME_POOL.pop()
 
 			cv2.imshow( "frame" , frame )
 			cv2.imshow( "Thresh" , thresh )
