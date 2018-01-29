@@ -77,25 +77,21 @@ class TenvisVideo():
 
 		send_slack_message( "python --> newMotion.py --> init()" )
 
-		self.startMotionTime = None
-		self.currentMotionTime = None
-		self.cachedMotionEvent = None
-		self.sentEmailTime = None
-		self.emailCoolOff = 150
-		self.elapsedTimeFromLastEmail = 150
-		self.currentMotion = False
-
 		self.FRAME_POOL = [ None ]*1800
 		self.EVENT_POOL = [ None ]*10
 
+		self.MIN_MOTION_FRAMES = 4
+
+		self.video_index = 0		
+
 		try:
-			self.minMotionSeconds = int( sys.argv[1] )
+			self.MIN_MOTION_SECONDS = int( sys.argv[1] )
 		except:
-			self.minMotionSeconds = 1
+			self.MIN_MOTION_SECONDS = 1
 		try:
-			self.totalMotionAcceptable = int( sys.argv[2] )
+			self.MOTION_EVENTS_ACCEPTABLE = int( sys.argv[2] )
 		except:
-			self.totalMotionAcceptable = 2
+			self.MOTION_EVENTS_ACCEPTABLE = 2
 		try:
 			self.totalTimeAcceptable = int( sys.argv[3] )
 		except:
@@ -105,13 +101,9 @@ class TenvisVideo():
 		except:
 			self.totalTimeAcceptableCoolOff = 8
 		
-		print "starting with " + str( self.minMotionSeconds ) + " " + str(self.totalMotionAcceptable) + " " + str(self.totalTimeAcceptable) + " " + str(self.totalTimeAcceptableCoolOff)
+		print "starting with " + str( self.MIN_MOTION_SECONDS ) + " " + str( self.MOTION_EVENTS_ACCEPTABLE ) + " " + str(self.totalTimeAcceptable) + " " + str(self.totalTimeAcceptableCoolOff)
 
-		self.coolOffTime = 3
-		self.elapsedTime = 0
-		self.totalMotion = 0
 
-		self.video_index = 0
 
 		self.w_Capture = cv2.VideoCapture( 0 )
 		self.motionTracking()
@@ -160,7 +152,6 @@ class TenvisVideo():
 		delta_thresh = 5
 
 		motionCounter = 0
-		min_motion_frames = 8
 
 		while( self.w_Capture.isOpened() ):
 
@@ -203,7 +194,7 @@ class TenvisVideo():
 				self.currentMotion = True
 				motionCounter += 1
 
-			if motionCounter >= min_motion_frames:
+			if motionCounter >= self.MIN_MOTION_FRAMES:
 				wNow = datetime.now( eastern_tz )
 				self.nowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )
 				send_slack_message( self.nowString + " === motion record" )
@@ -211,9 +202,20 @@ class TenvisVideo():
 				self.totalMotion += 1
 				motionCounter = 0
 
-			if self.totalMotion > 1:
-				print "this is the motion event we care about ???"
+			if self.totalMotion >= self.MOTION_EVENTS_ACCEPTABLE:
+				print "this is the motion event we care about ???"				
 				self.totalMotion = 0
+				wNow = datetime.now( eastern_tz )
+				wNowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )
+				#send_slack_message( wNowString + " === totalMotion >= MOTION_EVENTS_ACCEPTABLE" )
+				self.EVENT_POOL.append( wNow )
+				self.EVENT_POOL.pop( 0 )
+
+				for i , val in enumerate( self.EVENT_POOL ):
+					if val is not None:
+						print str(i) + " === " + val.strftime( "%Y-%m-%d %H:%M:%S" )
+					else:
+						print "None"
 
 			# if self.totalMotion >= self.totalMotionAcceptable:
 
@@ -250,7 +252,7 @@ class TenvisVideo():
 
 			cv2.imshow( "frame" , frame )
 			cv2.imshow( "Thresh" , thresh )
-			cv2.imshow( "Frame Delta" , frameDelta )
+			#cv2.imshow( "Frame Delta" , frameDelta )
 			if cv2.waitKey( 1 ) & 0xFF == ord( "q" ):
 				break
 
