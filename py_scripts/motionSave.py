@@ -80,28 +80,37 @@ class TenvisVideo():
 		self.FRAME_POOL = [ None ]*1800
 		self.EVENT_POOL = [ None ]*10
 
+		self.total_motion = 0
+		self.video_index = 0
+		self.last_email_time = None
+
 		self.MIN_MOTION_FRAMES = 4
 
-		self.video_index = 0		
+		self.MIN_MOTION_SECONDS = ( 1 , int( sys.argv[1] )[ sys.argv[1] is None ]
+		self.MOTION_EVENTS_ACCEPTABLE = 2
+		self.TIME_ACCEPTABLE = 3
+		self.TIME_COOLOFF = 8
 
-		try:
-			self.MIN_MOTION_SECONDS = int( sys.argv[1] )
-		except:
-			self.MIN_MOTION_SECONDS = 1
-		try:
-			self.MOTION_EVENTS_ACCEPTABLE = int( sys.argv[2] )
-		except:
-			self.MOTION_EVENTS_ACCEPTABLE = 2
-		try:
-			self.totalTimeAcceptable = int( sys.argv[3] )
-		except:
-			self.totalTimeAcceptable = 3
-		try:
-			self.totalTimeAcceptableCoolOff = int( sys.argv[4] )
-		except:
-			self.totalTimeAcceptableCoolOff = 8
+		print str( self.MIN_MOTION_SECONDS )
+
+		# try:
+		# 	self.MIN_MOTION_SECONDS = int( sys.argv[1] )
+		# except:
+			
+		# try:
+		# 	self.MOTION_EVENTS_ACCEPTABLE = int( sys.argv[2] )
+		# except:
+			
+		# try:
+		# 	self.totalTimeAcceptable = int( sys.argv[3] )
+		# except:
+			
+		# try:
+		# 	self.totalTimeAcceptableCoolOff = int( sys.argv[4] )
+		# except:
+		# 	self.totalTimeAcceptableCoolOff = 8
 		
-		print "starting with " + str( self.MIN_MOTION_SECONDS ) + " " + str( self.MOTION_EVENTS_ACCEPTABLE ) + " " + str(self.totalTimeAcceptable) + " " + str(self.totalTimeAcceptableCoolOff)
+		# print "starting with " + str( self.MIN_MOTION_SECONDS ) + " " + str( self.MOTION_EVENTS_ACCEPTABLE ) + " " + str(self.totalTimeAcceptable) + " " + str(self.totalTimeAcceptableCoolOff)
 
 
 
@@ -155,9 +164,9 @@ class TenvisVideo():
 
 		while( self.w_Capture.isOpened() ):
 
-			if self.sentEmailTime is not None:
+			if self.last_email_time is not None:
 				wNow = datetime.now( eastern_tz )
-				self.elapsedTimeFromLastEmail = int( ( wNow - self.sentEmailTime ).total_seconds() )
+				self.elapsedTimeFromLastEmail = int( ( wNow - self.last_email_time ).total_seconds() )
 				if self.elapsedTimeFromLastEmail < self.emailCoolOff:
 					print "inside email cooloff - passing"
 					continue
@@ -199,12 +208,12 @@ class TenvisVideo():
 				self.nowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )
 				send_slack_message( self.nowString + " === motion record" )
 				print "setting new motion record"
-				self.totalMotion += 1
+				self.total_motion += 1
 				motionCounter = 0
 
-			if self.totalMotion >= self.MOTION_EVENTS_ACCEPTABLE:
+			if self.total_motion >= self.MOTION_EVENTS_ACCEPTABLE:
 				print "this is the motion event we care about ???"				
-				self.totalMotion = 0
+				self.total_motion = 0
 				wNow = datetime.now( eastern_tz )
 				wNowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )
 				#send_slack_message( wNowString + " === totalMotion >= MOTION_EVENTS_ACCEPTABLE" )
