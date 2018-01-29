@@ -64,7 +64,7 @@ def send_email( alertLevel , msg ):
 	send_slack_message( "Motion @@ " + wNow )
 
 	try:
-		yag.send( securityDetails.toEmail , str( alertLevel ) , "Motion @@ " + wNow )
+		#yag.send( securityDetails.toEmail , str( alertLevel ) , "Motion @@ " + wNow )
 		print( "sent email" )
 	except Exception as e:
 		print e
@@ -210,6 +210,9 @@ class TenvisVideo():
 				print "setting new motion record"
 				self.totalMotion += 1
 				motionCounter = 0
+
+			if self.totalMotion > 1:
+				print "this is the motion event we care about ???"
 
 			# if self.totalMotion >= self.totalMotionAcceptable:
 
