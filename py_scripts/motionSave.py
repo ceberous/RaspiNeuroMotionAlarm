@@ -12,8 +12,6 @@ from time import localtime, strftime , sleep
 from pytz import timezone
 eastern_tz = timezone( "US/Eastern" )
 
-from flask import Flask, render_template, Response
-app = Flask(__name__)
 
 def signal_handler( signal , frame ):
 	wStr1 = "newMotion.py closed , Signal = " + str( signal )
@@ -70,7 +68,7 @@ def send_email( alertLevel , msg ):
 	send_slack_message( "Motion @@ " + wNow )
 
 	try:
-		#yag.send( securityDetails.toEmail , str( alertLevel ) , "Motion @@ " + wNow )
+		yag.send( securityDetails.toEmail , str( alertLevel ) , "Motion @@ " + wNow )
 		print( "sent email" )
 	except Exception as e:
 		print e
@@ -241,8 +239,9 @@ class TenvisVideo():
 					if wElapsedTime_1 >= self.MIN_TIME_ACCEPTABLE and wElapsedTime_1 <= self.TIME_COOLOFF:
 						print "Motion Event within Custom Time Range"
 						print "ALERT !!!!"
-						send_email( self.totalMotion , "Haley is Moving" )
+						send_email( self.total_motion , "Haley is Moving" )
 						self.last_email_time = wNow
+						#cv2.imwrite( framePath , frame )
 						# self.write_thread = threading.Thread( target=self.write_video , args=[] )
 						# self.write_thread.start()
 						#self.write_thread.join()
@@ -260,7 +259,7 @@ class TenvisVideo():
 				# 	else:
 				# 		print "None"
 
-			cv2.imwrite( framePath , frame )
+			#cv2.imwrite( framePath , frame )
 			# self.FRAME_POOL.insert( 0 , frame )
 			# self.FRAME_POOL.pop()
 			# self.FRAME_POOL.append( frame )
