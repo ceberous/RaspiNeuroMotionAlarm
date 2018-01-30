@@ -60,15 +60,14 @@ def send_slack_message( wMsgString ):
 
 #yagmail.register( securityDetails.fromGmail , securityDetails.gmailPass )
 yag = yagmail.SMTP( securityDetails.fromGmail , securityDetails.gmailPass )
-def send_email( alertLevel , msg ):
+def send_email( alertLevel , msg , wDateOBJ ):
 
-	wTN = datetime.now( eastern_tz )
-	wNow = wTN.strftime( "%Y-%m-%d %H:%M:%S" )
-	wTimeMsg = wNow + "\n\n" + msg
-	send_slack_message( "Motion @@ " + wNow )
+	wNowString = wDateOBJ.strftime( "%Y-%m-%d %H:%M:%S" )
+	wTimeMsg = wNowString + "\n\n" + msg
+	send_slack_message( "Motion @@ " + wTimeMsg )
 
 	try:
-		yag.send( securityDetails.toEmail , str( alertLevel ) , "Motion @@ " + wNow )
+		#yag.send( securityDetails.toEmail , str( alertLevel ) , "Motion @@ " + wTimeMsg )
 		print( "sent email" )
 	except Exception as e:
 		print e
@@ -80,7 +79,7 @@ class TenvisVideo():
 
 	def __init__( self ):
 
-		send_slack_message( "python --> newMotion.py --> init()" )
+		#send_slack_message( "python --> newMotion.py --> init()" )
 
 		self.write_thread = None
 
@@ -179,7 +178,7 @@ class TenvisVideo():
 				if self.elapsedTimeFromLastEmail < self.EMAIL_COOLOFF:
 					wSleepDuration = ( self.EMAIL_COOLOFF - self.elapsedTimeFromLastEmail )
 					print "inside email cooloff - sleeping( " + str( wSleepDuration ) + " )"
-					send_slack_message( self.nowString + "inside email cooloff - sleeping( " + str( wSleepDuration ) + " )" )
+					#send_slack_message( self.nowString + "inside email cooloff - sleeping( " + str( wSleepDuration ) + " )" )
 					sleep( wSleepDuration )
 					self.last_email_time = None
 					continue
@@ -208,6 +207,7 @@ class TenvisVideo():
 			thresh = cv2.threshold( frameDelta , delta_thresh , 255 , cv2.THRESH_BINARY )[1]
 			thresh = cv2.dilate( thresh , None , iterations=2 )
 
+			# Search for Movment
 			( cnts , _ ) = cv2.findContours( thresh.copy() , cv2.RETR_EXTERNAL , cv2.CHAIN_APPROX_SIMPLE )
 			for c in cnts:
 				if cv2.contourArea( c ) < min_area:
@@ -215,46 +215,44 @@ class TenvisVideo():
 					continue
 				motionCounter += 1
 
+			# If Movement Is Greater than Threshold , create motion record
 			if motionCounter >= self.MIN_MOTION_FRAMES:
 				wNow = datetime.now( eastern_tz )
 				self.nowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )
-				send_slack_message( self.nowString + " === motion record" )
+				#send_slack_message( self.nowString + " === motion record" )
 				print "setting new motion record"
 				self.EVENT_POOL.append( wNow )
-				self.EVENT_POOL.pop( 0 )
+				if len( self.EVENT_POOL ) > 10:
+					self.EVENT_POOL.pop( 0 )
 				motionCounter = 0
+				self.total_motion += 1
 
-				for i , val in enumerate( self.EVENT_POOL ):
-					print str(i) + " === " + val.strftime( "%Y-%m-%d %H:%M:%S" )
+			# Once Total Motion Events Reach Threshold , create alert if timing conditions are met
+			if self.total_motion >= self.MOTION_EVENTS_ACCEPTABLE:
+				print "this is the motion event we care about ???"
+				#send_slack_message( self.nowString + " === this is the motion event we care about ???" )		
+				self.total_motion = 0
+				wNeedToAlert = False
 
+				# Condition 1.) Check Elapsed Time Between Last 2 Motion Events
+				wElapsedTime_1 = int( ( self.EVENT_POOL[ -1 ] - self.EVENT_POOL[ -2 ] ).total_seconds() )
+				print "\n( Stage-1-Check ) Elapsed Time === " + str( wElapsedTime_1 )
+				if wElapsedTime_1 >= self.MIN_TIME_ACCEPTABLE and wElapsedTime_1 <= self.TIME_COOLOFF:
+					wNeedToAlert = True
 
-			# if self.total_motion >= self.MOTION_EVENTS_ACCEPTABLE:
-			# 	wNow = datetime.now( eastern_tz )
-			# 	self.nowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )				
-			# 	print "this is the motion event we care about ???"
-			# 	send_slack_message( self.nowString + " === this is the motion event we care about ???" )		
-			# 	self.total_motion = 0
-			# 	self.EVENT_POOL.append( wNow )
-			# 	self.EVENT_POOL.pop( 0 )
+				# Condition 2.) Check if there are multiple events in a greater window
+				if wNeedToAlert == False:
+					print "event outside of cooldown window .... reseting .... "
+					#send_slack_message( self.nowString + " === event outside of cooldown window .... reseting .... " )
 
-			# 	# Check Time Difference with Last Event 
-			# 	if self.EVENT_POOL[ 8 ] is not None:
-			# 		wElapsedTime_1 = int( ( wNow - self.EVENT_POOL[ 8 ] ).total_seconds() )
-			# 		print "\n( Tier - 0 ) Elapsed Time === " + str( wElapsedTime_1 )
-			# 		if wElapsedTime_1 >= self.MIN_TIME_ACCEPTABLE and wElapsedTime_1 <= self.TIME_COOLOFF:
-			# 			print "Motion Event within Custom Time Range"
-			# 			print "ALERT !!!!"
-			# 			send_email( self.total_motion , "Haley is Moving" )
-			# 			self.last_email_time = wNow
-			# 			#cv2.imwrite( framePath , frame )
-			# 			# self.write_thread = threading.Thread( target=self.write_video , args=[] )
-			# 			# self.write_thread.start()
-			# 			#self.write_thread.join()
-			# 		else:
-			# 			wNow = datetime.now( eastern_tz )
-			# 			self.nowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )
-			# 			print "event outside of cooldown window .... reseting .... "
-			# 			send_slack_message( self.nowString + " === event outside of cooldown window .... reseting .... " )
+				if wNeedToAlert == True:				
+					print "Motion Event within Custom Time Range"
+					print "ALERT !!!!"
+					#send_email( self.total_motion , "Haley is Moving" , self.EVENT_POOL[ -1 ] )
+					self.last_email_time = self.EVENT_POOL[ -1 ]				
+					self.EVENT_POOL = list( filter( lambda x: x > self.last_email_time , self.EVENT_POOL ) )
+					for i , val in enumerate( self.EVENT_POOL ):
+						print str(i) + " === " + val.strftime( "%Y-%m-%d %H:%M:%S" )
 
 
 
@@ -271,11 +269,11 @@ class TenvisVideo():
 			# GLOBAL_ACTIVE_FRAME_JPEG = GLOBAL_ACTIVE_FRAME_JPEG.tobytes()
 			# GLOBAL_ACTIVE_FRAME_JPEG = (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + GLOBAL_ACTIVE_FRAME_JPEG + b'\r\n\r\n')
 
-			#cv2.imshow( "frame" , frame )
+			cv2.imshow( "frame" , frame )
 			#cv2.imshow( "Thresh" , thresh )
 			#cv2.imshow( "Frame Delta" , frameDelta )
-			#if cv2.waitKey( 1 ) & 0xFF == ord( "q" ):
-				#break
+			if cv2.waitKey( 1 ) & 0xFF == ord( "q" ):
+				break
 
 		self.cleanup()
 
