@@ -233,6 +233,11 @@ class TenvisVideo():
 				#send_slack_message( self.nowString + " === this is the motion event we care about ???" )		
 				self.total_motion = 0
 				wNeedToAlert = False
+				
+				# Debugging
+				for i , val in enumerate( self.EVENT_POOL ):
+					print str(i) + " === " + val.strftime( "%Y-%m-%d %H:%M:%S" )
+				# Debugging
 
 				# Condition 1.) Check Elapsed Time Between Last 2 Motion Events
 				wElapsedTime_1 = int( ( self.EVENT_POOL[ -1 ] - self.EVENT_POOL[ -2 ] ).total_seconds() )
@@ -249,10 +254,8 @@ class TenvisVideo():
 					print "Motion Event within Custom Time Range"
 					print "ALERT !!!!"
 					#send_email( self.total_motion , "Haley is Moving" , self.EVENT_POOL[ -1 ] )
-					self.last_email_time = self.EVENT_POOL[ -1 ]				
+					self.last_email_time = self.EVENT_POOL[ -1 ]			
 					self.EVENT_POOL = list( filter( lambda x: x > self.last_email_time , self.EVENT_POOL ) )
-					for i , val in enumerate( self.EVENT_POOL ):
-						print str(i) + " === " + val.strftime( "%Y-%m-%d %H:%M:%S" )
 
 
 
