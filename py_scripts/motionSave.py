@@ -281,6 +281,10 @@ def gen_frame():
 def video_feed():
 	return Response( gen_frame() , mimetype='multipart/x-mixed-replace; boundary=wFrame')
 
-app.run(host='0.0.0.0', debug=True)
 
-TenvisVideo()
+def start_class_thread():
+	TenvisVideo()
+
+instance_thread = threading.Thread( target=start_class_thread , args=[] )
+instance_thread.start()
+app.run(host='0.0.0.0', debug=True)
