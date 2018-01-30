@@ -237,9 +237,9 @@ class TenvisVideo():
 				wNeedToAlert = False
 
 				# Debugging
-				print ""
-				for i , val in enumerate( self.EVENT_POOL ):
-					print str(i) + " === " + val.strftime( "%Y-%m-%d %H:%M:%S" )
+				#print ""
+				#for i , val in enumerate( self.EVENT_POOL ):
+					#print str(i) + " === " + val.strftime( "%Y-%m-%d %H:%M:%S" )
 				# Debugging
 
 				# Condition 1.) Check Elapsed Time Between Last 2 Motion Events
@@ -264,7 +264,7 @@ class TenvisVideo():
 
 
 
-			#cv2.imwrite( framePath , frame )
+			cv2.imwrite( framePath , frame )
 			
 			# self.FRAME_POOL.insert( 0 , frame )
 			# self.FRAME_POOL.pop()
