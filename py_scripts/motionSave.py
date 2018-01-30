@@ -30,6 +30,7 @@ signal.signal( signal.SIGINT , signal_handler )
 GLOBAL_ACTIVE_FRAME = None
 GLOBAL_ACTIVE_FRAME_JPEG = None
 videoPath = os.path.abspath( os.path.join( __file__ , ".." , ".." , "videos" ) )
+framePath = os.path.join( videoPath , "frame.jpg"  )
 try: 
 	os.makedirs( videoPath )
 except OSError:
@@ -110,8 +111,8 @@ class TenvisVideo():
 		print "MIN_TIME_ACCEPTABLE === " + str( self.MIN_TIME_ACCEPTABLE )
 		print "TIME_COOLOFF === " + str( self.TIME_COOLOFF )
 
-		# self.w_Capture = cv2.VideoCapture( 0 )
-		# self.motionTracking()
+		self.w_Capture = cv2.VideoCapture( 0 )
+		self.motionTracking()
 
 	def cleanup( self ):
 		self.w_Capture.release()
@@ -174,10 +175,12 @@ class TenvisVideo():
 
 			if self.last_email_time is not None:
 				wNow = datetime.now( eastern_tz )
+				self.nowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )
 				self.elapsedTimeFromLastEmail = int( ( wNow - self.last_email_time ).total_seconds() )
 				if self.elapsedTimeFromLastEmail < self.EMAIL_COOLOFF:
 					wSleepDuration = ( self.EMAIL_COOLOFF - self.elapsedTimeFromLastEmail )
 					print "inside email cooloff - sleeping( " + str( wSleepDuration ) + " )"
+					send_slack_message( self.nowString + "inside email cooloff - sleeping( " + str( wSleepDuration ) + " )" )
 					sleep( wSleepDuration )
 					self.last_email_time = None
 					continue
@@ -223,11 +226,11 @@ class TenvisVideo():
 				motionCounter = 0
 
 			if self.total_motion >= self.MOTION_EVENTS_ACCEPTABLE:
-				print "this is the motion event we care about ???"				
-				self.total_motion = 0
 				wNow = datetime.now( eastern_tz )
-				wNowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )
-				#send_slack_message( wNowString + " === totalMotion >= MOTION_EVENTS_ACCEPTABLE" )
+				self.nowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )				
+				print "this is the motion event we care about ???"
+				send_slack_message( self.nowString + " === this is the motion event we care about ???" )		
+				self.total_motion = 0
 				self.EVENT_POOL.append( wNow )
 				self.EVENT_POOL.pop( 0 )
 
@@ -238,12 +241,16 @@ class TenvisVideo():
 					if wElapsedTime_1 >= self.MIN_TIME_ACCEPTABLE and wElapsedTime_1 <= self.TIME_COOLOFF:
 						print "Motion Event within Custom Time Range"
 						print "ALERT !!!!"
+						send_email( self.totalMotion , "Haley is Moving" )
 						self.last_email_time = wNow
 						# self.write_thread = threading.Thread( target=self.write_video , args=[] )
 						# self.write_thread.start()
 						#self.write_thread.join()
 					else:
+						wNow = datetime.now( eastern_tz )
+						self.nowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )
 						print "event outside of cooldown window .... reseting .... "
+						send_slack_message( self.nowString + "event outside of cooldown window .... reseting .... " )
 						#send_slack_message( self.nowString + " === event outside of cooldown window .... reseting .... " )
 
 
@@ -253,16 +260,17 @@ class TenvisVideo():
 				# 	else:
 				# 		print "None"
 
-
+			cv2.imwrite( framePath , frame )
 			# self.FRAME_POOL.insert( 0 , frame )
 			# self.FRAME_POOL.pop()
 			# self.FRAME_POOL.append( frame )
 			# if len( self.FRAME_POOL ) > 900:
 			# 	self.FRAME_POOL.pop( 0 )
 
-			ret , GLOBAL_ACTIVE_FRAME_JPEG = cv2.imencode( '.jpg' , frame )
-			GLOBAL_ACTIVE_FRAME_JPEG = GLOBAL_ACTIVE_FRAME_JPEG.tobytes()
-			GLOBAL_ACTIVE_FRAME_JPEG = (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + GLOBAL_ACTIVE_FRAME_JPEG + b'\r\n\r\n')
+			# ret , GLOBAL_ACTIVE_FRAME_JPEG = cv2.imencode( '.jpg' , frame )
+			# GLOBAL_ACTIVE_FRAME_JPEG = GLOBAL_ACTIVE_FRAME_JPEG.tobytes()
+			# GLOBAL_ACTIVE_FRAME_JPEG = (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + GLOBAL_ACTIVE_FRAME_JPEG + b'\r\n\r\n')
+
 			#cv2.imshow( "frame" , frame )
 			#cv2.imshow( "Thresh" , thresh )
 			#cv2.imshow( "Frame Delta" , frameDelta )
@@ -271,17 +279,4 @@ class TenvisVideo():
 
 		self.cleanup()
 
-@app.route('/video_feed')
-def video_feed():
-	global GLOBAL_ACTIVE_FRAME_JPEG
-	return Response( GLOBAL_ACTIVE_FRAME_JPEG , mimetype='multipart/x-mixed-replace; boundary=frame')
-
-
-def start_class_thread():
-	my_instance = TenvisVideo()
-	my_instance.w_Capture = cv2.VideoCapture( 0 )
-	my_instance.motionTracking()
-
-instance_thread = threading.Thread( target=start_class_thread , args=[] )
-instance_thread.start()
-app.run(host='0.0.0.0', debug=True)
+TenvisVideo()
