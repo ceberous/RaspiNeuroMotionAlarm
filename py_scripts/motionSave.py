@@ -260,8 +260,8 @@ class TenvisVideo():
 			# if len( self.FRAME_POOL ) > 900:
 			# 	self.FRAME_POOL.pop( 0 )
 
-			GLOBAL_ACTIVE_FRAME_JPEG = cv2.imencode( '.jpg' , frame )
-			ret , GLOBAL_ACTIVE_FRAME_JPEG = GLOBAL_ACTIVE_FRAME_JPEG.tobytes()
+			ret , GLOBAL_ACTIVE_FRAME_JPEG = cv2.imencode( '.jpg' , frame )
+			GLOBAL_ACTIVE_FRAME_JPEG = GLOBAL_ACTIVE_FRAME_JPEG.tobytes()
 			GLOBAL_ACTIVE_FRAME_JPEG = (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + GLOBAL_ACTIVE_FRAME_JPEG + b'\r\n\r\n')
 			#cv2.imshow( "frame" , frame )
 			#cv2.imshow( "Thresh" , thresh )
