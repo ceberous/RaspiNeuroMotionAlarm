@@ -1,4 +1,4 @@
-import thread
+import threading
 import numpy as np
 import cv2
 import sys
@@ -77,6 +77,8 @@ class TenvisVideo():
 
 		send_slack_message( "python --> newMotion.py --> init()" )
 
+		self.write_thread = None
+
 		self.FRAME_POOL = [ None ]*1800
 		self.EVENT_POOL = [ None ]*10
 
@@ -127,8 +129,12 @@ class TenvisVideo():
 		# 	#cv2.imwrite( os.path.join( videoImagesPath , "frame%d.jpg" % i ) , frame )
 		# 	cv2.imwrite( os.path.join( videoImagesPath , "frame%s.jpg" % w_name_1 ) , frame )
 
-		fourcc = cv2.VideoWriter_fourcc( *"mp4v" )
-		w_path = os.path.join( videoImagesPath , "latestMotion%d.mp4" % self.video_index )
+		#fourcc = cv2.cv.CV_FOURCC(*"mp4v")
+		#w_path = os.path.join( videoPath , "latestMotion%d.mp4" % self.video_index )
+		
+		#fourcc = cv2.cv.CV_FOURCC(*'XVID')
+		fourcc = cv2.cv.CV_FOURCC(*"MJPG")
+		w_path = os.path.join( videoPath , "latestMotion%d.avi" % self.video_index )
 		print w_path
 		
 		videoWriter = cv2.VideoWriter( w_path , fourcc , 30 , ( 500 , 500 ) )		
@@ -138,9 +144,13 @@ class TenvisVideo():
 
 		self.video_index += 1
 		wTMP_COPY = None
+		del wTMP_COPY
 		print "done writing video"
+		self.write_thread.quit()
 
 	def motionTracking( self ):
+
+		global global_write_thread
 
 		avg = None
 		firstFrame = None
@@ -219,8 +229,8 @@ class TenvisVideo():
 						print "Motion Event within Custom Time Range"
 						print "ALERT !!!!"
 						self.last_email_time = wNow
-						write_thread = threading.Thread( target=self.write_video , args=[] )
-						write_thread.start()
+						self.write_thread = threading.Thread( target=self.write_video , args=[] )
+						self.write_thread.start()
 					else:
 						print "event outside of cooldown window .... reseting .... "
 						#send_slack_message( self.nowString + " === event outside of cooldown window .... reseting .... " )
@@ -233,8 +243,10 @@ class TenvisVideo():
 				# 		print "None"
 
 
-			self.FRAME_POOL.insert( 0 , frame )
-			self.FRAME_POOL.pop()
+			# self.FRAME_POOL.insert( 0 , frame )
+			# self.FRAME_POOL.pop()
+			self.FRAME_POOL.append( frame )
+			self.FRAME_POOL.pop( 0 )
 
 			cv2.imshow( "frame" , frame )
 			cv2.imshow( "Thresh" , thresh )
