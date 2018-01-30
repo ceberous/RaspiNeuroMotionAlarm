@@ -27,6 +27,7 @@ signal.signal( signal.SIGSEGV , signal_handler )
 signal.signal( signal.SIGTERM , signal_handler )
 signal.signal( signal.SIGINT , signal_handler )
 
+GLOBAL_ACTIVE_FRAME = None
 videoPath = os.path.abspath( os.path.join( __file__ , ".." , ".." , "videos" ) )
 try: 
 	os.makedirs( videoPath )
@@ -156,6 +157,8 @@ class TenvisVideo():
 
 	def motionTracking( self ):
 
+		global GLOBAL_ACTIVE_FRAME
+
 		avg = None
 		firstFrame = None
 
@@ -254,7 +257,7 @@ class TenvisVideo():
 			# if len( self.FRAME_POOL ) > 900:
 			# 	self.FRAME_POOL.pop( 0 )
 
-			self.active_frame = frame
+			GLOBAL_ACTIVE_FRAME = frame
 			cv2.imshow( "frame" , frame )
 			cv2.imshow( "Thresh" , thresh )
 			#cv2.imshow( "Frame Delta" , frameDelta )
@@ -263,12 +266,12 @@ class TenvisVideo():
 
 		self.cleanup()
 
-wInstance = TenvisVideo()
 
 def gen_frame():
-    while True:
+	global GLOBAL_ACTIVE_FRAME
+	while True:
 		try:
-			ret, jpeg = cv2.imencode( '.jpg' , wInstance.active_frame )
+			ret, jpeg = cv2.imencode( '.jpg' , GLOBAL_ACTIVE_FRAME )
 			wFrame = jpeg.tobytes()
 			yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
 		except:
@@ -276,6 +279,8 @@ def gen_frame():
 
 @app.route('/video_feed')
 def video_feed():
-    return Response( gen_frame() , mimetype='multipart/x-mixed-replace; boundary=frame')
+	return Response( gen_frame() , mimetype='multipart/x-mixed-replace; boundary=frame')
 
 app.run(host='0.0.0.0', debug=True)
+
+TenvisVideo()
