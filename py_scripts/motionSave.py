@@ -230,8 +230,8 @@ class TenvisVideo():
 						print "Motion Event within Custom Time Range"
 						print "ALERT !!!!"
 						self.last_email_time = wNow
-						self.write_thread = threading.Thread( target=self.write_video , args=[] )
-						self.write_thread.start()
+						# self.write_thread = threading.Thread( target=self.write_video , args=[] )
+						# self.write_thread.start()
 						#self.write_thread.join()
 					else:
 						print "event outside of cooldown window .... reseting .... "
@@ -247,8 +247,9 @@ class TenvisVideo():
 
 			# self.FRAME_POOL.insert( 0 , frame )
 			# self.FRAME_POOL.pop()
-			self.FRAME_POOL.append( frame )
-			self.FRAME_POOL.pop( 0 )
+			# self.FRAME_POOL.append( frame )
+			# if len( self.FRAME_POOL ) > 900:
+			# 	self.FRAME_POOL.pop( 0 )
 
 			cv2.imshow( "frame" , frame )
 			cv2.imshow( "Thresh" , thresh )
