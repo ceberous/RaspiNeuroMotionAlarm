@@ -273,13 +273,13 @@ def gen_frame():
 		try:
 			ret, jpeg = cv2.imencode( '.jpg' , GLOBAL_ACTIVE_FRAME )
 			wFrame = jpeg.tobytes()
-			yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+			yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + wFrame + b'\r\n\r\n')
 		except:
 			yield False
 
 @app.route('/video_feed')
 def video_feed():
-	return Response( gen_frame() , mimetype='multipart/x-mixed-replace; boundary=frame')
+	return Response( gen_frame() , mimetype='multipart/x-mixed-replace; boundary=wFrame')
 
 app.run(host='0.0.0.0', debug=True)
 
