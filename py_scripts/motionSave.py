@@ -12,6 +12,9 @@ from time import localtime, strftime , sleep
 from pytz import timezone
 eastern_tz = timezone( "US/Eastern" )
 
+from flask import Flask, render_template, Response
+app = Flask(__name__)
+
 def signal_handler( signal , frame ):
 	wStr1 = "newMotion.py closed , Signal = " + str( signal )
 	print( wStr1 )
@@ -79,7 +82,7 @@ class TenvisVideo():
 
 		self.write_thread = None
 
-		self.FRAME_POOL = [ None ]*1800
+		#self.FRAME_POOL = [ None ]*1800
 		self.EVENT_POOL = [ None ]*10
 
 		self.total_motion = 0
@@ -251,6 +254,7 @@ class TenvisVideo():
 			# if len( self.FRAME_POOL ) > 900:
 			# 	self.FRAME_POOL.pop( 0 )
 
+			self.active_frame = frame
 			cv2.imshow( "frame" , frame )
 			cv2.imshow( "Thresh" , thresh )
 			#cv2.imshow( "Frame Delta" , frameDelta )
@@ -259,4 +263,19 @@ class TenvisVideo():
 
 		self.cleanup()
 
-TenvisVideo()
+wInstance = TenvisVideo()
+
+def gen_frame():
+    while True:
+		try:
+			ret, jpeg = cv2.imencode( '.jpg' , wInstance.active_frame )
+			wFrame = jpeg.tobytes()
+			yield (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + frame + b'\r\n\r\n')
+		except:
+			yield False
+
+@app.route('/video_feed')
+def video_feed():
+    return Response( gen_frame() , mimetype='multipart/x-mixed-replace; boundary=frame')
+
+app.run(host='0.0.0.0', debug=True)
