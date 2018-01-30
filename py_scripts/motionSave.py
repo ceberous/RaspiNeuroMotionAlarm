@@ -75,6 +75,7 @@ def send_email( alertLevel , msg ):
 		print( "failed to send email" )
 		send_slack_error( "failed to send email" )
 
+
 class TenvisVideo():
 
 	def __init__( self ):
@@ -258,11 +259,11 @@ class TenvisVideo():
 			# 	self.FRAME_POOL.pop( 0 )
 
 			GLOBAL_ACTIVE_FRAME = frame
-			cv2.imshow( "frame" , frame )
-			cv2.imshow( "Thresh" , thresh )
+			#cv2.imshow( "frame" , frame )
+			#cv2.imshow( "Thresh" , thresh )
 			#cv2.imshow( "Frame Delta" , frameDelta )
-			if cv2.waitKey( 1 ) & 0xFF == ord( "q" ):
-				break
+			#if cv2.waitKey( 1 ) & 0xFF == ord( "q" ):
+				#break
 
 		self.cleanup()
 
@@ -277,13 +278,15 @@ def gen_frame():
 		except:
 			yield False
 
+
+
 @app.route('/video_feed')
 def video_feed():
 	return Response( gen_frame() , mimetype='multipart/x-mixed-replace; boundary=wFrame')
 
 
 def start_class_thread():
-	TenvisVideo()
+	my_instance = TenvisVideo()
 
 instance_thread = threading.Thread( target=start_class_thread , args=[] )
 instance_thread.start()
