@@ -85,7 +85,8 @@ class TenvisVideo():
 		self.write_thread = None
 
 		#self.FRAME_POOL = [ None ]*1800
-		self.EVENT_POOL = [ None ]*10
+		wNow = datetime.now( eastern_tz )
+		self.EVENT_POOL = [ wNow ]*10
 
 		self.total_motion = 0
 		self.video_index = 0
@@ -212,7 +213,6 @@ class TenvisVideo():
 				if cv2.contourArea( c ) < min_area:
 					motionCounter = 0
 					continue
-				self.currentMotion = True
 				motionCounter += 1
 
 			if motionCounter >= self.MIN_MOTION_FRAMES:
@@ -220,46 +220,47 @@ class TenvisVideo():
 				self.nowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )
 				send_slack_message( self.nowString + " === motion record" )
 				print "setting new motion record"
-				self.total_motion += 1
-				motionCounter = 0
-
-			if self.total_motion >= self.MOTION_EVENTS_ACCEPTABLE:
-				wNow = datetime.now( eastern_tz )
-				self.nowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )				
-				print "this is the motion event we care about ???"
-				send_slack_message( self.nowString + " === this is the motion event we care about ???" )		
-				self.total_motion = 0
 				self.EVENT_POOL.append( wNow )
 				self.EVENT_POOL.pop( 0 )
+				motionCounter = 0
 
-				# Check Time Difference with Last Event 
-				if self.EVENT_POOL[ 8 ] is not None:
-					wElapsedTime_1 = int( ( wNow - self.EVENT_POOL[ 8 ] ).total_seconds() )
-					print "\n( Tier - 0 ) Elapsed Time === " + str( wElapsedTime_1 )
-					if wElapsedTime_1 >= self.MIN_TIME_ACCEPTABLE and wElapsedTime_1 <= self.TIME_COOLOFF:
-						print "Motion Event within Custom Time Range"
-						print "ALERT !!!!"
-						send_email( self.total_motion , "Haley is Moving" )
-						self.last_email_time = wNow
-						#cv2.imwrite( framePath , frame )
-						# self.write_thread = threading.Thread( target=self.write_video , args=[] )
-						# self.write_thread.start()
-						#self.write_thread.join()
-					else:
-						wNow = datetime.now( eastern_tz )
-						self.nowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )
-						print "event outside of cooldown window .... reseting .... "
-						send_slack_message( self.nowString + "event outside of cooldown window .... reseting .... " )
-						#send_slack_message( self.nowString + " === event outside of cooldown window .... reseting .... " )
+				for i , val in enumerate( self.EVENT_POOL ):
+					print str(i) + " === " + val.strftime( "%Y-%m-%d %H:%M:%S" )
 
 
-				# for i , val in enumerate( self.EVENT_POOL ):
-				# 	if val is not None:
-				# 		print str(i) + " === " + val.strftime( "%Y-%m-%d %H:%M:%S" )
-				# 	else:
-				# 		print "None"
+			# if self.total_motion >= self.MOTION_EVENTS_ACCEPTABLE:
+			# 	wNow = datetime.now( eastern_tz )
+			# 	self.nowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )				
+			# 	print "this is the motion event we care about ???"
+			# 	send_slack_message( self.nowString + " === this is the motion event we care about ???" )		
+			# 	self.total_motion = 0
+			# 	self.EVENT_POOL.append( wNow )
+			# 	self.EVENT_POOL.pop( 0 )
+
+			# 	# Check Time Difference with Last Event 
+			# 	if self.EVENT_POOL[ 8 ] is not None:
+			# 		wElapsedTime_1 = int( ( wNow - self.EVENT_POOL[ 8 ] ).total_seconds() )
+			# 		print "\n( Tier - 0 ) Elapsed Time === " + str( wElapsedTime_1 )
+			# 		if wElapsedTime_1 >= self.MIN_TIME_ACCEPTABLE and wElapsedTime_1 <= self.TIME_COOLOFF:
+			# 			print "Motion Event within Custom Time Range"
+			# 			print "ALERT !!!!"
+			# 			send_email( self.total_motion , "Haley is Moving" )
+			# 			self.last_email_time = wNow
+			# 			#cv2.imwrite( framePath , frame )
+			# 			# self.write_thread = threading.Thread( target=self.write_video , args=[] )
+			# 			# self.write_thread.start()
+			# 			#self.write_thread.join()
+			# 		else:
+			# 			wNow = datetime.now( eastern_tz )
+			# 			self.nowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )
+			# 			print "event outside of cooldown window .... reseting .... "
+			# 			send_slack_message( self.nowString + " === event outside of cooldown window .... reseting .... " )
+
+
+
 
 			#cv2.imwrite( framePath , frame )
+			
 			# self.FRAME_POOL.insert( 0 , frame )
 			# self.FRAME_POOL.pop()
 			# self.FRAME_POOL.append( frame )
