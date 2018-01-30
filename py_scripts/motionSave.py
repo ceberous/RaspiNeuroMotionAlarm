@@ -109,8 +109,8 @@ class TenvisVideo():
 		print "MIN_TIME_ACCEPTABLE === " + str( self.MIN_TIME_ACCEPTABLE )
 		print "TIME_COOLOFF === " + str( self.TIME_COOLOFF )
 
-		self.w_Capture = cv2.VideoCapture( 0 )
-		self.motionTracking()
+		# self.w_Capture = cv2.VideoCapture( 0 )
+		# self.motionTracking()
 
 	def cleanup( self ):
 		self.w_Capture.release()
@@ -287,6 +287,8 @@ def video_feed():
 
 def start_class_thread():
 	my_instance = TenvisVideo()
+	my_instance.w_Capture = cv2.VideoCapture( 0 )
+	my_instance.motionTracking()
 
 instance_thread = threading.Thread( target=start_class_thread , args=[] )
 instance_thread.start()
