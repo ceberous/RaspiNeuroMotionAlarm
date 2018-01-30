@@ -84,8 +84,9 @@ class TenvisVideo():
 		self.write_thread = None
 
 		#self.FRAME_POOL = [ None ]*1800
-		wNow = datetime.now( eastern_tz )
-		self.EVENT_POOL = [ wNow ]*10
+		#wNow = datetime.now( eastern_tz )
+		#self.EVENT_POOL = [ wNow ]*10
+		self.EVENT_POOL = []
 
 		self.total_motion = 0
 		self.video_index = 0
@@ -233,8 +234,9 @@ class TenvisVideo():
 				#send_slack_message( self.nowString + " === this is the motion event we care about ???" )		
 				self.total_motion = 0
 				wNeedToAlert = False
-				
+
 				# Debugging
+				print ""
 				for i , val in enumerate( self.EVENT_POOL ):
 					print str(i) + " === " + val.strftime( "%Y-%m-%d %H:%M:%S" )
 				# Debugging
@@ -242,7 +244,8 @@ class TenvisVideo():
 				# Condition 1.) Check Elapsed Time Between Last 2 Motion Events
 				wElapsedTime_1 = int( ( self.EVENT_POOL[ -1 ] - self.EVENT_POOL[ -2 ] ).total_seconds() )
 				print "\n( Stage-1-Check ) Elapsed Time === " + str( wElapsedTime_1 )
-				if wElapsedTime_1 >= self.MIN_TIME_ACCEPTABLE and wElapsedTime_1 <= self.TIME_COOLOFF:
+				#if wElapsedTime_1 >= self.MIN_TIME_ACCEPTABLE and wElapsedTime_1 <= self.TIME_COOLOFF:
+				if wElapsedTime_1 <= self.TIME_COOLOFF:
 					wNeedToAlert = True
 
 				# Condition 2.) Check if there are multiple events in a greater window
