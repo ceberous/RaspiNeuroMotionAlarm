@@ -133,7 +133,10 @@ class TenvisVideo():
 		#w_path = os.path.join( videoPath , "latestMotion%d.mp4" % self.video_index )
 		
 		#fourcc = cv2.cv.CV_FOURCC(*'XVID')
-		fourcc = cv2.cv.CV_FOURCC(*"MJPG")
+		#fourcc = cv2.cv.CV_FOURCC('i', 'Y', 'U', 'V')
+		
+		#fourcc = cv2.cv.CV_FOURCC(*"MJPG")
+		fourcc = cv2.cv.CV_FOURCC('M','P','E','G')
 		w_path = os.path.join( videoPath , "latestMotion%d.avi" % self.video_index )
 		print w_path
 		
@@ -146,11 +149,9 @@ class TenvisVideo():
 		wTMP_COPY = None
 		del wTMP_COPY
 		print "done writing video"
-		self.write_thread.quit()
+		return
 
 	def motionTracking( self ):
-
-		global global_write_thread
 
 		avg = None
 		firstFrame = None
@@ -231,6 +232,7 @@ class TenvisVideo():
 						self.last_email_time = wNow
 						self.write_thread = threading.Thread( target=self.write_video , args=[] )
 						self.write_thread.start()
+						#self.write_thread.join()
 					else:
 						print "event outside of cooldown window .... reseting .... "
 						#send_slack_message( self.nowString + " === event outside of cooldown window .... reseting .... " )
