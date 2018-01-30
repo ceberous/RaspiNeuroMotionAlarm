@@ -261,7 +261,7 @@ class TenvisVideo():
 			# 	self.FRAME_POOL.pop( 0 )
 
 			GLOBAL_ACTIVE_FRAME_JPEG = cv2.imencode( '.jpg' , frame )
-			GLOBAL_ACTIVE_FRAME_JPEG = GLOBAL_ACTIVE_FRAME_JPEG.tobytes()
+			ret , GLOBAL_ACTIVE_FRAME_JPEG = GLOBAL_ACTIVE_FRAME_JPEG.tobytes()
 			GLOBAL_ACTIVE_FRAME_JPEG = (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + GLOBAL_ACTIVE_FRAME_JPEG + b'\r\n\r\n')
 			#cv2.imshow( "frame" , frame )
 			#cv2.imshow( "Thresh" , thresh )
@@ -274,7 +274,7 @@ class TenvisVideo():
 @app.route('/video_feed')
 def video_feed():
 	global GLOBAL_ACTIVE_FRAME_JPEG
-	return Response( GLOBAL_ACTIVE_FRAME_JPEG , mimetype='multipart/x-mixed-replace; boundary=wFrame')
+	return Response( GLOBAL_ACTIVE_FRAME_JPEG , mimetype='multipart/x-mixed-replace; boundary=frame')
 
 
 def start_class_thread():
