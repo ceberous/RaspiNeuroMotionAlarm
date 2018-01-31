@@ -175,7 +175,7 @@ class TenvisVideo():
 				if self.elapsedTimeFromLastEmail < self.EMAIL_COOLOFF:
 					wSleepDuration = ( self.EMAIL_COOLOFF - self.elapsedTimeFromLastEmail )
 					print "inside email cooloff - sleeping( " + str( wSleepDuration ) + " )"
-					#send_slack_message( self.nowString + "inside email cooloff - sleeping( " + str( wSleepDuration ) + " )" )
+					send_slack_message( self.nowString + " === inside email cooloff - sleeping( " + str( wSleepDuration ) + " )" )
 					sleep( wSleepDuration )
 					self.last_email_time = None
 					continue
@@ -216,7 +216,7 @@ class TenvisVideo():
 			if motionCounter >= self.MIN_MOTION_FRAMES:
 				wNow = datetime.now( eastern_tz )
 				self.nowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )
-				#send_slack_message( self.nowString + " === motion record" )
+				send_slack_message( self.nowString + " === motion record" )
 				print "setting new motion record"
 				self.EVENT_POOL.append( wNow )
 				if len( self.EVENT_POOL ) > 10:
@@ -227,7 +227,7 @@ class TenvisVideo():
 			# Once Total Motion Events Reach Threshold , create alert if timing conditions are met
 			if self.total_motion >= self.MOTION_EVENTS_ACCEPTABLE:
 				print "this is the motion event we care about ???"
-				#send_slack_message( self.nowString + " === this is the motion event we care about ???" )		
+				send_slack_message( self.nowString + " === this is the motion event we care about ???" )		
 				self.total_motion = 0
 				wNeedToAlert = False
 
@@ -247,12 +247,12 @@ class TenvisVideo():
 				# Condition 2.) Check if there are multiple events in a greater window
 				if wNeedToAlert == False:
 					print "event outside of cooldown window .... reseting .... "
-					#send_slack_message( self.nowString + " === event outside of cooldown window .... reseting .... " )
+					send_slack_message( self.nowString + " === event outside of cooldown window .... reseting .... " )
 
 				if wNeedToAlert == True:				
 					print "Motion Event within Custom Time Range"
 					print "ALERT !!!!"
-					#send_email( self.total_motion , "Haley is Moving" , self.EVENT_POOL[ -1 ] )
+					send_email( self.total_motion , "Haley is Moving" , self.EVENT_POOL[ -1 ] )
 					self.last_email_time = self.EVENT_POOL[ -1 ]			
 					self.EVENT_POOL = list( filter( lambda x: x > self.last_email_time , self.EVENT_POOL ) )
 
@@ -260,6 +260,7 @@ class TenvisVideo():
 
 
 			cv2.imwrite( framePath , frame )
+			sleep( .1 )
 			
 			# self.FRAME_POOL.insert( 0 , frame )
 			# self.FRAME_POOL.pop()
@@ -271,11 +272,11 @@ class TenvisVideo():
 			# GLOBAL_ACTIVE_FRAME_JPEG = GLOBAL_ACTIVE_FRAME_JPEG.tobytes()
 			# GLOBAL_ACTIVE_FRAME_JPEG = (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + GLOBAL_ACTIVE_FRAME_JPEG + b'\r\n\r\n')
 
-			cv2.imshow( "frame" , frame )
+			#cv2.imshow( "frame" , frame )
 			#cv2.imshow( "Thresh" , thresh )
 			#cv2.imshow( "Frame Delta" , frameDelta )
-			if cv2.waitKey( 1 ) & 0xFF == ord( "q" ):
-				break
+			#if cv2.waitKey( 1 ) & 0xFF == ord( "q" ):
+				#break
 
 		self.cleanup()
 
