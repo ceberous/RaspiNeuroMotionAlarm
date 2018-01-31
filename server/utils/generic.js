@@ -3,11 +3,11 @@ const spawn = require( "child_process" ).spawn;
 const ps = require( "ps-node" );
 const path = require( "path" );
 
-var arg1 = 3 	// = Minimum Seconds of Continuous Motion
-var arg2 = 1 	// = Total Motion Events Acceptable Before Alert
-var arg3 = 3 	// = Minimum Time of Motion Before Alert
-var arg4 = 8 	// = Cooloff Period Duration
-const lCode1 = path.join( __dirname , "../../py_scripts" , "newMotion.py" );
+var arg1 = 1 	// = Minimum Seconds of Continuous Motion
+var arg2 = 3 	// = Total Motion Events Acceptable Before Alert
+var arg3 = 2 	// = Minimum Time of Motion Before Alert
+var arg4 = 10 	// = Cooloff Period Duration
+const lCode1 = path.join( __dirname , "../../py_scripts" , "motionSave.py" );
 console.log( lCode1 );
 var wState = false;
 var wChild = null;
