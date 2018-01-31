@@ -29,6 +29,7 @@ GLOBAL_ACTIVE_FRAME = None
 GLOBAL_ACTIVE_FRAME_JPEG = None
 videoPath = os.path.abspath( os.path.join( __file__ , ".." , ".." , "videos" ) )
 framePath = os.path.join( videoPath , "frame.jpg"  )
+frameByteStringPath = os.path.join( videoPath , "frameByteString.txt"  )
 try: 
 	os.makedirs( videoPath )
 except OSError:
