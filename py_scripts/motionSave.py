@@ -62,10 +62,9 @@ def send_email( alertLevel , msg , wDateOBJ ):
 
 	wNowString = wDateOBJ.strftime( "%Y-%m-%d %H:%M:%S" )
 	wTimeMsg = wNowString + "\n\n" + msg
-	send_slack_message( "Motion @@ " + wTimeMsg )
-
+	send_slack_message( "Motion @@ " + wNowString )
 	try:
-		#yag.send( securityDetails.toEmail , str( alertLevel ) , "Motion @@ " + wTimeMsg )
+		yag.send( securityDetails.toEmail , str( alertLevel ) , "Motion @@ " + wTimeMsg )
 		print( "sent email" )
 	except Exception as e:
 		print e
@@ -77,7 +76,7 @@ class TenvisVideo():
 
 	def __init__( self ):
 
-		#send_slack_message( "python --> newMotion.py --> init()" )
+		send_slack_message( "python --> newMotion.py --> init()" )
 
 		self.write_thread = None
 
@@ -90,8 +89,8 @@ class TenvisVideo():
 		self.video_index = 0
 		self.last_email_time = None
 
-		#self.EMAIL_COOLOFF = 150
-		self.EMAIL_COOLOFF = 10
+		self.EMAIL_COOLOFF = 150
+		#self.EMAIL_COOLOFF = 10
 		#self.MIN_MOTION_FRAMES = 4
 		self.MIN_MOTION_FRAMES = 3
 		try:
@@ -101,7 +100,7 @@ class TenvisVideo():
 			self.TIME_COOLOFF = int( sys.argv[4] )
 		except:
 			self.MIN_MOTION_SECONDS = 1
-			self.MOTION_EVENTS_ACCEPTABLE = 3
+			self.MOTION_EVENTS_ACCEPTABLE = 2
 			self.MIN_TIME_ACCEPTABLE = 2
 			self.TIME_COOLOFF = 10
 		print "MIN_MOTION_SECONDS === " + str( self.MIN_MOTION_SECONDS )
@@ -168,6 +167,16 @@ class TenvisVideo():
 
 		while( self.w_Capture.isOpened() ):
 
+			( grabbed , frame ) = self.w_Capture.read()
+			text = "No Motion"
+
+			if not grabbed:
+				break
+
+			frame = imutils.resize( frame , width = 500 )
+			cv2.imwrite( framePath , frame )
+			sleep( .1 )			
+
 			if self.last_email_time is not None:
 				wNow = datetime.now( eastern_tz )
 				self.nowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )
@@ -180,13 +189,6 @@ class TenvisVideo():
 					self.last_email_time = None
 					continue
 
-			( grabbed , frame ) = self.w_Capture.read()
-			text = "No Motion"
-
-			if not grabbed:
-				break
-
-			frame = imutils.resize( frame , width = 500 )
 			gray = cv2.cvtColor( frame , cv2.COLOR_BGR2GRAY )
 			gray = cv2.GaussianBlur( gray , ( 21 , 21 ) , 0 )
 
@@ -256,11 +258,6 @@ class TenvisVideo():
 					self.last_email_time = self.EVENT_POOL[ -1 ]			
 					self.EVENT_POOL = list( filter( lambda x: x > self.last_email_time , self.EVENT_POOL ) )
 
-
-
-
-			cv2.imwrite( framePath , frame )
-			sleep( .1 )
 			
 			# self.FRAME_POOL.insert( 0 , frame )
 			# self.FRAME_POOL.pop()
