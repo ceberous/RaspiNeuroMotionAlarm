@@ -25,11 +25,8 @@ signal.signal( signal.SIGSEGV , signal_handler )
 signal.signal( signal.SIGTERM , signal_handler )
 signal.signal( signal.SIGINT , signal_handler )
 
-GLOBAL_ACTIVE_FRAME = None
-GLOBAL_ACTIVE_FRAME_JPEG = None
 videoPath = os.path.abspath( os.path.join( __file__ , ".." , ".." , "videos" ) )
-framePath = os.path.join( videoPath , "frame.jpg"  )
-frameByteStringPath = os.path.join( videoPath , "frameByteString.txt"  )
+framePath = os.path.abspath( os.path.join( __file__ , ".." , ".." , "client" , "frame.jpeg" ) )
 try: 
 	os.makedirs( videoPath )
 except OSError:
@@ -160,9 +157,6 @@ class TenvisVideo():
 		return
 
 	def motionTracking( self ):
-
-		global GLOBAL_ACTIVE_FRAME
-		global GLOBAL_ACTIVE_FRAME_JPEG
 
 		avg = None
 		firstFrame = None
