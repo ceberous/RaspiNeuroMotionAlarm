@@ -33,6 +33,7 @@ var stopEvent = null;
 	
 	await require( "./server/slackManager.js" ).initialize();
 	console.log( "LOADED Slack-Client" );
+	require( "./server/slackManager.js" ).post( "main.js restarted" );
 
 	server.listen( wPORT , async function() {
 		console.log( "\thttp://localhost:" + wPORT.toString() );
