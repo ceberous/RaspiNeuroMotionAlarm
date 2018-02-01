@@ -6,7 +6,7 @@ const path = require( "path" );
 var arg1 = 1 	// = Minimum Seconds of Continuous Motion
 var arg2 = 2 	// = Total Motion Events Acceptable Before Alert
 var arg3 = 2 	// = Minimum Time of Motion Before Alert
-var arg4 = 60 	// = Cooloff Period Duration
+var arg4 = 120 	// = Cooloff Period Duration
 const lCode1 = path.join( __dirname , "../../py_scripts" , "motionSave.py" );
 console.log( lCode1 );
 var wState = false;

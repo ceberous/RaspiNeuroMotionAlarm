@@ -69,7 +69,7 @@ app.post( "/setargs/" , function( req , res ) {
 	cur_state = GenericUtils.getState();
 	res.json( cur_state );
 });
-
+live
 
 const HTML_Live_Path = path.join( __dirname , "../../client/views/" , "live.html" );
 app.get( "/live" , function( req , res ) {
