@@ -266,13 +266,12 @@ class TenvisVideo():
 					wNeedToAlert = True
 				
 				# Condition 2.) Check if there are multiple events in a greater window
-				elif:
-					if len( self.EVENT_POOL ) >= 3:
-						wElapsedTime_2 = int( ( self.EVENT_POOL[ -1 ] - self.EVENT_POOL[ -3 ] ).total_seconds() )
-						if wElapsedTime_2 <= self.MAX_TIME_ACCEPTABLE_STAGE_2:
-							send_slack_message( "( Stage-2-Check ) Elapsed Time === " + str( wElapsedTime_2 ) )
-							print "\n( Stage-2-Check ) === PASSED || Elapsed Time === " + str( wElapsedTime_2 )
-							wNeedToAlert = True
+				elif len( self.EVENT_POOL ) >= 3:
+					wElapsedTime_2 = int( ( self.EVENT_POOL[ -1 ] - self.EVENT_POOL[ -3 ] ).total_seconds() )
+					if wElapsedTime_2 <= self.MAX_TIME_ACCEPTABLE_STAGE_2:
+						send_slack_message( "( Stage-2-Check ) Elapsed Time === " + str( wElapsedTime_2 ) )
+						print "\n( Stage-2-Check ) === PASSED || Elapsed Time === " + str( wElapsedTime_2 )
+						wNeedToAlert = True
 
 				if wNeedToAlert == True:
 					print "ALERT !!!!"
