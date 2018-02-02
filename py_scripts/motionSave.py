@@ -93,7 +93,7 @@ class TenvisVideo():
 		#self.EMAIL_COOLOFF = 20
 		#self.EMAIL_COOLOFF = 10
 		#self.MIN_MOTION_FRAMES = 4
-		self.MIN_MOTION_FRAMES = 3
+		self.MIN_MOTION_FRAMES = 2
 		try:
 			self.MIN_MOTION_SECONDS = int( sys.argv[1] )
 			self.MOTION_EVENTS_ACCEPTABLE = int( sys.argv[2] )
@@ -101,7 +101,7 @@ class TenvisVideo():
 			self.MAX_TIME_ACCEPTABLE_STAGE_2 = int( sys.argv[4] )
 		except:
 			self.MIN_MOTION_SECONDS = 1
-			self.MOTION_EVENTS_ACCEPTABLE = 3
+			self.MOTION_EVENTS_ACCEPTABLE = 4
 			self.MAX_TIME_ACCEPTABLE = 45
 			self.MAX_TIME_ACCEPTABLE_STAGE_2 = 90
 		print "MIN_MOTION_SECONDS === " + str( self.MIN_MOTION_SECONDS )
@@ -217,13 +217,16 @@ class TenvisVideo():
 				if cv2.contourArea( c ) < min_area:
 					motionCounter = 0
 					continue
+				wNow = datetime.now( eastern_tz )
+				self.nowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )
+				send_slack_message( self.nowString + " === motion record" )
 				motionCounter += 1
 
 			# If Movement Is Greater than Threshold , create motion record
 			if motionCounter >= self.MIN_MOTION_FRAMES:
 				wNow = datetime.now( eastern_tz )
 				self.nowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )
-				send_slack_message( self.nowString + " === motion record" )
+				send_slack_message( self.nowString + " === Motiion Counter > MIN_MOTION_FRAMES" )
 				print "setting new motion record"
 				self.EVENT_POOL.append( wNow )
 				if len( self.EVENT_POOL ) > 10:
