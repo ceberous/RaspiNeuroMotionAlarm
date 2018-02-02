@@ -93,7 +93,7 @@ class TenvisVideo():
 		#self.EMAIL_COOLOFF = 20
 		#self.EMAIL_COOLOFF = 10
 		#self.MIN_MOTION_FRAMES = 4
-		self.MIN_MOTION_FRAMES = 2
+		self.MIN_MOTION_FRAMES = 4
 		try:
 			self.MIN_MOTION_SECONDS = int( sys.argv[1] )
 			self.MOTION_EVENTS_ACCEPTABLE = int( sys.argv[2] )
