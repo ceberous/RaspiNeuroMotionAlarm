@@ -266,7 +266,7 @@ class TenvisVideo():
 					wNeedToAlert = True
 				
 				# Condition 2.) Check if there are multiple events in a greater window
-				elif :
+				elif:
 					if len( self.EVENT_POOL ) >= 3:
 						wElapsedTime_2 = int( ( self.EVENT_POOL[ -1 ] - self.EVENT_POOL[ -3 ] ).total_seconds() )
 						if wElapsedTime_2 <= self.MAX_TIME_ACCEPTABLE_STAGE_2:
