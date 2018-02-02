@@ -4,9 +4,9 @@ const ps = require( "ps-node" );
 const path = require( "path" );
 
 var arg1 = 1 	// = Minimum Seconds of Continuous Motion
-var arg2 = 2 	// = Total Motion Events Acceptable Before Alert
-var arg3 = 2 	// = Minimum Time of Motion Before Alert
-var arg4 = 120 	// = Cooloff Period Duration
+var arg2 = 4 	// = Total Motion Events Acceptable Before Alert
+var arg3 = 45 	// = Minimum Time of Motion Before Alert
+var arg4 = 90 	// = Cooloff Period Duration
 const lCode1 = path.join( __dirname , "../../py_scripts" , "motionSave.py" );
 console.log( lCode1 );
 var wState = false;
