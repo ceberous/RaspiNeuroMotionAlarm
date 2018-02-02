@@ -97,17 +97,17 @@ class TenvisVideo():
 		try:
 			self.MIN_MOTION_SECONDS = int( sys.argv[1] )
 			self.MOTION_EVENTS_ACCEPTABLE = int( sys.argv[2] )
-			self.MIN_TIME_ACCEPTABLE = int( sys.argv[3] )
-			self.TIME_COOLOFF = int( sys.argv[4] )
+			self.MAX_TIME_ACCEPTABLE = int( sys.argv[3] )
+			self.MAX_TIME_ACCEPTABLE_STAGE_2 = int( sys.argv[4] )
 		except:
 			self.MIN_MOTION_SECONDS = 1
 			self.MOTION_EVENTS_ACCEPTABLE = 3
 			self.MAX_TIME_ACCEPTABLE = 45
-			self.TIME_COOLOFF = 10
+			self.MAX_TIME_ACCEPTABLE_STAGE_2 = 90
 		print "MIN_MOTION_SECONDS === " + str( self.MIN_MOTION_SECONDS )
 		print "MOTION_EVENTS_ACCEPTABLE === " + str( self.MOTION_EVENTS_ACCEPTABLE )
 		print "MAX_TIME_ACCEPTABLE === " + str( self.MAX_TIME_ACCEPTABLE )
-		print "TIME_COOLOFF === " + str( self.TIME_COOLOFF )
+		print "MAX_TIME_ACCEPTABLE_STAGE_2 === " + str( self.MAX_TIME_ACCEPTABLE_STAGE_2 )
 
 		self.w_Capture = cv2.VideoCapture( 0 )
 		self.motionTracking()
@@ -253,10 +253,15 @@ class TenvisVideo():
 
 				# Condition 2.) Check if there are multiple events in a greater window
 				if wNeedToAlert == False:
-
-					#self.total_motion = += 1
-					print "event outside of cooldown window .... reseting .... "
-					send_slack_message( self.nowString + " === event outside of cooldown window .... reseting .... " )
+					if len( self.EVENT_POOL ) >= 3:
+						wElapsedTime_2 = int( ( self.EVENT_POOL[ -1 ] - self.EVENT_POOL[ -3 ] ).total_seconds() )
+						print "\n( Stage-2-Check ) Elapsed Time === " + str( wElapsedTime_2 )
+							if wElapsedTime_2 <= self.MAX_TIME_ACCEPTABLE_STAGE_2:
+							wNeedToAlert = True
+					else:
+						self.EVENT_POOL = []
+						print "event outside of cooldown window .... reseting .... "
+						send_slack_message( self.nowString + " === event outside of cooldown window .... reseting .... " )
 
 				if wNeedToAlert == True:				
 					print "Motion Event within Custom Time Range"
