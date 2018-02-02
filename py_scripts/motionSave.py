@@ -229,6 +229,17 @@ class TenvisVideo():
 				self.nowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )
 				send_slack_message( self.nowString + " === Motiion Counter > MIN_MOTION_FRAMES" )
 				print "setting new motion record"
+
+				# Check if this is "fresh" in a series of new motion records
+				if self.last_email_time is not None:
+					if len( self.EVENT_POOL ) > 1:
+						wElapsedTime_x = int( ( self.EVENT_POOL[ -1 ] - self.EVENT_POOL[ -2 ] ).total_seconds() )
+						if wElapsedTime_x > self.MAX_TIME_ACCEPTABLE:
+							print "Not Fresh , Resetting to 1st Event === " + str( wElapsedTime_x )
+							send_slack_message( "Not Fresh , Resetting to 1st Event === " + str( wElapsedTime_x ) )							
+							self.EVENT_POOL = []
+							self.total_motion = 0
+
 				self.EVENT_POOL.append( wNow )
 				if len( self.EVENT_POOL ) > 10:
 					self.EVENT_POOL.pop( 0 )
@@ -238,46 +249,27 @@ class TenvisVideo():
 			# Once Total Motion Events Reach Threshold , create alert if timing conditions are met
 			if self.total_motion >= self.MOTION_EVENTS_ACCEPTABLE:
 				print "this is the motion event we care about ???"
-				send_slack_message( self.nowString + " === this is the motion event we care about ???" )		
+				send_slack_message( self.nowString + " === self.total_motion >= self.MOTION_EVENTS_ACCEPTABLE" )		
 				self.total_motion = 0
 				wNeedToAlert = False
 
 				# Debugging
-				print ""
-				for i , val in enumerate( self.EVENT_POOL ):
-					print str(i) + " === " + val.strftime( "%Y-%m-%d %H:%M:%S" )
+				#print ""
+				#for i , val in enumerate( self.EVENT_POOL ):
+					#print str(i) + " === " + val.strftime( "%Y-%m-%d %H:%M:%S" )
 				#Debugging
 
 				# Condition 1.) Check Elapsed Time Between Last 2 Motion Events
 				wElapsedTime_1 = int( ( self.EVENT_POOL[ -1 ] - self.EVENT_POOL[ 0 ] ).total_seconds() )
-				print "\n( Stage-1-Check ) Elapsed Time === " + str( wElapsedTime_1 )
-				send_slack_message( "( Stage-1-Check ) Elapsed Time === " + str( wElapsedTime_1 ) )
-				#if wElapsedTime_1 >= self.MIN_TIME_ACCEPTABLE and wElapsedTime_1 <= self.TIME_COOLOFF:
 				if wElapsedTime_1 <= self.MAX_TIME_ACCEPTABLE:
-					wNeedToAlert = True
-
-				# Condition 2.) Check if there are multiple events in a greater window
-				if wNeedToAlert == False:
-					if len( self.EVENT_POOL ) >= 3:
-						wElapsedTime_2 = int( ( self.EVENT_POOL[ -1 ] - self.EVENT_POOL[ -3 ] ).total_seconds() )
-						print "\n( Stage-2-Check ) Elapsed Time === " + str( wElapsedTime_2 )
-						send_slack_message( "( Stage-2-Check ) Elapsed Time === " + str( wElapsedTime_2 ) )
-						if wElapsedTime_2 <= self.MAX_TIME_ACCEPTABLE_STAGE_2:
-							wNeedToAlert = True
-					else:
-						self.EVENT_POOL = []
-						print "event outside of cooldown window .... reseting .... "
-						send_slack_message( self.nowString + " === event outside of cooldown window .... reseting .... " )
-
-				if wNeedToAlert == True:				
+					print "\n( Stage-1-Check ) Elapsed Time === " + str( wElapsedTime_1 )
 					print "Motion Event within Custom Time Range"
 					print "ALERT !!!!"
 					send_email( self.total_motion , "Haley is Moving" , self.EVENT_POOL[ -1 ] )
 					self.last_email_time = self.EVENT_POOL[ -1 ]			
-					self.EVENT_POOL = list( filter( lambda x: x > self.last_email_time , self.EVENT_POOL ) )
+					#self.EVENT_POOL = list( filter( lambda x: x > self.last_email_time , self.EVENT_POOL ) )
+					self.EVENT_POOL = []
 					print ""
-					for i , val in enumerate( self.EVENT_POOL ):
-						print str(i) + " === " + val.strftime( "%Y-%m-%d %H:%M:%S" )
 
 
 			
