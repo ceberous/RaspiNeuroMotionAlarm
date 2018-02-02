@@ -250,6 +250,7 @@ class TenvisVideo():
 				# Condition 1.) Check Elapsed Time Between Last 2 Motion Events
 				wElapsedTime_1 = int( ( self.EVENT_POOL[ -1 ] - self.EVENT_POOL[ 0 ] ).total_seconds() )
 				print "\n( Stage-1-Check ) Elapsed Time === " + str( wElapsedTime_1 )
+				send_slack_message( "( Stage-1-Check ) Elapsed Time === " + str( wElapsedTime_1 ) )
 				#if wElapsedTime_1 >= self.MIN_TIME_ACCEPTABLE and wElapsedTime_1 <= self.TIME_COOLOFF:
 				if wElapsedTime_1 <= self.MAX_TIME_ACCEPTABLE:
 					wNeedToAlert = True
@@ -259,6 +260,7 @@ class TenvisVideo():
 					if len( self.EVENT_POOL ) >= 3:
 						wElapsedTime_2 = int( ( self.EVENT_POOL[ -1 ] - self.EVENT_POOL[ -3 ] ).total_seconds() )
 						print "\n( Stage-2-Check ) Elapsed Time === " + str( wElapsedTime_2 )
+						send_slack_message( "( Stage-2-Check ) Elapsed Time === " + str( wElapsedTime_2 ) )
 						if wElapsedTime_2 <= self.MAX_TIME_ACCEPTABLE_STAGE_2:
 							wNeedToAlert = True
 					else:
