@@ -47,7 +47,7 @@ var stopEvent = null;
 
 		//}
 		GenericUtils.restartPYProcess();
-		require( "./server/slackManager.js" ).post( "main.js restarted , newMotion.py needs launched , starting" );
+		require( "./server/slackManager.js" ).post( "newMotion.py needs launched , starting" );
 	}
 
 	startEvent = schedule.scheduleJob( startTime , function(){
