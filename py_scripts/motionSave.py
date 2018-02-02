@@ -291,11 +291,11 @@ class TenvisVideo():
 			# GLOBAL_ACTIVE_FRAME_JPEG = GLOBAL_ACTIVE_FRAME_JPEG.tobytes()
 			# GLOBAL_ACTIVE_FRAME_JPEG = (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + GLOBAL_ACTIVE_FRAME_JPEG + b'\r\n\r\n')
 
-			cv2.imshow( "frame" , frame )
-			cv2.imshow( "Thresh" , thresh )
+			#cv2.imshow( "frame" , frame )
+			#cv2.imshow( "Thresh" , thresh )
 			#cv2.imshow( "Frame Delta" , frameDelta )
-			if cv2.waitKey( 1 ) & 0xFF == ord( "q" ):
-				break
+			#if cv2.waitKey( 1 ) & 0xFF == ord( "q" ):
+				#break
 
 		self.cleanup()
 
