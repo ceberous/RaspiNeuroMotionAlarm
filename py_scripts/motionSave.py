@@ -93,7 +93,7 @@ class TenvisVideo():
 		#self.EMAIL_COOLOFF = 20
 		#self.EMAIL_COOLOFF = 10
 		#self.MIN_MOTION_FRAMES = 4
-		self.MIN_MOTION_FRAMES = 3
+		self.MIN_MOTION_FRAMES = 2
 		try:
 			self.MIN_MOTION_SECONDS = int( sys.argv[1] )
 			self.MOTION_EVENTS_ACCEPTABLE = int( sys.argv[2] )
@@ -187,6 +187,10 @@ class TenvisVideo():
 					print "inside email cooloff - sleeping( " + str( wSleepDuration ) + " )"
 					send_slack_message( self.nowString + " === inside email cooloff - sleeping( " + str( wSleepDuration ) + " )" )
 					sleep( wSleepDuration )
+					print "done sleeping"
+					wNow = datetime.now( eastern_tz )
+					self.nowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )					
+					send_slack_message( self.nowString + " === done sleeping" )					
 					self.last_email_time = None
 					continue
 
