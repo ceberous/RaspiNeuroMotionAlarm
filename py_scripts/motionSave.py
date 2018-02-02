@@ -219,7 +219,8 @@ class TenvisVideo():
 					continue
 				wNow = datetime.now( eastern_tz )
 				self.nowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )
-				send_slack_message( self.nowString + " === motion record" )
+				print self.nowString + " === motion record"
+				#send_slack_message( self.nowString + " === motion record" )
 				motionCounter += 1
 
 			# If Movement Is Greater than Threshold , create motion record
