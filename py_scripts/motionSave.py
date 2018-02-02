@@ -89,8 +89,8 @@ class TenvisVideo():
 		self.video_index = 0
 		self.last_email_time = None
 
-		#self.EMAIL_COOLOFF = 150
-		self.EMAIL_COOLOFF = 20
+		self.EMAIL_COOLOFF = 150
+		#self.EMAIL_COOLOFF = 20
 		#self.EMAIL_COOLOFF = 10
 		#self.MIN_MOTION_FRAMES = 4
 		self.MIN_MOTION_FRAMES = 3
@@ -101,12 +101,12 @@ class TenvisVideo():
 			self.TIME_COOLOFF = int( sys.argv[4] )
 		except:
 			self.MIN_MOTION_SECONDS = 1
-			self.MOTION_EVENTS_ACCEPTABLE = 2
-			self.MIN_TIME_ACCEPTABLE = 2
+			self.MOTION_EVENTS_ACCEPTABLE = 3
+			self.MAX_TIME_ACCEPTABLE = 45
 			self.TIME_COOLOFF = 10
 		print "MIN_MOTION_SECONDS === " + str( self.MIN_MOTION_SECONDS )
 		print "MOTION_EVENTS_ACCEPTABLE === " + str( self.MOTION_EVENTS_ACCEPTABLE )
-		print "MIN_TIME_ACCEPTABLE === " + str( self.MIN_TIME_ACCEPTABLE )
+		print "MAX_TIME_ACCEPTABLE === " + str( self.MAX_TIME_ACCEPTABLE )
 		print "TIME_COOLOFF === " + str( self.TIME_COOLOFF )
 
 		self.w_Capture = cv2.VideoCapture( 0 )
@@ -238,17 +238,18 @@ class TenvisVideo():
 				print ""
 				for i , val in enumerate( self.EVENT_POOL ):
 					print str(i) + " === " + val.strftime( "%Y-%m-%d %H:%M:%S" )
-				Debugging
+				#Debugging
 
 				# Condition 1.) Check Elapsed Time Between Last 2 Motion Events
-				wElapsedTime_1 = int( ( self.EVENT_POOL[ -1 ] - self.EVENT_POOL[ -2 ] ).total_seconds() )
+				wElapsedTime_1 = int( ( self.EVENT_POOL[ -1 ] - self.EVENT_POOL[ 0 ] ).total_seconds() )
 				print "\n( Stage-1-Check ) Elapsed Time === " + str( wElapsedTime_1 )
 				#if wElapsedTime_1 >= self.MIN_TIME_ACCEPTABLE and wElapsedTime_1 <= self.TIME_COOLOFF:
-				if wElapsedTime_1 <= self.TIME_COOLOFF:
+				if wElapsedTime_1 <= self.MAX_TIME_ACCEPTABLE:
 					wNeedToAlert = True
 
 				# Condition 2.) Check if there are multiple events in a greater window
 				if wNeedToAlert == False:
+
 					#self.total_motion = += 1
 					print "event outside of cooldown window .... reseting .... "
 					send_slack_message( self.nowString + " === event outside of cooldown window .... reseting .... " )
@@ -259,6 +260,10 @@ class TenvisVideo():
 					send_email( self.total_motion , "Haley is Moving" , self.EVENT_POOL[ -1 ] )
 					self.last_email_time = self.EVENT_POOL[ -1 ]			
 					self.EVENT_POOL = list( filter( lambda x: x > self.last_email_time , self.EVENT_POOL ) )
+					print ""
+					for i , val in enumerate( self.EVENT_POOL ):
+						print str(i) + " === " + val.strftime( "%Y-%m-%d %H:%M:%S" )
+
 
 			
 			# self.FRAME_POOL.insert( 0 , frame )
