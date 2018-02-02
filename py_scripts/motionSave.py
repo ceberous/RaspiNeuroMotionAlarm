@@ -169,7 +169,7 @@ class TenvisVideo():
 		while( self.w_Capture.isOpened() ):
 
 			( grabbed , frame ) = self.w_Capture.read()
-			text = "No Motion"
+			#text = "No Motion"
 
 			if not grabbed:
 				break
@@ -202,7 +202,7 @@ class TenvisVideo():
 				continue
 
 			if avg is None:
-				avg = gray.copy().astype("float")
+				avg = gray.copy().astype( "float" )
 				continue
 
 			cv2.accumulateWeighted( gray , avg , 0.5 )
@@ -215,7 +215,7 @@ class TenvisVideo():
 			( cnts , _ ) = cv2.findContours( thresh.copy() , cv2.RETR_EXTERNAL , cv2.CHAIN_APPROX_SIMPLE )
 			for c in cnts:
 				if cv2.contourArea( c ) < min_area:
-					motionCounter = 0
+					motionCounter = 0 # ???
 					continue
 				wNow = datetime.now( eastern_tz )
 				self.nowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )
@@ -231,14 +231,13 @@ class TenvisVideo():
 				print "setting new motion record"
 
 				# Check if this is "fresh" in a series of new motion records
-				if self.last_email_time is not None:
-					if len( self.EVENT_POOL ) > 1:
-						wElapsedTime_x = int( ( self.EVENT_POOL[ -1 ] - self.EVENT_POOL[ -2 ] ).total_seconds() )
-						if wElapsedTime_x > self.MAX_TIME_ACCEPTABLE:
-							print "Not Fresh , Resetting to 1st Event === " + str( wElapsedTime_x )
-							send_slack_message( "Not Fresh , Resetting to 1st Event === " + str( wElapsedTime_x ) )							
-							self.EVENT_POOL = []
-							self.total_motion = 0
+				if len( self.EVENT_POOL ) > 1:
+					wElapsedTime_x = int( ( self.EVENT_POOL[ -1 ] - self.EVENT_POOL[ -2 ] ).total_seconds() )
+					if wElapsedTime_x > self.MAX_TIME_ACCEPTABLE:
+						print "Not Fresh , Resetting to 1st Event === " + str( wElapsedTime_x )
+						send_slack_message( "Not Fresh , Resetting to 1st Event === " + str( wElapsedTime_x ) )							
+						self.EVENT_POOL = []
+						self.total_motion = 0
 
 				self.EVENT_POOL.append( wNow )
 				if len( self.EVENT_POOL ) > 10:
@@ -251,13 +250,11 @@ class TenvisVideo():
 				print "this is the motion event we care about ???"
 				send_slack_message( self.nowString + " === self.total_motion >= self.MOTION_EVENTS_ACCEPTABLE" )		
 				self.total_motion = 0
-				wNeedToAlert = False
 
-				# Debugging
 				#print ""
 				#for i , val in enumerate( self.EVENT_POOL ):
 					#print str(i) + " === " + val.strftime( "%Y-%m-%d %H:%M:%S" )
-				#Debugging
+				#print ""
 
 				# Condition 1.) Check Elapsed Time Between Last 2 Motion Events
 				wElapsedTime_1 = int( ( self.EVENT_POOL[ -1 ] - self.EVENT_POOL[ 0 ] ).total_seconds() )
@@ -267,7 +264,6 @@ class TenvisVideo():
 					print "ALERT !!!!"
 					send_email( self.total_motion , "Haley is Moving" , self.EVENT_POOL[ -1 ] )
 					self.last_email_time = self.EVENT_POOL[ -1 ]			
-					#self.EVENT_POOL = list( filter( lambda x: x > self.last_email_time , self.EVENT_POOL ) )
 					self.EVENT_POOL = []
 					print ""
 
