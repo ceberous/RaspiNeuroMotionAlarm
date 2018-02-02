@@ -227,7 +227,7 @@ class TenvisVideo():
 			if motionCounter >= self.MIN_MOTION_FRAMES:
 				wNow = datetime.now( eastern_tz )
 				self.nowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )
-				send_slack_message( self.nowString + " === Motiion Counter > MIN_MOTION_FRAMES" )
+				send_slack_message( self.nowString + " === Motion Counter > MIN_MOTION_FRAMES" )
 				print "setting new motion record"
 
 				# Check if this is "fresh" in a series of new motion records
@@ -248,7 +248,7 @@ class TenvisVideo():
 			# Once Total Motion Events Reach Threshold , create alert if timing conditions are met
 			if self.total_motion >= self.MOTION_EVENTS_ACCEPTABLE:
 				print self.nowString + " === self.total_motion >= self.MOTION_EVENTS_ACCEPTABLE"
-				send_slack_message( self.nowString + " === self.total_motion >= self.MOTION_EVENTS_ACCEPTABLE" )		
+				send_slack_message( self.nowString + " === Total Motion >= MOTION_EVENTS_ACCEPTABLE" )		
 				self.total_motion = 0
 
 				#print ""
@@ -269,7 +269,7 @@ class TenvisVideo():
 				elif len( self.EVENT_POOL ) >= 3:
 					wElapsedTime_2 = int( ( self.EVENT_POOL[ -1 ] - self.EVENT_POOL[ -3 ] ).total_seconds() )
 					if wElapsedTime_2 <= self.MAX_TIME_ACCEPTABLE_STAGE_2:
-						send_slack_message( "( Stage-2-Check ) Elapsed Time === " + str( wElapsedTime_2 ) )
+						send_slack_message( "( Stage-2-Check ) === PASSED || Elapsed Time === " + str( wElapsedTime_2 ) )
 						print "\n( Stage-2-Check ) === PASSED || Elapsed Time === " + str( wElapsedTime_2 )
 						wNeedToAlert = True
 

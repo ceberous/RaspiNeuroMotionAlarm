@@ -47,7 +47,7 @@ var stopEvent = null;
 
 		//}
 		GenericUtils.restartPYProcess();
-		require( "./server/slackManager.js" ).post( "newMotion.py needs launched , starting" );
+		require( "./server/slackManager.js" ).post( "motionSave.py needs launched , starting" );
 	}
 
 	startEvent = schedule.scheduleJob( startTime , function(){
@@ -55,13 +55,13 @@ var stopEvent = null;
 		const cur_state = GenericUtils.getState();
 		if ( !cur_state.state ) { GenericUtils.startPYProcess(); } 
 		else { GenericUtils.restartPYProcess(); }
-		require( "./server/slackManager.js" ).post( "newMotion.py scheduled start" );
+		require( "./server/slackManager.js" ).post( "motionSave.py scheduled start" );
 	});
 
 	stopEvent = schedule.scheduleJob( stopTime , function(){
 		console.log( "scheduled stop" );
 		GenericUtils.killAllPYProcess();
-		require( "./server/slackManager.js" ).post( "newMotion.py scheduled stop" );
+		require( "./server/slackManager.js" ).post( "motionSave.py scheduled stop" );
 	});
 
 	process.on( "unhandledRejection" , function( reason , p ) {
