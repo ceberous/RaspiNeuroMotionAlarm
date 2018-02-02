@@ -233,7 +233,7 @@ class TenvisVideo():
 				# Check if this is "fresh" in a series of new motion records
 				if len( self.EVENT_POOL ) > 1:
 					wElapsedTime_x = int( ( self.EVENT_POOL[ -1 ] - self.EVENT_POOL[ -2 ] ).total_seconds() )
-					if wElapsedTime_x > self.MAX_TIME_ACCEPTABLE:
+					if wElapsedTime_x > self.MAX_TIME_ACCEPTABLE_STAGE_2:
 						print "Not Fresh , Resetting to 1st Event === " + str( wElapsedTime_x )
 						send_slack_message( "Not Fresh , Resetting to 1st Event === " + str( wElapsedTime_x ) )							
 						self.EVENT_POOL = []
@@ -247,7 +247,7 @@ class TenvisVideo():
 
 			# Once Total Motion Events Reach Threshold , create alert if timing conditions are met
 			if self.total_motion >= self.MOTION_EVENTS_ACCEPTABLE:
-				print "this is the motion event we care about ???"
+				print self.nowString + " === self.total_motion >= self.MOTION_EVENTS_ACCEPTABLE"
 				send_slack_message( self.nowString + " === self.total_motion >= self.MOTION_EVENTS_ACCEPTABLE" )		
 				self.total_motion = 0
 
@@ -256,18 +256,30 @@ class TenvisVideo():
 					#print str(i) + " === " + val.strftime( "%Y-%m-%d %H:%M:%S" )
 				#print ""
 
+				wNeedToAlert = False
+				
 				# Condition 1.) Check Elapsed Time Between Last 2 Motion Events
 				wElapsedTime_1 = int( ( self.EVENT_POOL[ -1 ] - self.EVENT_POOL[ 0 ] ).total_seconds() )
 				if wElapsedTime_1 <= self.MAX_TIME_ACCEPTABLE:
-					print "\n( Stage-1-Check ) Elapsed Time === " + str( wElapsedTime_1 )
-					print "Motion Event within Custom Time Range"
+					print "\n( Stage-1-Check ) === PASSED || Elapsed Time === " + str( wElapsedTime_1 )
+					send_slack_message( "( Stage-1-Check ) === PASSED || Elapsed Time === " + str( wElapsedTime_1 ) )					
+					wNeedToAlert = True
+				
+				# Condition 2.) Check if there are multiple events in a greater window
+				elif :
+					if len( self.EVENT_POOL ) >= 3:
+						wElapsedTime_2 = int( ( self.EVENT_POOL[ -1 ] - self.EVENT_POOL[ -3 ] ).total_seconds() )
+						if wElapsedTime_2 <= self.MAX_TIME_ACCEPTABLE_STAGE_2:
+							send_slack_message( "( Stage-2-Check ) Elapsed Time === " + str( wElapsedTime_2 ) )
+							print "\n( Stage-2-Check ) === PASSED || Elapsed Time === " + str( wElapsedTime_2 )
+							wNeedToAlert = True
+
+				if wNeedToAlert == True:
 					print "ALERT !!!!"
 					send_email( self.total_motion , "Haley is Moving" , self.EVENT_POOL[ -1 ] )
 					self.last_email_time = self.EVENT_POOL[ -1 ]			
 					self.EVENT_POOL = []
 					print ""
-
-
 			
 			# self.FRAME_POOL.insert( 0 , frame )
 			# self.FRAME_POOL.pop()
