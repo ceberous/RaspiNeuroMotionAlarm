@@ -76,7 +76,7 @@ class TenvisVideo():
 
 	def __init__( self ):
 
-		send_slack_message( "python --> newMotion.py --> init()" )
+		send_slack_message( "python --> motionSave.py --> init()" )
 
 		self.write_thread = None
 
@@ -231,7 +231,7 @@ class TenvisVideo():
 				print "setting new motion record"
 
 				# Check if this is "fresh" in a series of new motion records
-				if len( self.EVENT_POOL ) > 1:
+				if len( self.EVENT_POOL ) >= 1:
 					wElapsedTime_x = int( ( self.EVENT_POOL[ -1 ] - self.EVENT_POOL[ -2 ] ).total_seconds() )
 					if wElapsedTime_x > self.MAX_TIME_ACCEPTABLE_STAGE_2:
 						print "Not Fresh , Resetting to 1st Event === " + str( wElapsedTime_x )

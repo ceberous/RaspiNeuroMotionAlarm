@@ -39,12 +39,9 @@ var stopEvent = null;
 		console.log( "\thttp://localhost:" + wPORT.toString() );
 	});
 
-	var now = new Date();
-    var day = now.getDay();
-    var hours = now.getHours();
-    console.log( startTime.hour.toString() );
-    console.log( hours.toString() );
-    console.log( stopTime.hour.toString() );
+	const now = new Date();
+    const day = now.getDay();
+    const hours = now.getHours();
 	if( hours < startTime.hour && hours < stopTime.hour ) {
 		//if( hours !== s || now.getMinutes() <= 30 ) {
 
