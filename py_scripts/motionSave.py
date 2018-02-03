@@ -233,7 +233,7 @@ class TenvisVideo():
 				# Check if this is "fresh" in a series of new motion records
 				if len( self.EVENT_POOL ) > 1:
 					wElapsedTime_x = int( ( self.EVENT_POOL[ -1 ] - self.EVENT_POOL[ -2 ] ).total_seconds() )
-					if wElapsedTime_x > self.MAX_TIME_ACCEPTABLE_STAGE_2:
+					if wElapsedTime_x > ( self.MAX_TIME_ACCEPTABLE_STAGE_2 * 2 ):
 						print "Not Fresh , Resetting to 1st Event === " + str( wElapsedTime_x )
 						send_slack_message( "Not Fresh , Resetting to 1st Event === " + str( wElapsedTime_x ) )							
 						self.EVENT_POOL = []
