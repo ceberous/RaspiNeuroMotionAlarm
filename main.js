@@ -46,7 +46,7 @@ var stopEvent = null;
 	else if ( hours <= stopTime.hour ) {
 		wRestart = true;
 		if ( hours === stopTime.hour ) {
-			if ( now.getMinutes() < stopTime.minute ) { wRestart = true; }
+			if ( now.getMinutes() > stopTime.minute ) { wRestart = false; }
 		}
 	}
 	if ( wRestart ) {
