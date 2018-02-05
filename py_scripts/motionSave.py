@@ -272,6 +272,9 @@ class TenvisVideo():
 						send_slack_message( "( Stage-2-Check ) === PASSED || Elapsed Time === " + str( wElapsedTime_2 ) )
 						print "\n( Stage-2-Check ) === PASSED || Elapsed Time === " + str( wElapsedTime_2 )
 						wNeedToAlert = True
+					else:
+						send_slack_message( "( Stage-2-Check ) === FAILED || Elapsed Time === " + str( wElapsedTime_2 ) )
+						print "\n( Stage-2-Check ) === FAILED || Elapsed Time === " + str( wElapsedTime_2 )
 
 				if wNeedToAlert == True:
 					print "ALERT !!!!"
