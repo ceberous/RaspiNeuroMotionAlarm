@@ -42,7 +42,7 @@ var stopEvent = null;
 	const now = new Date();
     const day = now.getDay();
     const hours = now.getHours();
-	if( hours < startTime.hour && hours < stopTime.hour ) {
+	if( hours >= startTime.hour && hours <= stopTime.hour ) {
 		//if( hours !== s || now.getMinutes() <= 30 ) {
 
 		//}
