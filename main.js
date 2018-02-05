@@ -39,15 +39,16 @@ var stopEvent = null;
 		console.log( "\thttp://localhost:" + wPORT.toString() );
 	});
 
+	var wRestart = false;
 	const now = new Date();
-    const day = now.getDay();
     const hours = now.getHours();
-	if( hours >= startTime.hour && hours <= stopTime.hour ) {
-		//if( hours !== s || now.getMinutes() <= 30 ) {
-
-		//}
-		GenericUtils.restartPYProcess();
+	if( hours >= startTime.hour  ) { wRestart = true; }
+	else if ( hours <= stopTime.hour ) {
+		if ( now.getMinutes() < stopTime.minute ) { wRestart = true; }
+	}
+	if ( wRestart ) {
 		require( "./server/slackManager.js" ).post( "motionSave.py needs launched , starting" );
+		GenericUtils.restartPYProcess();
 	}
 
 	startEvent = schedule.scheduleJob( startTime , function(){
