@@ -64,7 +64,7 @@ def send_email( alertLevel , msg , wDateOBJ ):
 	wTimeMsg = wNowString + "\n\n" + msg
 	send_slack_message( "Motion @@ " + wNowString )
 	try:
-		yag.send( securityDetails.toEmail , str( alertLevel ) , "Motion @@ " + wTimeMsg )
+		yag.send( securityDetails.toEmail , str( alertLevel ) , "Motion @@ " + wNowString )
 		print( "sent email" )
 	except Exception as e:
 		print e
