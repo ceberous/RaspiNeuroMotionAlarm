@@ -42,6 +42,7 @@ var stopEvent = null;
 	var wRestart = false;
 	const now = new Date();
     const hours = now.getHours();
+    console.log( hours.toString() );
 	if( hours >= startTime.hour  ) { wRestart = true; }
 	else if ( hours <= stopTime.hour ) {
 		wRestart = true;
