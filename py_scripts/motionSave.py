@@ -187,6 +187,7 @@ class TenvisVideo():
 					#print "inside email cooloff - sleeping( " + str( wSleepDuration ) + " )"
 					#send_slack_message( self.nowString + " === inside email cooloff - sleeping( " + str( wSleepDuration ) + " )" )
 					#sleep( wSleepDuration )
+					pass
 				else:
 					print "done sleeping"
 					wNow = datetime.now( eastern_tz )
