@@ -183,16 +183,17 @@ class TenvisVideo():
 				self.nowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )
 				self.elapsedTimeFromLastEmail = int( ( wNow - self.last_email_time ).total_seconds() )
 				if self.elapsedTimeFromLastEmail < self.EMAIL_COOLOFF:
-					wSleepDuration = ( self.EMAIL_COOLOFF - self.elapsedTimeFromLastEmail )
-					print "inside email cooloff - sleeping( " + str( wSleepDuration ) + " )"
-					send_slack_message( self.nowString + " === inside email cooloff - sleeping( " + str( wSleepDuration ) + " )" )
-					sleep( wSleepDuration )
+					#wSleepDuration = ( self.EMAIL_COOLOFF - self.elapsedTimeFromLastEmail )
+					#print "inside email cooloff - sleeping( " + str( wSleepDuration ) + " )"
+					#send_slack_message( self.nowString + " === inside email cooloff - sleeping( " + str( wSleepDuration ) + " )" )
+					#sleep( wSleepDuration )
+				else:
 					print "done sleeping"
 					wNow = datetime.now( eastern_tz )
 					self.nowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )					
 					send_slack_message( self.nowString + " === done sleeping" )					
 					self.last_email_time = None
-					continue
+				continue
 
 			gray = cv2.cvtColor( frame , cv2.COLOR_BGR2GRAY )
 			gray = cv2.GaussianBlur( gray , ( 21 , 21 ) , 0 )
