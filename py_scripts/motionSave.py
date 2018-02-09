@@ -90,7 +90,7 @@ def send_email_gmx( alertLevel , msg , wDateOBJ ):
 	wMessage = MIMEMultipart()
 	wMessage['From'] = wFROM
 	wMessage['To'] = wTO
-	wMessage['Subject'] = alertLevel
+	wMessage['Subject'] = str( alertLevel )
 	wMessage.attach( MIMEText( msg ) )
 	#print wMessage
 	try:
