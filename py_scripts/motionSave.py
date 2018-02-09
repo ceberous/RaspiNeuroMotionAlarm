@@ -10,6 +10,9 @@ import yagmail
 from datetime import datetime , timedelta
 from time import localtime, strftime , sleep
 from pytz import timezone
+import smtplib
+from email.MIMEMultipart import MIMEMultipart
+from email.MIMEText import MIMEText
 eastern_tz = timezone( "US/Eastern" )
 
 
@@ -69,6 +72,34 @@ def send_email( alertLevel , msg , wDateOBJ ):
 	except Exception as e:
 		print e
 		print( "failed to send email" )
+		send_slack_error( "failed to send email" )
+
+
+def send_email_gmx( alertLevel , msg , wDateOBJ ):
+	wFROM = securityDetails.fromGmx
+	wTO = securityDetails.toEmail
+
+	wNow = wDateOBJ.strftime( "%Y-%m-%d %H:%M:%S" )
+	msg = "Motion @@ " + wNow
+	send_slack_message( msg )
+
+	wMessage = MIMEMultipart()
+	wMessage['From'] = wFROM
+	wMessage['To'] = wTO
+	wMessage['Subject'] = alertLevel
+	wMessage.attach( MIMEText( msg ) )
+	#print wMessage
+	try:
+		server = smtplib.SMTP( "mail.gmx.com" , 587 )
+		server.ehlo()
+		server.starttls()
+		server.ehlo()
+		server.login( wFROM ,  securityDetails.gmxPass  )
+		server.sendmail( wFROM , wTO , wMessage.as_string() )
+		server.close()
+		print('sent email')
+	except:
+		print('failed to send email')
 		send_slack_error( "failed to send email" )
 
 
@@ -184,14 +215,11 @@ class TenvisVideo():
 				self.elapsedTimeFromLastEmail = int( ( wNow - self.last_email_time ).total_seconds() )
 				if self.elapsedTimeFromLastEmail < self.EMAIL_COOLOFF:
 					#wSleepDuration = ( self.EMAIL_COOLOFF - self.elapsedTimeFromLastEmail )
-					#print "inside email cooloff - sleeping( " + str( wSleepDuration ) + " )"
+					print "inside email cooloff - sleeping( " + str( wSleepDuration ) + " )"
 					#send_slack_message( self.nowString + " === inside email cooloff - sleeping( " + str( wSleepDuration ) + " )" )
 					#sleep( wSleepDuration )
-					pass
 				else:
 					print "done sleeping"
-					wNow = datetime.now( eastern_tz )
-					self.nowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )					
 					send_slack_message( self.nowString + " === done sleeping" )					
 					self.last_email_time = None
 				continue
@@ -280,7 +308,7 @@ class TenvisVideo():
 
 				if wNeedToAlert == True:
 					print "ALERT !!!!"
-					send_email( self.total_motion , "Haley is Moving" , self.EVENT_POOL[ -1 ] )
+					send_email_gmx( self.total_motion , "Haley is Moving" , self.EVENT_POOL[ -1 ] )
 					self.last_email_time = self.EVENT_POOL[ -1 ]			
 					self.EVENT_POOL = []
 					print ""
