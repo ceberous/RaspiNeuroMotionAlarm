@@ -82,7 +82,8 @@ def send_email_gmx( alertLevel , msg , wDateOBJ ):
 	print wTO
 	print wFROM
 
-	wNow = wDateOBJ.strftime( "%Y-%m-%d %H:%M:%S" )
+	wDateOBJ1 = datetime.now( eastern_tz )
+	wNow = wDateOBJ1.strftime( "%Y-%m-%d %H:%M:%S" )
 	msg = "Motion @@ " + wNow
 	send_slack_message( msg )
 
