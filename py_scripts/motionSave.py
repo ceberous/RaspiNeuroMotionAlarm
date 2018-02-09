@@ -76,8 +76,11 @@ def send_email( alertLevel , msg , wDateOBJ ):
 
 
 def send_email_gmx( alertLevel , msg , wDateOBJ ):
+
 	wFROM = securityDetails.fromGmx
 	wTO = securityDetails.toEmail
+	print wTO
+	print wFROM
 
 	wNow = wDateOBJ.strftime( "%Y-%m-%d %H:%M:%S" )
 	msg = "Motion @@ " + wNow
@@ -101,7 +104,6 @@ def send_email_gmx( alertLevel , msg , wDateOBJ ):
 	except:
 		print('failed to send email')
 		send_slack_error( "failed to send email" )
-
 
 class TenvisVideo():
 
