@@ -75,6 +75,7 @@ def send_email( alertLevel , msg , wDateOBJ ):
 		send_slack_error( "failed to send email" )
 
 
+
 def send_email_gmx( alertLevel , msg , wDateOBJ ):
 
 	wFROM = securityDetails.fromGmx
@@ -218,7 +219,8 @@ class TenvisVideo():
 				self.elapsedTimeFromLastEmail = int( ( wNow - self.last_email_time ).total_seconds() )
 				if self.elapsedTimeFromLastEmail < self.EMAIL_COOLOFF:
 					#wSleepDuration = ( self.EMAIL_COOLOFF - self.elapsedTimeFromLastEmail )
-					print "inside email cooloff - sleeping( " + str( wSleepDuration ) + " )"
+					#print "inside email cooloff - sleeping( " + str( wSleepDuration ) + " )"
+					print "sleeping"
 					#send_slack_message( self.nowString + " === inside email cooloff - sleeping( " + str( wSleepDuration ) + " )" )
 					#sleep( wSleepDuration )
 				else:
@@ -312,7 +314,7 @@ class TenvisVideo():
 				if wNeedToAlert == True:
 					print "ALERT !!!!"
 					send_email_gmx( self.total_motion , "Haley is Moving" , self.EVENT_POOL[ -1 ] )
-					self.last_email_time = self.EVENT_POOL[ -1 ]			
+					self.last_email_time = self.EVENT_POOL[ -1 ]
 					self.EVENT_POOL = []
 					print ""
 			
