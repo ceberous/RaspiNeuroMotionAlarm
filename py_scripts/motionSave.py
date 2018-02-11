@@ -10,6 +10,7 @@ import yagmail
 from datetime import datetime , timedelta
 from time import localtime, strftime , sleep
 from pytz import timezone
+from twilio.rest import Client
 import smtplib
 from email.MIMEMultipart import MIMEMultipart
 from email.MIMEText import MIMEText
@@ -38,6 +39,7 @@ securityDetailsPath = os.path.abspath( os.path.join( __file__ , ".." , ".." ) )
 sys.path.append( securityDetailsPath )
 import securityDetails
 
+
 slack_client = SlackClient( securityDetails.slack_token )
 def send_slack_error( wErrString ):
 	try:
@@ -57,7 +59,23 @@ def send_slack_message( wMsgString ):
 			text=wMsgString
 		)
 	except:
-		print( "failed to send slack message" )		
+		print( "failed to send slack message" )
+
+
+TwilioClient = Client( securityDetails.twilio_sid , securityDetails.twilio_auth_token )
+def send_twilio_sms( alertLevel , msg , wDateOBJ ):
+	try:
+		wNowString = wDateOBJ.strftime( "%Y-%m-%d %H:%M:%S" )
+		wTimeMsg = wNowString + "\n\n" + msg
+		message = TwilioClient.messages.create( securityDetails.toSMSNumber ,
+	    	body=wTimeMsg ,
+	    	from_=securityDetails.fromSMSNumber ,
+		)
+		send_slack_message( "Motion @@ " + wNowString )
+	except:
+		print "failed to send sms"
+		send_slack_error( "failed to send sms" )
+
 
 #yagmail.register( securityDetails.fromGmail , securityDetails.gmailPass )
 yag = yagmail.SMTP( securityDetails.fromGmail , securityDetails.gmailPass )
