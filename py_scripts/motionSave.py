@@ -66,7 +66,7 @@ TwilioClient = Client( securityDetails.twilio_sid , securityDetails.twilio_auth_
 def send_twilio_sms( alertLevel , msg , wDateOBJ ):
 	try:
 		wNowString = wDateOBJ.strftime( "%Y-%m-%d %H:%M:%S" )
-		wTimeMsg = wNowString + "\n\n" + msg
+		wTimeMsg = "Motion @@ " + wNowString
 		message = TwilioClient.messages.create( securityDetails.toSMSNumber ,
 	    	body=wTimeMsg ,
 	    	from_=securityDetails.fromSMSNumber ,
