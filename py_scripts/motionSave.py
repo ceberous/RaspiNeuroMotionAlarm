@@ -331,7 +331,7 @@ class TenvisVideo():
 
 				if wNeedToAlert == True:
 					print "ALERT !!!!"
-					send_email_gmx( self.total_motion , "Haley is Moving" , self.EVENT_POOL[ -1 ] )
+					send_twilio_sms( self.total_motion , "Haley is Moving" , self.EVENT_POOL[ -1 ] )
 					self.last_email_time = self.EVENT_POOL[ -1 ]
 					self.EVENT_POOL = []
 					print ""
