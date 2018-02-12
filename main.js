@@ -15,7 +15,7 @@ const GenericUtils = require( "./server/utils/generic.js" );
 
 var startTime = new schedule.RecurrenceRule();
 startTime.dayOfWeek = [ new schedule.Range( 0 , 6 ) ];
-startTime.hour = 22;
+startTime.hour = 23;
 startTime.minute = 00;
 var stopTime = new schedule.RecurrenceRule();
 stopTime.dayOfWeek = [ new schedule.Range( 0 , 6 ) ];

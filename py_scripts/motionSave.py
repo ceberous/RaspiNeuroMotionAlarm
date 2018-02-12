@@ -71,8 +71,9 @@ def send_twilio_sms( alertLevel , msg , wDateOBJ ):
 	    	body=wTimeMsg ,
 	    	from_=securityDetails.fromSMSNumber ,
 		)
-		send_slack_message( "Motion @@ " + wNowString )
-	except:
+		send_slack_message( wTimeMsg )
+	except Exception as e:
+		print e
 		print "failed to send sms"
 		send_slack_error( "failed to send sms" )
 
