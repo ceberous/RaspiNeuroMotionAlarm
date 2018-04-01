@@ -6,6 +6,39 @@ const Eris = require("eris");
 var discordBot = null;
 var discordCreds = require( "../personal.js" ).discord_creds;
 
+function DISCORD_POST_ERROR( wMessage ) {
+	return new Promise( async function( resolve , reject ) {
+		try {
+			await discordBot.createMessage( discordCreds.error_channel_id , wMessage );
+			resolve();
+		}
+		catch( error ) { console.log( error ); reject( error ); }
+	});s
+}
+module.exports.discordPostError = DISCORD_POST_ERROR;
+
+function DISCORD_POST_EVENT( wMessage ) {
+	return new Promise( async function( resolve , reject ) {
+		try {
+			await discordBot.createMessage( discordCreds.events_channel_id , wMessage );
+			resolve();
+		}
+		catch( error ) { console.log( error ); reject( error ); }
+	});s
+}
+module.exports.discordPostEvent = DISCORD_POST_EVENT;
+
+function DISCORD_POST_RECORD( wMessage ) {
+	return new Promise( async function( resolve , reject ) {
+		try {
+			await discordBot.createMessage( discordCreds.records_channel_id , wMessage );
+			resolve();
+		}
+		catch( error ) { console.log( error ); reject( error ); }
+	});s
+}
+module.exports.discordPostRecord = DISCORD_POST_RECORD;
+
 const xChannel = "#raspi-neuro";
 function POST_MESSAGE( wMessage , wChannel ) {
 	return new Promise( async function( resolve , reject ) {

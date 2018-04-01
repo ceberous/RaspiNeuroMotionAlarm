@@ -11,6 +11,8 @@ from datetime import datetime , timedelta
 from time import localtime, strftime , sleep
 from pytz import timezone
 from twilio.rest import Client
+import json
+from websocket import create_connection
 #import discord
 #import smtplib
 #from email.MIMEMultipart import MIMEMultipart
@@ -43,6 +45,8 @@ import securityDetails
 
 #discord_client = discord.Client()
 #discord_client.run( securityDetails.discordToken )
+
+ws = create_connection( "ws://localhost:6161" )
 
 slack_client = SlackClient( securityDetails.slack_token )
 def send_slack_error( wErrString ):
@@ -131,17 +135,25 @@ def send_twilio_sms( wMsgString ):
 # 		send_slack_error( "failed to send email" )
 
 
+def send_web_socket_message( wType , wMsgString ):
+	xJString = json.dumps( { "type": wType , "message": wMsgString } )
+	ws.send( xJString )
+
+
 def broadcast_error( wMsgString ):
 	#discord_client.send_message( securityDetails.discordErrorChannelID , wMsgString )
+	send_web_socket_message( "error" , wMsgString )
 	send_slack_error( wMsgString )	
 
 def broadcast_event( wMsgString ):
 	#discord_client.send_message( securityDetails.discordEventsChannelID , wMsgString )
+	send_web_socket_message( "event" , wMsgString )
 	send_slack_message( wMsgString )	
 
 def broadcast_record( wMsgString ):
 	send_twilio_sms( wMsgString )
 	#discord_client.send_message( securityDetails.discordRecordsChannelID , wMsgString )
+	send_web_socket_message( "record" , wMsgString )
 	send_slack_message( wMsgString )
 
 
@@ -190,6 +202,7 @@ class TenvisVideo():
 		self.w_Capture.release()
 		cv2.destroyAllWindows()
 		#send_slack_error( "newMotion.py --> cleanup()" )
+		ws.close()
 		broadcast_event( "newMotion.py --> cleanup()" )
 
 	def write_video( self ):

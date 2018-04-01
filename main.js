@@ -25,11 +25,54 @@ stopTime.minute = 00;
 var startEvent = null;
 var stopEvent = null;
 
+const WebSocket = require( "ws" );
+var wss = wss_interval = null;
+
+function LOAD_WEBSOCKET_STUFF() {
+	return new Promise( function( resolve , reject ) {
+		try {
+			wss.on( "connection" ,  function( socket , req ) {
+				socket.on( "message" ,  function( message ) {
+					try { message = JSON.parse( message ); }
+					catch( e ) { var a = message; message = { "type": a }; }
+					switch( message.type ) {
+						case "pong":
+							//console.log( "inside pong()" );
+							this.isAlive = true;
+							break;
+						case "error":
+							require( "./server/slackManager.js" ).discordPostError( message.message );
+							break;
+						case "event":
+							require( "./server/slackManager.js" ).discordPostEvent( message.message );
+							break;
+						case "record":
+							require( "./server/slackManager.js" ).discordPostRecord( message.message );
+							break;
+						default:
+							break;
+					}
+				});
+			});
+			wss_interval = setInterval( function ping() {
+				wss.clients.forEach( function each( ws ) {
+					if ( ws.isAlive === false ) { console.log( "terminating client" ); return ws.terminate(); }
+					ws.isAlive = false;
+					//ws.send( JSON.stringify( { message: "ping" } ) );
+				});
+			} , 30000 );
+			resolve();
+		}
+		catch( error ) { console.log( error ); reject( error ); }
+	});
+}
+
 ( async ()=> {
 	console.log( "SERVER STARTING" );
 
 	app = require( "./server/express/app.js" );
 	server = require( "http" ).createServer( app );
+	wss = new WebSocket.Server({ server });
 	
 	await require( "./server/slackManager.js" ).initialize();
 	console.log( "LOADED Slack-Client" );

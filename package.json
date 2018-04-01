@@ -13,7 +13,8 @@
     "path": "^0.12.7",
     "ps-node": "^0.1.6",
     "shelljs": "^0.8.1",
-    "slack": "^9.1.5"
+    "slack": "^9.1.5",
+    "ws": "^5.1.0"
   },
   "devDependencies": {},
   "scripts": {
