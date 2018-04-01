@@ -74,7 +74,6 @@ function LOAD_WEBSOCKET_STUFF() {
 	app = require( "./server/express/app.js" );
 	server = require( "http" ).createServer( app );
 	wss = new WebSocket.Server({ server });
-	await LOAD_WEBSOCKET_STUFF();
 	
 	await require( "./server/slackManager.js" ).initialize();
 	console.log( "LOADED Slack-Client" );
