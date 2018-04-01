@@ -55,13 +55,13 @@ function LOAD_WEBSOCKET_STUFF() {
 					}
 				});
 			});
-			wss_interval = setInterval( function ping() {
-				wss.clients.forEach( function each( ws ) {
-					if ( ws.isAlive === false ) { console.log( "terminating client" ); return ws.terminate(); }
-					ws.isAlive = false;
-					//ws.send( JSON.stringify( { message: "ping" } ) );
-				});
-			} , 30000 );
+			// wss_interval = setInterval( function ping() {
+			// 	wss.clients.forEach( function each( ws ) {
+			// 		if ( ws.isAlive === false ) { console.log( "terminating client" ); return ws.terminate(); }
+			// 		ws.isAlive = false;
+			// 		//ws.send( JSON.stringify( { message: "ping" } ) );
+			// 	});
+			// } , 30000 );
 			resolve();
 		}
 		catch( error ) { console.log( error ); reject( error ); }
