@@ -137,6 +137,7 @@ def send_twilio_sms( wMsgString ):
 
 def send_web_socket_message( wType , wMsgString ):
 	xJString = json.dumps( { "type": wType , "message": wMsgString } )
+	print ( xJString )
 	ws.send( xJString )
 
 

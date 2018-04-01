@@ -35,6 +35,7 @@ function LOAD_WEBSOCKET_STUFF() {
 				socket.on( "message" ,  function( message ) {
 					try { message = JSON.parse( message ); }
 					catch( e ) { var a = message; message = { "type": a }; }
+					console.log( message );
 					switch( message.type ) {
 						case "pong":
 							//console.log( "inside pong()" );
@@ -73,6 +74,7 @@ function LOAD_WEBSOCKET_STUFF() {
 	app = require( "./server/express/app.js" );
 	server = require( "http" ).createServer( app );
 	wss = new WebSocket.Server({ server });
+	await LOAD_WEBSOCKET_STUFF();
 	
 	await require( "./server/slackManager.js" ).initialize();
 	console.log( "LOADED Slack-Client" );
@@ -127,5 +129,6 @@ function LOAD_WEBSOCKET_STUFF() {
 		} , 3000 );
 	});
 
+	await LOAD_WEBSOCKET_STUFF();
 	console.log( "SERVER READY" );
 })();
