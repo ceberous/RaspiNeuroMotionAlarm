@@ -195,7 +195,7 @@ class TenvisVideo():
 	def write_video( self ):
 		# https://www.programcreek.com/python/example/72134/cv2.VideoWriter
 		# https://video.stackexchange.com/questions/7903/how-to-losslessly-encode-a-jpg-image-sequence-to-a-video-in-ffmpeg
-		print "starting to write video"
+		print ( "starting to write video" )
 		wTMP_COPY = self.FRAME_POOL
 		
 		# try: 
@@ -218,7 +218,7 @@ class TenvisVideo():
 		#fourcc = cv2.cv.CV_FOURCC(*"MJPG")
 		fourcc = cv2.cv.CV_FOURCC('M','P','E','G')
 		w_path = os.path.join( videoPath , "latestMotion%d.avi" % self.video_index )
-		print w_path
+		print ( w_path )
 		
 		videoWriter = cv2.VideoWriter( w_path , fourcc , 30 , ( 500 , 500 ) )		
 		for i , frame in enumerate( wTMP_COPY ):
@@ -228,7 +228,7 @@ class TenvisVideo():
 		self.video_index += 1
 		wTMP_COPY = None
 		del wTMP_COPY
-		print "done writing video"
+		print ( "done writing video" )
 		return
 
 	def motionTracking( self ):
