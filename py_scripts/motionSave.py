@@ -11,7 +11,7 @@ from datetime import datetime , timedelta
 from time import localtime, strftime , sleep
 from pytz import timezone
 from twilio.rest import Client
-import discord
+#import discord
 #import smtplib
 #from email.MIMEMultipart import MIMEMultipart
 #from email.MIMEText import MIMEText
@@ -41,8 +41,8 @@ securityDetailsPath = os.path.abspath( os.path.join( __file__ , ".." , ".." ) )
 sys.path.append( securityDetailsPath )
 import securityDetails
 
-discord_client = discord.Client()
-discord_client.run( securityDetails.discordToken )
+#discord_client = discord.Client()
+#discord_client.run( securityDetails.discordToken )
 
 slack_client = SlackClient( securityDetails.slack_token )
 def send_slack_error( wErrString ):
@@ -132,16 +132,16 @@ def send_twilio_sms( wMsgString ):
 
 
 def broadcast_error( wMsgString ):
-	discord_client.send_message( securityDetails.discordErrorChannelID , wMsgString )
+	#discord_client.send_message( securityDetails.discordErrorChannelID , wMsgString )
 	send_slack_error( wMsgString )	
 
 def broadcast_event( wMsgString ):
-	discord_client.send_message( securityDetails.discordEventsChannelID , wMsgString )
+	#discord_client.send_message( securityDetails.discordEventsChannelID , wMsgString )
 	send_slack_message( wMsgString )	
 
 def broadcast_record( wMsgString ):
 	send_twilio_sms( wMsgString )
-	discord_client.send_message( securityDetails.discordRecordsChannelID , wMsgString )
+	#discord_client.send_message( securityDetails.discordRecordsChannelID , wMsgString )
 	send_slack_message( wMsgString )
 
 
