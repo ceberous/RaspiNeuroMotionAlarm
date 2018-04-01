@@ -6,21 +6,23 @@ import os
 import signal
 import imutils
 from slackclient import SlackClient
-import yagmail
+#import yagmail
 from datetime import datetime , timedelta
 from time import localtime, strftime , sleep
 from pytz import timezone
 from twilio.rest import Client
-import smtplib
-from email.MIMEMultipart import MIMEMultipart
-from email.MIMEText import MIMEText
+import discord
+#import smtplib
+#from email.MIMEMultipart import MIMEMultipart
+#from email.MIMEText import MIMEText
 eastern_tz = timezone( "US/Eastern" )
 
 
 def signal_handler( signal , frame ):
 	wStr1 = "newMotion.py closed , Signal = " + str( signal )
 	print( wStr1 )
-	send_slack_error( wStr1 )
+	#send_slack_error( wStr1 )
+	broadcast_error( wStr1 )
 	sys.exit(0)
 signal.signal( signal.SIGABRT , signal_handler )
 signal.signal( signal.SIGFPE , signal_handler )
@@ -39,6 +41,8 @@ securityDetailsPath = os.path.abspath( os.path.join( __file__ , ".." , ".." ) )
 sys.path.append( securityDetailsPath )
 import securityDetails
 
+discord_client = discord.Client()
+discord_client.run( securityDetails.discordToken )
 
 slack_client = SlackClient( securityDetails.slack_token )
 def send_slack_error( wErrString ):
@@ -62,75 +66,91 @@ def send_slack_message( wMsgString ):
 		print( "failed to send slack message" )
 
 
+
 TwilioClient = Client( securityDetails.twilio_sid , securityDetails.twilio_auth_token )
-def send_twilio_sms( alertLevel , msg , wDateOBJ ):
+def send_twilio_sms( wMsgString ):
 	try:
-		wNowString = wDateOBJ.strftime( "%Y-%m-%d %H:%M:%S" )
-		wTimeMsg = "Motion @@ " + wNowString
 		message = TwilioClient.messages.create( securityDetails.toSMSNumber ,
-	    	body=wTimeMsg ,
+	    	body=wMsgString ,
 	    	from_=securityDetails.fromSMSNumber ,
 		)
-		send_slack_message( wTimeMsg )
+		#send_slack_message( wTimeMsg )
 	except Exception as e:
 		print e
 		print "failed to send sms"
-		send_slack_error( "failed to send sms" )
+		#send_slack_error( "failed to send sms" )
+		broadcast_error( "failed to send sms" )
 
 
 #yagmail.register( securityDetails.fromGmail , securityDetails.gmailPass )
-yag = yagmail.SMTP( securityDetails.fromGmail , securityDetails.gmailPass )
-def send_email( alertLevel , msg , wDateOBJ ):
+# yag = yagmail.SMTP( securityDetails.fromGmail , securityDetails.gmailPass )
+# def send_email( alertLevel , msg , wDateOBJ ):
 
-	wNowString = wDateOBJ.strftime( "%Y-%m-%d %H:%M:%S" )
-	wTimeMsg = wNowString + "\n\n" + msg
-	send_slack_message( "Motion @@ " + wNowString )
-	try:
-		yag.send( securityDetails.toEmail , str( alertLevel ) , "Motion @@ " + wNowString )
-		print( "sent email" )
-	except Exception as e:
-		print e
-		print( "failed to send email" )
-		send_slack_error( "failed to send email" )
+# 	wNowString = wDateOBJ.strftime( "%Y-%m-%d %H:%M:%S" )
+# 	wTimeMsg = wNowString + "\n\n" + msg
+# 	send_slack_message( "Motion @@ " + wNowString )
+# 	try:
+# 		yag.send( securityDetails.toEmail , str( alertLevel ) , "Motion @@ " + wNowString )
+# 		print( "sent email" )
+# 	except Exception as e:
+# 		print e
+# 		print( "failed to send email" )
+# 		send_slack_error( "failed to send email" )
 
 
 
-def send_email_gmx( alertLevel , msg , wDateOBJ ):
+# def send_email_gmx( alertLevel , msg , wDateOBJ ):
 
-	wFROM = securityDetails.fromGmx
-	wTO = securityDetails.toEmail
-	print wTO
-	print wFROM
+# 	wFROM = securityDetails.fromGmx
+# 	wTO = securityDetails.toEmail
+# 	print wTO
+# 	print wFROM
 
-	wDateOBJ1 = datetime.now( eastern_tz )
-	wNow = wDateOBJ1.strftime( "%Y-%m-%d %H:%M:%S" )
-	msg = "Motion @@ " + wNow
-	send_slack_message( msg )
+# 	wDateOBJ1 = datetime.now( eastern_tz )
+# 	wNow = wDateOBJ1.strftime( "%Y-%m-%d %H:%M:%S" )
+# 	msg = "Motion @@ " + wNow
+# 	send_slack_message( msg )
 
-	wMessage = MIMEMultipart()
-	wMessage['From'] = wFROM
-	wMessage['To'] = wTO
-	wMessage['Subject'] = str( alertLevel )
-	wMessage.attach( MIMEText( msg ) )
-	#print wMessage
-	try:
-		server = smtplib.SMTP( "mail.gmx.com" , 587 )
-		server.ehlo()
-		server.starttls()
-		server.ehlo()
-		server.login( wFROM ,  securityDetails.gmxPass  )
-		server.sendmail( wFROM , wTO , wMessage.as_string() )
-		server.close()
-		print('sent email')
-	except:
-		print('failed to send email')
-		send_slack_error( "failed to send email" )
+# 	wMessage = MIMEMultipart()
+# 	wMessage['From'] = wFROM
+# 	wMessage['To'] = wTO
+# 	wMessage['Subject'] = str( alertLevel )
+# 	wMessage.attach( MIMEText( msg ) )
+# 	#print wMessage
+# 	try:
+# 		server = smtplib.SMTP( "mail.gmx.com" , 587 )
+# 		server.ehlo()
+# 		server.starttls()
+# 		server.ehlo()
+# 		server.login( wFROM ,  securityDetails.gmxPass  )
+# 		server.sendmail( wFROM , wTO , wMessage.as_string() )
+# 		server.close()
+# 		print('sent email')
+# 	except:
+# 		print('failed to send email')
+# 		send_slack_error( "failed to send email" )
+
+
+def broadcast_error( wMsgString ):
+	discord_client.send_message( securityDetails.discordErrorChannelID , wMsgString )
+	send_slack_error( wMsgString )	
+
+def broadcast_event( wMsgString ):
+	discord_client.send_message( securityDetails.discordEventsChannelID , wMsgString )
+	send_slack_message( wMsgString )	
+
+def broadcast_record( wMsgString ):
+	send_twilio_sms( wMsgString )
+	discord_client.send_message( securityDetails.discordRecordsChannelID , wMsgString )
+	send_slack_message( wMsgString )
+
 
 class TenvisVideo():
 
 	def __init__( self ):
 
-		send_slack_message( "python --> motionSave.py --> init()" )
+		#send_slack_message( "python --> motionSave.py --> init()" )
+		broadcast_error( "python --> motionSave.py --> init()" )
 
 		self.write_thread = None
 
@@ -169,7 +189,8 @@ class TenvisVideo():
 	def cleanup( self ):
 		self.w_Capture.release()
 		cv2.destroyAllWindows()
-		send_slack_error( "newMotion.py --> cleanup()" )
+		#send_slack_error( "newMotion.py --> cleanup()" )
+		broadcast_error( "newMotion.py --> cleanup()" )
 
 	def write_video( self ):
 		# https://www.programcreek.com/python/example/72134/cv2.VideoWriter
@@ -239,12 +260,14 @@ class TenvisVideo():
 				if self.elapsedTimeFromLastEmail < self.EMAIL_COOLOFF:
 					#wSleepDuration = ( self.EMAIL_COOLOFF - self.elapsedTimeFromLastEmail )
 					#print "inside email cooloff - sleeping( " + str( wSleepDuration ) + " )"
-					print "sleeping"
+					#print "sleeping"
+					pass
 					#send_slack_message( self.nowString + " === inside email cooloff - sleeping( " + str( wSleepDuration ) + " )" )
 					#sleep( wSleepDuration )
 				else:
-					print "done sleeping"
-					send_slack_message( self.nowString + " === done sleeping" )					
+					#print "done sleeping"
+					#send_slack_message( self.nowString + " === done sleeping" )
+					broadcast_event( self.nowString + " === done sleeping" )
 					self.last_email_time = None
 				continue
 
@@ -273,7 +296,7 @@ class TenvisVideo():
 					continue
 				wNow = datetime.now( eastern_tz )
 				self.nowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )
-				print self.nowString + " === motion record"
+				#print self.nowString + " === motion record"
 				#send_slack_message( self.nowString + " === motion record" )
 				motionCounter += 1
 
@@ -281,15 +304,17 @@ class TenvisVideo():
 			if motionCounter >= self.MIN_MOTION_FRAMES:
 				wNow = datetime.now( eastern_tz )
 				self.nowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )
-				send_slack_message( self.nowString + " === Motion Counter > MIN_MOTION_FRAMES" )
-				print "setting new motion record"
+				#send_slack_message( self.nowString + " === Motion Counter > MIN_MOTION_FRAMES" )
+				broadcast_event( self.nowString + " === Motion Counter > MIN_MOTION_FRAMES" )
+				#print "setting new motion record"
 
 				# Check if this is "fresh" in a series of new motion records
 				if len( self.EVENT_POOL ) > 1:
 					wElapsedTime_x = int( ( self.EVENT_POOL[ -1 ] - self.EVENT_POOL[ -2 ] ).total_seconds() )
 					if wElapsedTime_x > ( self.MAX_TIME_ACCEPTABLE_STAGE_2 * 2 ):
-						print "Not Fresh , Resetting to 1st Event === " + str( wElapsedTime_x )
-						send_slack_message( "Not Fresh , Resetting to 1st Event === " + str( wElapsedTime_x ) )							
+						#print "Not Fresh , Resetting to 1st Event === " + str( wElapsedTime_x )
+						#send_slack_message( "Not Fresh , Resetting to 1st Event === " + str( wElapsedTime_x ) )
+						broadcast_event( "Not Fresh , Resetting to 1st Event === " + str( wElapsedTime_x ) )
 						self.EVENT_POOL = []
 						self.total_motion = 0
 
@@ -301,8 +326,9 @@ class TenvisVideo():
 
 			# Once Total Motion Events Reach Threshold , create alert if timing conditions are met
 			if self.total_motion >= self.MOTION_EVENTS_ACCEPTABLE:
-				print self.nowString + " === self.total_motion >= self.MOTION_EVENTS_ACCEPTABLE"
-				send_slack_message( self.nowString + " === Total Motion >= MOTION_EVENTS_ACCEPTABLE" )		
+				#print self.nowString + " === self.total_motion >= self.MOTION_EVENTS_ACCEPTABLE"
+				#send_slack_message( self.nowString + " === Total Motion >= MOTION_EVENTS_ACCEPTABLE" )
+				broadcast_event( self.nowString + " === Total Motion >= MOTION_EVENTS_ACCEPTABLE" )
 				self.total_motion = 0
 
 				#print ""
@@ -315,27 +341,33 @@ class TenvisVideo():
 				# Condition 1.) Check Elapsed Time Between Last 2 Motion Events
 				wElapsedTime_1 = int( ( self.EVENT_POOL[ -1 ] - self.EVENT_POOL[ 0 ] ).total_seconds() )
 				if wElapsedTime_1 <= self.MAX_TIME_ACCEPTABLE:
-					print "\n( Stage-1-Check ) === PASSED || Elapsed Time === " + str( wElapsedTime_1 )
-					send_slack_message( "( Stage-1-Check ) === PASSED || Elapsed Time === " + str( wElapsedTime_1 ) )					
+					#print "\n( Stage-1-Check ) === PASSED || Elapsed Time === " + str( wElapsedTime_1 )
+					#send_slack_message( "( Stage-1-Check ) === PASSED || Elapsed Time === " + str( wElapsedTime_1 ) )
+					broadcast_event( "( Stage-1-Check ) === PASSED || Elapsed Time === " + str( wElapsedTime_1 ) )
 					wNeedToAlert = True
 				
 				# Condition 2.) Check if there are multiple events in a greater window
 				elif len( self.EVENT_POOL ) >= 3:
 					wElapsedTime_2 = int( ( self.EVENT_POOL[ -1 ] - self.EVENT_POOL[ -3 ] ).total_seconds() )
 					if wElapsedTime_2 <= self.MAX_TIME_ACCEPTABLE_STAGE_2:
-						send_slack_message( "( Stage-2-Check ) === PASSED || Elapsed Time === " + str( wElapsedTime_2 ) )
-						print "\n( Stage-2-Check ) === PASSED || Elapsed Time === " + str( wElapsedTime_2 )
+						#print "\n( Stage-2-Check ) === PASSED || Elapsed Time === " + str( wElapsedTime_2 )
+						#send_slack_message( "( Stage-2-Check ) === PASSED || Elapsed Time === " + str( wElapsedTime_2 ) )
+						broadcast_event( "( Stage-2-Check ) === PASSED || Elapsed Time === " + str( wElapsedTime_2 ) )
 						wNeedToAlert = True
 					else:
-						send_slack_message( "( Stage-2-Check ) === FAILED || Elapsed Time === " + str( wElapsedTime_2 ) )
-						print "\n( Stage-2-Check ) === FAILED || Elapsed Time === " + str( wElapsedTime_2 )
+						#print "\n( Stage-2-Check ) === FAILED || Elapsed Time === " + str( wElapsedTime_2 )
+						#send_slack_message( "( Stage-2-Check ) === FAILED || Elapsed Time === " + str( wElapsedTime_2 ) )
+						broadcast_event( "( Stage-2-Check ) === FAILED || Elapsed Time === " + str( wElapsedTime_2 ) )
 
 				if wNeedToAlert == True:
-					print "ALERT !!!!"
-					send_twilio_sms( self.total_motion , "Haley is Moving" , self.EVENT_POOL[ -1 ] )
+					#print "ALERT !!!!"
+					wNowString = self.EVENT_POOL[ -1 ].strftime( "%Y-%m-%d %H:%M:%S" )
+					wTimeMsg = "Motion @@ " + wNowString					
+					#send_twilio_sms( self.total_motion , "Haley is Moving" , self.EVENT_POOL[ -1 ] )
+					broadcast_record( wTimeMsg )
 					self.last_email_time = self.EVENT_POOL[ -1 ]
 					self.EVENT_POOL = []
-					print ""
+					#print ""
 			
 			# self.FRAME_POOL.insert( 0 , frame )
 			# self.FRAME_POOL.pop()
