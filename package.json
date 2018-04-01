@@ -6,6 +6,7 @@
   "dependencies": {
     "body-parser": "^1.18.2",
     "cors": "^2.8.4",
+    "eris": "^0.8.5",
     "express": "^4.16.2",
     "http": "^0.0.0",
     "node-schedule": "^1.3.0",

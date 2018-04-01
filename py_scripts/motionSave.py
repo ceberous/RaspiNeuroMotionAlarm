@@ -150,7 +150,7 @@ class TenvisVideo():
 	def __init__( self ):
 
 		#send_slack_message( "python --> motionSave.py --> init()" )
-		broadcast_error( "python --> motionSave.py --> init()" )
+		broadcast_event( "python --> motionSave.py --> init()" )
 
 		self.write_thread = None
 
@@ -190,7 +190,7 @@ class TenvisVideo():
 		self.w_Capture.release()
 		cv2.destroyAllWindows()
 		#send_slack_error( "newMotion.py --> cleanup()" )
-		broadcast_error( "newMotion.py --> cleanup()" )
+		broadcast_event( "newMotion.py --> cleanup()" )
 
 	def write_video( self ):
 		# https://www.programcreek.com/python/example/72134/cv2.VideoWriter

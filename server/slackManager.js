@@ -2,6 +2,10 @@ const Slack = require( "slack" );
 var bot = null;
 const wToken = require( "../personal.js" ).slack.access_token;
 
+const Eris = require("eris");
+var discordBot = null;
+var discordCreds = require( "../personal.js" ).discord_creds;
+
 const xChannel = "#raspi-neuro";
 function POST_MESSAGE( wMessage , wChannel ) {
 	return new Promise( async function( resolve , reject ) {
@@ -9,6 +13,12 @@ function POST_MESSAGE( wMessage , wChannel ) {
 			if ( !wMessage ) { resolve(); return; }
 			wChannel = wChannel || xChannel;
 			await bot.chat.postMessage( { token: wToken , channel: wChannel , text: wMessage  } );
+			if ( wChannel === xChannel ) {
+				await discordBot.createMessage( discordCreds.events_channel_id , wMessage );
+			}
+			else {
+				await discordBot.createMessage( discordCreds.error_channel_id , wMessage );
+			}
 			resolve();
 		}
 		catch( error ) { console.log( error ); reject( error ); }
@@ -37,6 +47,8 @@ function INITIALIZE() {
 	return new Promise( async function( resolve , reject ) {
 		try {
 			bot = await new Slack( { wToken } );
+			discordBot = new Eris( discordCreds.token );
+			await discordBot.connect();			
 			resolve();
 		}
 		catch( error ) { console.log( error ); reject( error ); }
