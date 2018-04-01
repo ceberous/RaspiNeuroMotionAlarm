@@ -76,8 +76,8 @@ def send_twilio_sms( wMsgString ):
 		)
 		#send_slack_message( wTimeMsg )
 	except Exception as e:
-		print e
-		print "failed to send sms"
+		print ( e )
+		print ( "failed to send sms" )
 		#send_slack_error( "failed to send sms" )
 		broadcast_error( "failed to send sms" )
 
@@ -178,10 +178,10 @@ class TenvisVideo():
 			self.MOTION_EVENTS_ACCEPTABLE = 4
 			self.MAX_TIME_ACCEPTABLE = 45
 			self.MAX_TIME_ACCEPTABLE_STAGE_2 = 90
-		print "MIN_MOTION_SECONDS === " + str( self.MIN_MOTION_SECONDS )
-		print "MOTION_EVENTS_ACCEPTABLE === " + str( self.MOTION_EVENTS_ACCEPTABLE )
-		print "MAX_TIME_ACCEPTABLE === " + str( self.MAX_TIME_ACCEPTABLE )
-		print "MAX_TIME_ACCEPTABLE_STAGE_2 === " + str( self.MAX_TIME_ACCEPTABLE_STAGE_2 )
+		print ( "MIN_MOTION_SECONDS === " + str( self.MIN_MOTION_SECONDS ) )
+		print ( "MOTION_EVENTS_ACCEPTABLE === " + str( self.MOTION_EVENTS_ACCEPTABLE ) )
+		print ( "MAX_TIME_ACCEPTABLE === " + str( self.MAX_TIME_ACCEPTABLE ) )
+		print ( "MAX_TIME_ACCEPTABLE_STAGE_2 === " + str( self.MAX_TIME_ACCEPTABLE_STAGE_2 ) )
 
 		self.w_Capture = cv2.VideoCapture( 0 )
 		self.motionTracking()
