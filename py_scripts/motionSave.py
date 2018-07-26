@@ -71,12 +71,13 @@ def send_slack_message( wMsgString ):
 
 
 
+
 TwilioClient = Client( securityDetails.twilio_sid , securityDetails.twilio_auth_token )
 def send_twilio_sms( wMsgString ):
 	try:
 		message = TwilioClient.messages.create( securityDetails.toSMSNumber ,
-	    	body=wMsgString ,
-	    	from_=securityDetails.fromSMSNumber ,
+			body=wMsgString ,
+			from_=securityDetails.fromSMSNumber ,
 		)
 		#send_slack_message( wTimeMsg )
 	except Exception as e:
@@ -85,6 +86,19 @@ def send_twilio_sms( wMsgString ):
 		#send_slack_error( "failed to send sms" )
 		broadcast_error( "failed to send sms" )
 
+
+def send_twilio_extra_sms( wMsgString ):
+	try:
+		message = TwilioClient.messages.create( securityDetails.toSMSExtraNumber ,
+			body=wMsgString ,
+			from_=securityDetails.fromSMSNumber ,
+		)
+		#send_slack_message( wTimeMsg )
+	except Exception as e:
+		print ( e )
+		print ( "failed to send extra sms" )
+		#send_slack_error( "failed to send sms" )
+		broadcast_error( "failed to send extra sms" )
 
 #yagmail.register( securityDetails.fromGmail , securityDetails.gmailPass )
 # yag = yagmail.SMTP( securityDetails.fromGmail , securityDetails.gmailPass )
@@ -157,6 +171,11 @@ def broadcast_record( wMsgString ):
 	send_web_socket_message( "record" , wMsgString )
 	send_slack_message( wMsgString )
 
+def broadcast_extra_record( wMsgString ):
+	send_twilio_extra_sms( wMsgString )
+	#discord_client.send_message( securityDetails.discordRecordsChannelID , wMsgString )
+	#send_web_socket_message( "record" , wMsgString )
+	#send_slack_message( wMsgString )
 
 class TenvisVideo():
 
@@ -171,6 +190,7 @@ class TenvisVideo():
 		#wNow = datetime.now( eastern_tz )
 		#self.EVENT_POOL = [ wNow ]*10
 		self.EVENT_POOL = []
+		self.ExtraAlertPool = [ datetime.now( eastern_tz ) ] * 8
 
 		self.total_motion = 0
 		self.video_index = 0
@@ -381,6 +401,18 @@ class TenvisVideo():
 					broadcast_record( wTimeMsg )
 					self.last_email_time = self.EVENT_POOL[ -1 ]
 					self.EVENT_POOL = []
+
+					try:					
+						self.ExtraAlertPool.insert( 0 , self.last_email_time )
+						self.ExtraAlertPool.pop()
+						num_records_in_10_minutes = len( [ for record in self.ExtraAlertPool if int( ( self.EVENT_POOL[ -1 ] - record ).total_seconds() ) < 600 ] )
+						if num_records_in_10_minutes >= 8:
+							wS1 = str( num_records_in_10_minutes ) + " Records in 10 Minutes"
+							broadcast_extra_record( wS1 )
+					except:
+						print( "failed to process extra events que" )
+						broadcast_error( "failed to process extra events que" )
+
 					#print ""
 			
 			# self.FRAME_POOL.insert( 0 , frame )
