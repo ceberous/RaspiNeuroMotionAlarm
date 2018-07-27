@@ -4,7 +4,7 @@ const wToken = require( "../personal.js" ).slack.access_token;
 
 const fs = require( "fs" );
 const path = require( "path" );
-const still_path = path.join( __dirname , ".." , ".." , "client" , "fram.jpeg" );
+const still_path = path.join( __dirname , ".." , "client" , "frame.jpeg" );
 console.log( still_path );
 const Eris = require("eris");
 var discordBot = null;
