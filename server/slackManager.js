@@ -84,7 +84,10 @@ function POST_STILL() {
 	return new Promise( async function( resolve , reject ) {
 		try {
 			const still_data = fs.readFileSync( still_path );
-			await discordBot.createMessage( discordCreds.events_channel_id , "still" , still_data );
+			await discordBot.createMessage( discordCreds.events_channel_id , "still" , {
+				file: still_data ,
+				name: "still.jpeg"
+			});
 			resolve();
 		}
 		catch( error ) { console.log( error ); reject( error ); }
