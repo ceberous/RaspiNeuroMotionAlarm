@@ -113,7 +113,8 @@ function INITIALIZE() {
 				fullDescription: "Posts Still",
 				usage: "<text>" ,
 				reactionButtonTimeout: 0
-			});		
+			});
+			discordBot.registerCommandAlias( "frame" , "still" );
 			await discordBot.connect();
 			setTimeout( function() {
 				resolve();
