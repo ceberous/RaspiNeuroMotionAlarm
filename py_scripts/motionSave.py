@@ -402,20 +402,20 @@ class TenvisVideo():
 					self.last_email_time = self.EVENT_POOL[ -1 ]
 					self.EVENT_POOL = []
 
-					try:					
-						self.ExtraAlertPool.insert( 0 , self.last_email_time )
-						self.ExtraAlertPool.pop()
-						num_records_in_10_minutes = 0
-						for i , record in enumerate( self.ExtraAlertPool ):
-							if int( ( self.EVENT_POOL[ -1 ] - record ).total_seconds() ) < 600:
-								num_records_in_10_minutes = num_records_in_10_minutes + 1
-						if num_records_in_10_minutes >= 8:
-							wS1 = str( num_records_in_10_minutes ) + " Records in 10 Minutes"
-							broadcast_extra_record( wS1 )
-					except Exception as e:
-						print( "failed to process extra events que" )
-						broadcast_error( "failed to process extra events que" )
-						broadcast_error( e )
+					# try:					
+					# 	self.ExtraAlertPool.insert( 0 , self.last_email_time )
+					# 	self.ExtraAlertPool.pop()
+					# 	num_records_in_10_minutes = 0
+					# 	for i , record in enumerate( self.ExtraAlertPool ):
+					# 		if int( ( self.EVENT_POOL[ -1 ] - record ).total_seconds() ) < 600:
+					# 			num_records_in_10_minutes = num_records_in_10_minutes + 1
+					# 	if num_records_in_10_minutes >= 8:
+					# 		wS1 = str( num_records_in_10_minutes ) + " Records in 10 Minutes"
+					# 		broadcast_extra_record( wS1 )
+					# except Exception as e:
+					# 	print( "failed to process extra events que" )
+					# 	broadcast_error( "failed to process extra events que" )
+					# 	broadcast_error( e )
 
 					#print ""
 			
