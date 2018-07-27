@@ -405,7 +405,7 @@ class TenvisVideo():
 					try:					
 						self.ExtraAlertPool.insert( 0 , self.last_email_time )
 						self.ExtraAlertPool.pop()
-						num_records_in_10_minutes = len( [ for record in self.ExtraAlertPool if int( ( self.EVENT_POOL[ -1 ] - record ).total_seconds() ) < 600 ] )
+						num_records_in_10_minutes = len( [ record for record in self.ExtraAlertPool if int( ( self.EVENT_POOL[ -1 ] - record ).total_seconds() ) < 600 ] )
 						if num_records_in_10_minutes >= 8:
 							wS1 = str( num_records_in_10_minutes ) + " Records in 10 Minutes"
 							broadcast_extra_record( wS1 )
