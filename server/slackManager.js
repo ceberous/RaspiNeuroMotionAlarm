@@ -2,6 +2,10 @@ const Slack = require( "slack" );
 var bot = null;
 const wToken = require( "../personal.js" ).slack.access_token;
 
+const fs = require( "fs" );
+const path = require( "path" );
+const still_path = path.join( __dirname , ".." , ".." , "client" , "fram.jpeg" );
+console.log( still_path );
 const Eris = require("eris");
 var discordBot = null;
 var discordCreds = require( "../personal.js" ).discord_creds;
@@ -45,7 +49,7 @@ function POST_MESSAGE( wMessage , wChannel ) {
 		try {
 			if ( !wMessage ) { resolve(); return; }
 			wChannel = wChannel || xChannel;
-			await bot.chat.postMessage( { token: wToken , channel: wChannel , text: wMessage  } );
+			//await bot.chat.postMessage( { token: wToken , channel: wChannel , text: wMessage  } );
 			if ( wChannel === xChannel ) {
 				await discordBot.createMessage( discordCreds.events_channel_id , wMessage );
 			}
@@ -68,7 +72,7 @@ function POST_SLACK_ERROR( wStatus ) {
 				try { wStatus = wStatus.toString(); }
 				catch( e ) { wStatus = e; }
 			}
-			await POST_MESSAGE( wStatus , wErrChannel );
+			//await POST_MESSAGE( wStatus , wErrChannel );
 			resolve();
 		}
 		catch( error ) { console.log( error ); reject( error ); }
@@ -76,11 +80,37 @@ function POST_SLACK_ERROR( wStatus ) {
 }
 module.exports.postError = POST_SLACK_ERROR;
 
+function POST_STILL() {
+	return new Promise( async function( resolve , reject ) {
+		try {
+			const still_data = fs.readFileSync( still_path );
+			await discordBot.createMessage( discordCreds.events_channel_id , "still" , still_data );
+			resolve();
+		}
+		catch( error ) { console.log( error ); reject( error ); }
+	});
+}
+
 function INITIALIZE() {
 	return new Promise( async function( resolve , reject ) {
 		try {
-			bot = await new Slack( { wToken } );
-			discordBot = new Eris( discordCreds.token );
+			//bot = await new Slack( { wToken } );
+			discordBot = new Eris.CommandClient( discordCreds.token , {} , {
+				description: "333",
+				owner: discordCreds.bot_id ,
+				prefix: "!"
+			});
+			var stillCommand = discordBot.registerCommand( "still" , ( msg , args ) => {
+				if( args.length === 0 ) {
+					POST_STILL();
+				}
+				return;
+			}, {
+				description: "Posts Still",
+				fullDescription: "Posts Still",
+				usage: "<text>" ,
+				reactionButtonTimeout: 0
+			});		
 			await discordBot.connect();
 			setTimeout( function() {
 				resolve();
