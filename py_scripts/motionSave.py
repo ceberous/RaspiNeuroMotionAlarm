@@ -401,7 +401,7 @@ class TenvisVideo():
 					self.last_email_time = self.EVENT_POOL[ -1 ]
 					self.EVENT_POOL = []
 
-					try:					
+					try:
 						self.ExtraAlertPool.insert( 0 , self.last_email_time )
 						self.ExtraAlertPool.pop()
 						num_records_in_10_minutes = 0

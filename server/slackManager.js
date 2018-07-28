@@ -2,6 +2,7 @@ const Slack = require( "slack" );
 var bot = null;
 const wToken = require( "../personal.js" ).slack.access_token;
 
+require( "shelljs/global" );
 const fs = require( "fs" );
 const path = require( "path" );
 const still_path = path.join( __dirname , ".." , "client" , "frame.jpeg" );
@@ -93,6 +94,31 @@ function POST_STILL() {
 		catch( error ) { console.log( error ); reject( error ); }
 	});
 }
+module.exports.postStill = POST_STILL;
+
+function RESTART_PM2() {
+	return new Promise( function( resolve , reject ) {
+		try {
+			exec( "pm2 restart all" , { silent: true , async: false } );
+		}
+		catch( error ) { console.log( error ); reject( error ); }
+	});
+}
+module.exports.restartPM2 = RESTART_PM2;
+
+
+function OS_COMMAND( wTask ) {
+	return new Promise( function( resolve , reject ) {
+		try {
+			var result = null;
+			var x1 = exec( wTask , { silent: true , async: false } );
+			if ( x1.stderr ) { result = x1.stderr }
+			else { result = x1.stdout.trim() }
+			resolve( result );
+		}
+		catch( error ) { console.log( error ); reject( error ); }
+	});
+}
 
 function INITIALIZE() {
 	return new Promise( async function( resolve , reject ) {
@@ -115,6 +141,19 @@ function INITIALIZE() {
 				reactionButtonTimeout: 0
 			});
 			discordBot.registerCommandAlias( "frame" , "still" );
+
+			var smsCommand = discordBot.registerCommand( "sms" , ( msg , args ) => {
+				if( args.length === 0 ) {
+					OS_COMMAND( "/usr/local/bin/sendMotionSMS" );
+				}
+				return;
+			}, {
+				description: "Sends Extra Motion SMS",
+				fullDescription: "Sends Extra Motion SMS",
+				usage: "<text>" ,
+				reactionButtonTimeout: 0
+			});
+			discordBot.registerCommandAlias( "notify" , "sms" );
 			await discordBot.connect();
 			setTimeout( function() {
 				resolve();
