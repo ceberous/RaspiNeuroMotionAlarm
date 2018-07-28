@@ -397,7 +397,6 @@ class TenvisVideo():
 					#print "ALERT !!!!"
 					wNowString = self.EVENT_POOL[ -1 ].strftime( "%Y-%m-%d %H:%M:%S" )
 					wTimeMsg = "Motion @@ " + wNowString					
-					#send_twilio_sms( self.total_motion , "Haley is Moving" , self.EVENT_POOL[ -1 ] )
 					broadcast_record( wTimeMsg )
 					self.last_email_time = self.EVENT_POOL[ -1 ]
 					self.EVENT_POOL = []
@@ -409,7 +408,7 @@ class TenvisVideo():
 						for i , record in enumerate( self.ExtraAlertPool ):
 							if int( ( self.last_email_time - record ).total_seconds() ) < 600:
 								num_records_in_10_minutes = num_records_in_10_minutes + 1
-						if num_records_in_10_minutes >= 8:
+						if num_records_in_10_minutes >= 3:
 							wS1 = str( num_records_in_10_minutes ) + " Records in 10 Minutes"
 							broadcast_extra_record( wS1 )
 					except Exception as e:
