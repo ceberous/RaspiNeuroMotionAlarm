@@ -13,6 +13,28 @@ var wState = false;
 var wChild = null;
 var wPIDResultSet = [];
 
+const MonthNames = [ "JAN" , "FEB" , "MAR" , "APR" , "MAY" , "JUN" , "JUL" , "AUG" , "SEP" , "OCT" , "NOV" , "DEC" ];
+function GET_NOW_TIME() {
+	const today = new Date();
+	var day = today.getDate();
+	if ( parseInt( day ) < 10 ) { day = "0" + day; }
+	const month = MonthNames[ today.getMonth() ];
+	const year = today.getFullYear();
+	var hours = today.getHours();
+	if ( parseInt( hours ) < 10 ) { hours = "0" + hours; }
+	var minutes = today.getMinutes();
+	if ( parseInt( minutes ) < 10 ) { minutes = "0" + minutes; }
+	var seconds = today.getSeconds();
+	if ( parseInt( seconds ) < 10 ) { seconds = "0" + seconds; }
+	var milliseconds = today.getMilliseconds();
+	const mi = parseInt( milliseconds );
+	if ( mi < 10 ) { milliseconds = "00" + milliseconds; }
+	else if ( mi < 100 ) { milliseconds = "0" + milliseconds; }
+	//return day + month + year + " @ " + hours + ":" + minutes + ":" + seconds + "." + milliseconds;
+	return day + month + year + " @ " + hours + ":" + minutes + ":" + seconds;
+}
+module.exports.time = GET_NOW_TIME;
+
 function SET_ARGS( wArg1 , wArg2 , wArg3 , wArg4 ) {
 	arg1 = wArg1 || arg1;
 	arg2 = wArg2 || arg2;

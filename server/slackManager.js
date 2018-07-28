@@ -84,10 +84,11 @@ module.exports.postError = POST_SLACK_ERROR;
 function POST_STILL() {
 	return new Promise( async function( resolve , reject ) {
 		try {
+			const timeName = require( "./utils/generic.js" ).time();
 			const still_data = fs.readFileSync( still_path );
-			await discordBot.createMessage( discordCreds.events_channel_id , "still" , {
+			await discordBot.createMessage( discordCreds.events_channel_id , timeName , {
 				file: still_data ,
-				name: "still.jpeg"
+				name: timeName + ".jpeg"
 			});
 			resolve();
 		}
