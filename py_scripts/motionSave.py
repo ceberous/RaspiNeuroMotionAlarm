@@ -172,6 +172,7 @@ def broadcast_record( wMsgString ):
 	send_slack_message( wMsgString )
 
 def broadcast_extra_record( wMsgString ):
+	send_web_socket_message( "extra" , wMsgString )
 	send_twilio_extra_sms( wMsgString )
 	#discord_client.send_message( securityDetails.discordRecordsChannelID , wMsgString )
 	#send_web_socket_message( "record" , wMsgString )

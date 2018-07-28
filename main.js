@@ -51,6 +51,9 @@ function LOAD_WEBSOCKET_STUFF() {
 							require( "./server/slackManager.js" ).discordPostRecord( message.message );
 							//require( "./server/slackManager.js" ).postStill();
 							break;
+						case "extra":
+							require( "./server/slackManager.js" ).postStill();
+							break;
 						default:
 							break;
 					}
