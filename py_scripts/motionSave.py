@@ -410,7 +410,7 @@ class TenvisVideo():
 							if int( ( self.last_email_time - record ).total_seconds() ) < 600:
 								num_records_in_10_minutes = num_records_in_10_minutes + 1
 						if num_records_in_10_minutes >= 3:
-							wS1 = str( num_records_in_10_minutes ) + " Records in 10 Minutes"
+							wS1 = wNowString + " @@ " + str( num_records_in_10_minutes ) + " Records in 10 Minutes"
 							broadcast_extra_record( wS1 )
 					except Exception as e:
 						print( "failed to process extra events que" )
