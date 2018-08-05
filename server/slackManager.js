@@ -155,6 +155,33 @@ function INITIALIZE() {
 				reactionButtonTimeout: 0
 			});
 			discordBot.registerCommandAlias( "notify" , "sms" );
+			discordBot.registerCommandAlias( "alert" , "sms" );
+
+			var callCommand = discordBot.registerCommand( "call" , ( msg , args ) => {
+				if( args.length === 0 ) {
+					OS_COMMAND( "/usr/local/bin/callDad" );
+					return;
+				}
+				if ( args[ 0 ] === "house" ) {
+					OS_COMMAND( "/usr/local/bin/callHouse" );
+					return;
+				}
+				
+				if ( args[ 0 ] === "mom" ) {
+					OS_COMMAND( "/usr/local/bin/callMom" );
+					return;
+				}
+				if ( args[ 0 ] === "me" || args[ 0 ] === "test" ) {
+					OS_COMMAND( "/usr/local/bin/callMe" );
+					return;
+				}				
+			}, {
+				description: "Makes Voice Call to Number",
+				fullDescription: "Makes Voice Call to Number",
+				usage: "<text>" ,
+				reactionButtonTimeout: 0
+			});
+
 			await discordBot.connect();
 			setTimeout( function() {
 				resolve();

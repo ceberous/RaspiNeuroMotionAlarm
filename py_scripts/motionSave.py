@@ -43,6 +43,11 @@ securityDetailsPath = os.path.abspath( os.path.join( __file__ , ".." , ".." ) )
 sys.path.append( securityDetailsPath )
 import securityDetails
 
+TwilioClient = Client( securityDetails.twilio_sid , securityDetails.twilio_auth_token )
+
+def make_voice_call():
+	new_call = TwilioClient.calls.create( url=securityDetails.twilio_response_server_url , to=securityDetails.toSMSExtraNumber , from_=securityDetails.fromSMSNumber , method="POST" )
+
 #discord_client = discord.Client()
 #discord_client.run( securityDetails.discordToken )
 
@@ -174,6 +179,7 @@ def broadcast_record( wMsgString ):
 def broadcast_extra_record( wMsgString ):
 	send_web_socket_message( "extra" , wMsgString )
 	send_twilio_extra_sms( wMsgString )
+	#send_twilio_sms( wMsgString )
 	#discord_client.send_message( securityDetails.discordRecordsChannelID , wMsgString )
 	#send_web_socket_message( "record" , wMsgString )
 	#send_slack_message( wMsgString )
@@ -406,12 +412,17 @@ class TenvisVideo():
 						self.ExtraAlertPool.insert( 0 , self.last_email_time )
 						self.ExtraAlertPool.pop()
 						num_records_in_10_minutes = 0
+						num_records_in_25_minutes = 0
 						for i , record in enumerate( self.ExtraAlertPool ):
 							if int( ( self.last_email_time - record ).total_seconds() ) < 600:
 								num_records_in_10_minutes = num_records_in_10_minutes + 1
+							elif int( ( self.last_email_time - record ).total_seconds() ) < 1500:
+								num_records_in_25_minutes = num_records_in_25_minutes + 1
 						if num_records_in_10_minutes >= 3:
 							wS1 = wNowString + " @@ " + str( num_records_in_10_minutes ) + " Records in 10 Minutes"
 							broadcast_extra_record( wS1 )
+						if num_records_in_25_minutes >= 5:
+							make_voice_call()
 					except Exception as e:
 						print( "failed to process extra events que" )
 						broadcast_error( "failed to process extra events que" )
