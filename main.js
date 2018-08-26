@@ -1,4 +1,7 @@
 const schedule = require( "node-schedule" );
+const ip = require("ip");
+const fs = require( "fs" );
+const path = require( "path" );
 
 process.on( "unhandledRejection" , function( reason , p ) {
     console.error( reason, "Unhandled Rejection at Promise" , p );
@@ -72,8 +75,13 @@ function LOAD_WEBSOCKET_STUFF() {
 	});
 }
 
+const localIP = ip.address();
+const LIVE_HTML_PAGE = `<img alt=""id="liveimage"src=""/><img alt="" id="liveimage" src=""/> <script type="text/javascript">(function(){setInterval(function(){var myImageElement=document.getElementById("liveimage");myImageElement.src="http://${localIP}:${wPORT}/live_image?"+new Date().getTime()},500)}());</script>;`
+
 ( async ()=> {
 	console.log( "SERVER STARTING" );
+
+	fs.writeFileSync( path.join( __dirname , "client" , "views" , "live.html" ) , LIVE_HTML_PAGE );
 
 	app = require( "./server/express/app.js" );
 	server = require( "http" ).createServer( app );
