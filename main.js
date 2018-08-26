@@ -76,7 +76,9 @@ function LOAD_WEBSOCKET_STUFF() {
 }
 
 const localIP = ip.address();
-const LIVE_HTML_PAGE = `<img alt=""id="liveimage"src=""/><img alt="" id="liveimage" src=""/> <script type="text/javascript">(function(){setInterval(function(){var myImageElement=document.getElementById("liveimage");myImageElement.src="http://${localIP}:${wPORT}/live_image?"+new Date().getTime()},500)}());</script>;`
+var LIVE_HTML_PAGE = '<img alt=""id="liveimage"src=""/><img alt="" id="liveimage" src=""/> <script type="text/javascript">(function(){setInterval(function(){var myImageElement=document.getElementById("liveimage");myImageElement.src="http://';
+LIVE_HTML_PAGE = LIVE_HTML_PAGE + localIP + ":" + wPORT + "/live_image?";
+LIVE_HTML_PAGE = LIVE_HTML_PAGE + "+ new Date().getTime()},500)}());</script>";
 
 ( async ()=> {
 	console.log( "SERVER STARTING" );
