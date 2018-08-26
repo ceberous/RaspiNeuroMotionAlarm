@@ -84,6 +84,7 @@ LIVE_HTML_PAGE = LIVE_HTML_PAGE + " + new Date().getTime()},500)}());</script>";
 	console.log( "SERVER STARTING" );
 
 	fs.writeFileSync( path.join( __dirname , "client" , "views" , "live.html" ) , LIVE_HTML_PAGE );
+	console.log( "Wrote LIVE_HTML_PAGE file" );
 
 	app = require( "./server/express/app.js" );
 	server = require( "http" ).createServer( app );
