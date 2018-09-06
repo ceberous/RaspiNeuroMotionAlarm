@@ -118,7 +118,7 @@ def broadcast_event( wMsgString ):
 	send_slack_message( wMsgString )	
 
 def broadcast_record( wMsgString ):
-	##send_twilio_sms( wMsgString )
+	send_twilio_sms( wMsgString )
 	#discord_client.send_message( securityDetails.discordRecordsChannelID , wMsgString )
 	send_web_socket_message( "record" , wMsgString )
 	send_slack_message( wMsgString )
@@ -126,7 +126,7 @@ def broadcast_record( wMsgString ):
 def broadcast_extra_record( wMsgString ):
 	print( "Broadcasting Extra Event" )
 	send_web_socket_message( "extra" , wMsgString )
-	##send_twilio_extra_sms( wMsgString )
+	send_twilio_extra_sms( wMsgString )
 	#send_twilio_sms( wMsgString )
 	#discord_client.send_message( securityDetails.discordRecordsChannelID , wMsgString )
 	#send_web_socket_message( "record" , wMsgString )
@@ -153,7 +153,7 @@ class TenvisVideo():
 		#self.FRAME_POOL = [ None ]*1800
 		#wNow = datetime.now( eastern_tz )
 		#self.EVENT_POOL = [ wNow ]*10
-		self.EVENT_TOTAL = 0
+		self.EVENT_TOTAL = -1
 		self.EVENT_POOL = []
 		self.ExtraAlertPool = [ datetime.now( eastern_tz ) ] * 8
 
@@ -411,16 +411,16 @@ class TenvisVideo():
 						self.ExtraAlertPool.insert( 0 , self.last_email_time )
 						self.ExtraAlertPool.pop()
 						num_records_in_10_minutes = 0
-						num_records_in_25_minutes = 0
+						num_records_in_20_minutes = 0
 						for i , record in enumerate( self.ExtraAlertPool ):
 							if int( ( self.last_email_time - record ).total_seconds() ) < 600:
 								num_records_in_10_minutes = num_records_in_10_minutes + 1
-							elif int( ( self.last_email_time - record ).total_seconds() ) < 1500:
-								num_records_in_25_minutes = num_records_in_25_minutes + 1
+							elif int( ( self.last_email_time - record ).total_seconds() ) < 1200:
+								num_records_in_20_minutes = num_records_in_20_minutes + 1
 						if num_records_in_10_minutes >= 3:
 							wS1 = wNowString + " @@ " + str( num_records_in_10_minutes ) + " Records in 10 Minutes"
 							broadcast_extra_record( wS1 )
-						if num_records_in_25_minutes >= 5:
+						if num_records_in_20_minutes >= 5:
 							make_voice_call()
 					except Exception as e:
 						print( "failed to process extra events que" )
