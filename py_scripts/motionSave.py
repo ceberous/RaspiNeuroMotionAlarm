@@ -135,8 +135,9 @@ def make_folder( path ):
 	try:
 		os.makedirs( path )
 	except OSError as exception:
-		if exception.errno != errno.EEXIST:
-			raise
+		pass
+		#if exception.errno != errno.EEXIST:
+			#raise
 
 class TenvisVideo():
 
