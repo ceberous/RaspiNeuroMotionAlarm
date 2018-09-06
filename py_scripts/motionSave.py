@@ -133,6 +133,8 @@ def broadcast_extra_record( wMsgString ):
 
 def make_folder( path ):
 	try:
+		print( "Trying to Make Folder Path --> " )
+		print( path )
 		os.makedirs( path )
 	except OSError as exception:
 		pass
@@ -191,7 +193,7 @@ class TenvisVideo():
 		self.TODAY_DATE_STRING = datetime.now( eastern_tz ).strftime( "%d%b%Y" ).upper()
 		self.TODAY_DATE_FILE_PATH = os.path.abspath( os.path.join( __file__ , "RECORDS" , self.TODAY_DATE_STRING ) )
 		make_folder( self.TODAY_DATE_FILE_PATH )
-		self.CURRENT_EVENT_FOLDER_PATH = os.path.abspath( os.path.join( self.TODAY_DATE_STRING , str( self.EVENT_TOTAL ) ) )
+		self.CURRENT_EVENT_FOLDER_PATH = os.path.abspath( os.path.join( self.TODAY_DATE_FILE_PATH , str( self.EVENT_TOTAL ) ) )
 		make_folder( self.CURRENT_EVENT_FOLDER_PATH )
 
 		# Start
@@ -275,7 +277,7 @@ class TenvisVideo():
 					self.WRITING_EVENT_FRAMES = False
 					self.FRAME_EVENT_COUNT = 0
 					self.EVENT_TOTAL += 1
-					self.CURRENT_EVENT_FOLDER_PATH = os.path.abspath( os.path.join( self.TODAY_DATE_STRING , str( self.EVENT_TOTAL ) ) )
+					self.CURRENT_EVENT_FOLDER_PATH = os.path.abspath( os.path.join( self.TODAY_DATE_FILE_PATH , str( self.EVENT_TOTAL ) ) )
 					make_folder( self.CURRENT_EVENT_FOLDER_PATH )
 			sleep( .1 )
 
