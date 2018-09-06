@@ -118,14 +118,15 @@ def broadcast_event( wMsgString ):
 	send_slack_message( wMsgString )	
 
 def broadcast_record( wMsgString ):
-	send_twilio_sms( wMsgString )
+	##send_twilio_sms( wMsgString )
 	#discord_client.send_message( securityDetails.discordRecordsChannelID , wMsgString )
 	send_web_socket_message( "record" , wMsgString )
 	send_slack_message( wMsgString )
 
 def broadcast_extra_record( wMsgString ):
+	print( "Broadcasting Extra Event" )
 	send_web_socket_message( "extra" , wMsgString )
-	send_twilio_extra_sms( wMsgString )
+	##send_twilio_extra_sms( wMsgString )
 	#send_twilio_sms( wMsgString )
 	#discord_client.send_message( securityDetails.discordRecordsChannelID , wMsgString )
 	#send_web_socket_message( "record" , wMsgString )
@@ -269,7 +270,7 @@ class TenvisVideo():
 			# https://stackoverflow.com/questions/39622281/capture-one-frame-from-a-video-file-after-every-10-seconds
 			cv2.imwrite( frameLiveImagePath , frame )
 			if self.WRITING_EVENT_FRAMES == True:
-				if self.FRAME_EVENT_COUNT%self.TOTAL_RECORDING_EVENT_FRAMES == 0:
+				if self.FRAME_EVENT_COUNT < self.TOTAL_RECORDING_EVENT_FRAMES:
 					cur_path = os.path.abspath( os.path.join( self.CURRENT_EVENT_FOLDER_PATH , 'frame-{}.jpg'.format( self.FRAME_EVENT_COUNT ) ) )
 					cv2.imwrite( cur_path , frame )
 					self.FRAME_EVENT_COUNT += 1
