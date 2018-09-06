@@ -190,7 +190,7 @@ class TenvisVideo():
 		self.TODAY_DATE_STRING = '{ date:%Y-%m-%d }'.format( date=self.ExtraAlertPool[ 0 ] )
 		self.TODAY_DATE_FILE_PATH = os.path.abspath( os.path.join( __file__ , "RECORDS" , self.TODAY_DATE_STRING ) )
 		make_folder( self.TODAY_DATE_FILE_PATH )
-		self.CURRENT_EVENT_FOLDER_PATH = os.path.abspath( os.path.join( self.TODAY_DATE_STRING , str( self.EVENT_TOTAL ) )
+		self.CURRENT_EVENT_FOLDER_PATH = os.path.abspath( os.path.join( self.TODAY_DATE_STRING , str( self.EVENT_TOTAL ) ) )
 		make_folder( self.CURRENT_EVENT_FOLDER_PATH )
 
 		# Start
