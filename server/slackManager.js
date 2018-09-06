@@ -182,6 +182,55 @@ function INITIALIZE() {
 				reactionButtonTimeout: 0
 			});
 
+			var stopCommand = discordBot.registerCommand( "stop" , ( msg , args ) => {
+				if( args.length === 0 ) {
+					require( "./utils/generic.js" ).killAllPYProcess();
+					return;
+				}
+			}, {
+				description: "Stops PY Process",
+				fullDescription: "Stops PY Process",
+				usage: "<text>" ,
+				reactionButtonTimeout: 0
+			});			
+
+			var restartCommand = discordBot.registerCommand( "restart" , ( msg , args ) => {
+				if( args.length === 0 ) {
+					require( "./utils/generic.js" ).restartPYProcess();
+					return;
+				}
+			}, {
+				description: "Restarts PY Process",
+				fullDescription: "Restarts PY Process",
+				usage: "<text>" ,
+				reactionButtonTimeout: 0
+			});
+			discordBot.registerCommandAlias( "start" , "restart" );
+
+			var getStateCommand = discordBot.registerCommand( "state" , ( msg , args ) => {
+				if( args.length === 0 ) {
+					const cur_state = require( "./utils/generic.js" ).getState();
+					return "Py Process Active = " + cur_state.state;
+				}
+			}, {
+				description: "Get PY Process State",
+				fullDescription: "Get PY Process State",
+				usage: "<text>" ,
+				reactionButtonTimeout: 0
+			});
+
+			var fpyCommand = discordBot.registerCommand( "fpy" , ( msg , args ) => {
+				if( args.length === 0 ) {
+					const active_py_procs = require( "./utils/generic.js" ).childPIDLookup();
+					return "Active PY PID's = " + active_py_procs.join( " , " );
+				}
+			}, {
+				description: "Returns Running PY Processes",
+				fullDescription: "Returns Running PY Processes",
+				usage: "<text>" ,
+				reactionButtonTimeout: 0
+			});			
+
 			await discordBot.connect();
 			setTimeout( function() {
 				resolve();

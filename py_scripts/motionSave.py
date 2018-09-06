@@ -6,17 +6,14 @@ import os
 import signal
 import imutils
 from slackclient import SlackClient
-#import yagmail
+
 from datetime import datetime , timedelta
 from time import localtime, strftime , sleep
 from pytz import timezone
 from twilio.rest import Client
 import json
 from websocket import create_connection
-#import discord
-#import smtplib
-#from email.MIMEMultipart import MIMEMultipart
-#from email.MIMEText import MIMEText
+
 eastern_tz = timezone( "US/Eastern" )
 
 
@@ -34,7 +31,9 @@ signal.signal( signal.SIGTERM , signal_handler )
 signal.signal( signal.SIGINT , signal_handler )
 
 videoPath = os.path.abspath( os.path.join( __file__ , ".." , ".." , "videos" ) )
-framePath = os.path.abspath( os.path.join( __file__ , ".." , ".." , "client" , "frame.jpeg" ) )
+framePathBase = os.path.abspath( os.path.join( __file__ , ".." , ".." , "client" ) )
+frameLiveImagePath = os.path.abspath( os.path.join( framePathBase , "frame.jpeg" ) )
+
 try: 
 	os.makedirs( videoPath )
 except OSError:
@@ -48,8 +47,6 @@ TwilioClient = Client( securityDetails.twilio_sid , securityDetails.twilio_auth_
 def make_voice_call():
 	new_call = TwilioClient.calls.create( url=securityDetails.twilio_response_server_url , to=securityDetails.toSMSExtraNumber , from_=securityDetails.fromSMSNumber , method="POST" )
 
-#discord_client = discord.Client()
-#discord_client.run( securityDetails.discordToken )
 
 ws = create_connection( "ws://localhost:6161" )
 
@@ -73,8 +70,6 @@ def send_slack_message( wMsgString ):
 		)
 	except:
 		print( "failed to send slack message" )
-
-
 
 
 TwilioClient = Client( securityDetails.twilio_sid , securityDetails.twilio_auth_token )
@@ -104,54 +99,6 @@ def send_twilio_extra_sms( wMsgString ):
 		print ( "failed to send extra sms" )
 		#send_slack_error( "failed to send sms" )
 		broadcast_error( "failed to send extra sms" )
-
-#yagmail.register( securityDetails.fromGmail , securityDetails.gmailPass )
-# yag = yagmail.SMTP( securityDetails.fromGmail , securityDetails.gmailPass )
-# def send_email( alertLevel , msg , wDateOBJ ):
-
-# 	wNowString = wDateOBJ.strftime( "%Y-%m-%d %H:%M:%S" )
-# 	wTimeMsg = wNowString + "\n\n" + msg
-# 	send_slack_message( "Motion @@ " + wNowString )
-# 	try:
-# 		yag.send( securityDetails.toEmail , str( alertLevel ) , "Motion @@ " + wNowString )
-# 		print( "sent email" )
-# 	except Exception as e:
-# 		print e
-# 		print( "failed to send email" )
-# 		send_slack_error( "failed to send email" )
-
-
-
-# def send_email_gmx( alertLevel , msg , wDateOBJ ):
-
-# 	wFROM = securityDetails.fromGmx
-# 	wTO = securityDetails.toEmail
-# 	print wTO
-# 	print wFROM
-
-# 	wDateOBJ1 = datetime.now( eastern_tz )
-# 	wNow = wDateOBJ1.strftime( "%Y-%m-%d %H:%M:%S" )
-# 	msg = "Motion @@ " + wNow
-# 	send_slack_message( msg )
-
-# 	wMessage = MIMEMultipart()
-# 	wMessage['From'] = wFROM
-# 	wMessage['To'] = wTO
-# 	wMessage['Subject'] = str( alertLevel )
-# 	wMessage.attach( MIMEText( msg ) )
-# 	#print wMessage
-# 	try:
-# 		server = smtplib.SMTP( "mail.gmx.com" , 587 )
-# 		server.ehlo()
-# 		server.starttls()
-# 		server.ehlo()
-# 		server.login( wFROM ,  securityDetails.gmxPass  )
-# 		server.sendmail( wFROM , wTO , wMessage.as_string() )
-# 		server.close()
-# 		print('sent email')
-# 	except:
-# 		print('failed to send email')
-# 		send_slack_error( "failed to send email" )
 
 
 def send_web_socket_message( wType , wMsgString ):
@@ -184,11 +131,17 @@ def broadcast_extra_record( wMsgString ):
 	#send_web_socket_message( "record" , wMsgString )
 	#send_slack_message( wMsgString )
 
+def make_folder( path ):
+	try:
+		os.makedirs( path )
+	except OSError as exception:
+		if exception.errno != errno.EEXIST:
+		raise	
+
 class TenvisVideo():
 
 	def __init__( self ):
 
-		#send_slack_message( "python --> motionSave.py --> init()" )
 		broadcast_event( "python --> motionSave.py --> init()" )
 
 		self.write_thread = None
@@ -196,6 +149,7 @@ class TenvisVideo():
 		#self.FRAME_POOL = [ None ]*1800
 		#wNow = datetime.now( eastern_tz )
 		#self.EVENT_POOL = [ wNow ]*10
+		self.EVENT_TOTAL = 0
 		self.EVENT_POOL = []
 		self.ExtraAlertPool = [ datetime.now( eastern_tz ) ] * 8
 
@@ -208,6 +162,7 @@ class TenvisVideo():
 		#self.EMAIL_COOLOFF = 10
 		#self.MIN_MOTION_FRAMES = 4
 		self.MIN_MOTION_FRAMES = 2
+
 		try:
 			self.MIN_MOTION_SECONDS = int( sys.argv[1] )
 			self.MOTION_EVENTS_ACCEPTABLE = int( sys.argv[2] )
@@ -223,6 +178,22 @@ class TenvisVideo():
 		print ( "MAX_TIME_ACCEPTABLE === " + str( self.MAX_TIME_ACCEPTABLE ) )
 		print ( "MAX_TIME_ACCEPTABLE_STAGE_2 === " + str( self.MAX_TIME_ACCEPTABLE_STAGE_2 ) )
 
+
+		## Setup Video Saving Folders
+		
+		# five seconds of video ?
+		self.TOTAL_RECORDING_EVENT_FRAMES = 150
+		self.FRAME_EVENT_COUNT = 0
+		self.WRITING_EVENT_FRAMES = False		
+		make_folder( os.path.abspath( os.path.join( __file__ , "RECORDS" )  ) )
+
+		self.TODAY_DATE_STRING = '{ date:%Y-%m-%d }'.format( date=self.ExtraAlertPool[ 0 ] )
+		self.TODAY_DATE_FILE_PATH = os.path.abspath( os.path.join( __file__ , "RECORDS" , self.TODAY_DATE_STRING ) )
+		make_folder( self.TODAY_DATE_FILE_PATH )
+		self.CURRENT_EVENT_FOLDER_PATH = os.path.abspath( os.path.join( self.TODAY_DATE_STRING , str( self.EVENT_TOTAL ) )
+		make_folder( self.CURRENT_EVENT_FOLDER_PATH )
+
+		# Start
 		self.w_Capture = cv2.VideoCapture( 0 )
 		self.motionTracking()
 
@@ -291,8 +262,21 @@ class TenvisVideo():
 				break
 
 			frame = imutils.resize( frame , width = 500 )
-			cv2.imwrite( framePath , frame )
-			sleep( .1 )			
+
+			# https://stackoverflow.com/questions/39622281/capture-one-frame-from-a-video-file-after-every-10-seconds
+			cv2.imwrite( frameLiveImagePath , frame )
+			if self.WRITING_EVENT_FRAMES == True:
+				if self.FRAME_EVENT_COUNT%self.TOTAL_RECORDING_EVENT_FRAMES == 0:
+					cur_path = os.path.abspath( os.path.join( self.CURRENT_EVENT_FOLDER_PATH , 'frame-{}.jpg'.format( self.FRAME_EVENT_COUNT ) ) )
+					cv2.imwrite( cur_path , frame )
+				self.FRAME_EVENT_COUNT+=1
+				else:
+					self.WRITING_EVENT_FRAMES = False
+					self.FRAME_EVENT_COUNT = 0
+					self.EVENT_TOTAL += 1
+					self.CURRENT_EVENT_FOLDER_PATH = os.path.abspath( os.path.join( self.TODAY_DATE_STRING , str( self.EVENT_TOTAL ) )
+					make_folder( self.CURRENT_EVENT_FOLDER_PATH )
+			sleep( .1 )
 
 			if self.last_email_time is not None:
 				wNow = datetime.now( eastern_tz )
@@ -405,6 +389,7 @@ class TenvisVideo():
 					wNowString = self.EVENT_POOL[ -1 ].strftime( "%Y-%m-%d %H:%M:%S" )
 					wTimeMsg = "Motion @@ " + wNowString					
 					broadcast_record( wTimeMsg )
+					self.WRITING_EVENT_FRAMES = True
 					self.last_email_time = self.EVENT_POOL[ -1 ]
 					self.EVENT_POOL = []
 
