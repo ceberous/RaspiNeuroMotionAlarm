@@ -269,7 +269,7 @@ class TenvisVideo():
 				if self.FRAME_EVENT_COUNT%self.TOTAL_RECORDING_EVENT_FRAMES == 0:
 					cur_path = os.path.abspath( os.path.join( self.CURRENT_EVENT_FOLDER_PATH , 'frame-{}.jpg'.format( self.FRAME_EVENT_COUNT ) ) )
 					cv2.imwrite( cur_path , frame )
-				self.FRAME_EVENT_COUNT+=1
+					self.FRAME_EVENT_COUNT += 1
 				else:
 					self.WRITING_EVENT_FRAMES = False
 					self.FRAME_EVENT_COUNT = 0
