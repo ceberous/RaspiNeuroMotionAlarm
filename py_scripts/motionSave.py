@@ -271,15 +271,20 @@ class TenvisVideo():
 			cv2.imwrite( frameLiveImagePath , frame )
 			if self.WRITING_EVENT_FRAMES == True:
 				if self.FRAME_EVENT_COUNT < self.TOTAL_RECORDING_EVENT_FRAMES:
-					cur_path = os.path.abspath( os.path.join( self.CURRENT_EVENT_FOLDER_PATH , 'frame-{}.jpg'.format( self.FRAME_EVENT_COUNT ) ) )
+					if self.FRAME_EVENT_COUNT < 10:
+						cur_path = os.path.abspath( os.path.join( self.CURRENT_EVENT_FOLDER_PATH , '{}.jpg'.format( "00" + str( self.FRAME_EVENT_COUNT ) ) ) )
+					elif self.FRAME_EVENT_COUNT < 100:
+						cur_path = os.path.abspath( os.path.join( self.CURRENT_EVENT_FOLDER_PATH , '{}.jpg'.format( "0" + str( self.FRAME_EVENT_COUNT ) ) )
+					else:
+						cur_path = os.path.abspath( os.path.join( self.CURRENT_EVENT_FOLDER_PATH , '{}.jpg'.format( self.FRAME_EVENT_COUNT ) ) )
 					cv2.imwrite( cur_path , frame )
 					self.FRAME_EVENT_COUNT += 1
 				else:
 					self.WRITING_EVENT_FRAMES = False
 					self.FRAME_EVENT_COUNT = 0
-					self.EVENT_TOTAL += 1
-					self.CURRENT_EVENT_FOLDER_PATH = os.path.abspath( os.path.join( self.TODAY_DATE_FILE_PATH , str( self.EVENT_TOTAL ) ) )
-					make_folder( self.CURRENT_EVENT_FOLDER_PATH )
+					#self.EVENT_TOTAL += 1
+					#self.CURRENT_EVENT_FOLDER_PATH = os.path.abspath( os.path.join( self.TODAY_DATE_FILE_PATH , str( self.EVENT_TOTAL ) ) )
+					#make_folder( self.CURRENT_EVENT_FOLDER_PATH )
 			sleep( .1 )
 
 			if self.last_email_time is not None:
@@ -393,9 +398,14 @@ class TenvisVideo():
 					wNowString = self.EVENT_POOL[ -1 ].strftime( "%Y-%m-%d %H:%M:%S" )
 					wTimeMsg = "Motion @@ " + wNowString					
 					broadcast_record( wTimeMsg )
-					self.WRITING_EVENT_FRAMES = True
 					self.last_email_time = self.EVENT_POOL[ -1 ]
 					self.EVENT_POOL = []
+
+					self.WRITING_EVENT_FRAMES = True
+					self.FRAME_EVENT_COUNT = 0
+					self.EVENT_TOTAL += 1
+					self.CURRENT_EVENT_FOLDER_PATH = os.path.abspath( os.path.join( self.TODAY_DATE_FILE_PATH , str( self.EVENT_TOTAL ) ) )
+					make_folder( self.CURRENT_EVENT_FOLDER_PATH )					
 
 					try:
 						self.ExtraAlertPool.insert( 0 , self.last_email_time )
