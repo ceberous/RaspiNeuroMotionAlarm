@@ -184,7 +184,7 @@ class TenvisVideo():
 		
 		# five seconds of video ?
 		self.TOTAL_RECORDING_EVENT_FRAMES = 150
-		self.FRAME_EVENT_COUNT = 0r
+		self.FRAME_EVENT_COUNT = 0
 		self.WRITING_EVENT_FRAMES = False		
 		make_folder( os.path.abspath( os.path.join( __file__ , "RECORDS" )  ) )
 
