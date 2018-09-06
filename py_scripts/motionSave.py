@@ -194,7 +194,7 @@ class TenvisVideo():
 		self.TODAY_DATE_STRING = datetime.now( eastern_tz ).strftime( "%d%b%Y" ).upper()
 		self.TODAY_DATE_FILE_PATH = os.path.abspath( os.path.join( __file__ , ".." , ".." , "RECORDS" , self.TODAY_DATE_STRING ) )
 		make_folder( self.TODAY_DATE_FILE_PATH )
-		self.CURRENT_EVENT_FOLDER_PATH = os.path.abspath( os.path.join( self.TODAY_DATE_FILE_PATH , str( self.EVENT_TOTAL ) ) )
+		self.CURRENT_EVENT_FOLDER_PATH = os.path.abspath( os.path.join( self.TODAY_DATE_FILE_PATH , "0" ) )
 		make_folder( self.CURRENT_EVENT_FOLDER_PATH )
 
 		# Start
