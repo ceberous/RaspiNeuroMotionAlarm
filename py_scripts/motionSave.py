@@ -274,7 +274,7 @@ class TenvisVideo():
 					self.WRITING_EVENT_FRAMES = False
 					self.FRAME_EVENT_COUNT = 0
 					self.EVENT_TOTAL += 1
-					self.CURRENT_EVENT_FOLDER_PATH = os.path.abspath( os.path.join( self.TODAY_DATE_STRING , str( self.EVENT_TOTAL ) )
+					self.CURRENT_EVENT_FOLDER_PATH = os.path.abspath( os.path.join( self.TODAY_DATE_STRING , str( self.EVENT_TOTAL ) ) )
 					make_folder( self.CURRENT_EVENT_FOLDER_PATH )
 			sleep( .1 )
 
