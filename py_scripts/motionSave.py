@@ -274,7 +274,7 @@ class TenvisVideo():
 					if self.FRAME_EVENT_COUNT < 10:
 						cur_path = os.path.abspath( os.path.join( self.CURRENT_EVENT_FOLDER_PATH , '{}.jpg'.format( "00" + str( self.FRAME_EVENT_COUNT ) ) ) )
 					elif self.FRAME_EVENT_COUNT < 100:
-						cur_path = os.path.abspath( os.path.join( self.CURRENT_EVENT_FOLDER_PATH , '{}.jpg'.format( "0" + str( self.FRAME_EVENT_COUNT ) ) )
+						cur_path = os.path.abspath( os.path.join( self.CURRENT_EVENT_FOLDER_PATH , '{}.jpg'.format( "0" + str( self.FRAME_EVENT_COUNT ) ) ) )
 					else:
 						cur_path = os.path.abspath( os.path.join( self.CURRENT_EVENT_FOLDER_PATH , '{}.jpg'.format( self.FRAME_EVENT_COUNT ) ) )
 					cv2.imwrite( cur_path , frame )
