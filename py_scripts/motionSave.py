@@ -133,7 +133,7 @@ def broadcast_extra_record( wMsgString ):
 	#send_slack_message( wMsgString )
 
 def broadcast_video_ready( wTodayDateString , wEventNumber ):
-	print( "Today Date String == " + wPath )
+	print( "Today Date String == " + wTodayDateString )
 	print( "Current Event Number == " + wEventNumber )
 	send_web_socket_message( "videoReady" , wTodayDateString + "-" + wEventNumber )
 
