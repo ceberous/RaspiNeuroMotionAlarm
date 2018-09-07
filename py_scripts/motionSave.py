@@ -166,7 +166,7 @@ class TenvisVideo():
 		self.video_index = 0
 		self.last_email_time = None
 
-		self.EMAIL_COOLOFF = 1
+		self.EMAIL_COOLOFF = 60
 		##self.EMAIL_COOLOFF = 150
 		#self.EMAIL_COOLOFF = 20
 		#self.EMAIL_COOLOFF = 10
