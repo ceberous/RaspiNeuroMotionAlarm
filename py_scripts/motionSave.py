@@ -427,7 +427,7 @@ class TenvisVideo():
 							wS1 = wNowString + " @@ " + str( num_records_in_10_minutes ) + " Records in 10 Minutes"
 							broadcast_extra_record( wS1 )
 						if num_records_in_20_minutes >= 5:
-							##make_voice_call()
+							make_voice_call()
 					except Exception as e:
 						print( "failed to process extra events que" )
 						broadcast_error( "failed to process extra events que" )
