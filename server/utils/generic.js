@@ -154,3 +154,4 @@ function GENERATE_VIDEO( wPath ) {
 	}
 	return x1.stdout;
 }
+module.exports.generateVideo = GENERATE_VIDEO;

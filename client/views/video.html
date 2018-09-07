@@ -3,7 +3,7 @@
 (function() {
 	var myVideoElement = document.getElementById( "latestvideo" );
 	var wPath = new URL( window.location.href );
-	wPath = url.searchParams.get( "path" );
+	wPath = wPath.searchParams.get( "path" );
 	myVideoElement.src = "http://192.168.0.25:6161/latest_video?path='" + wPath + "'";
 }());
 </script>
