@@ -118,7 +118,7 @@ def broadcast_event( wMsgString ):
 	send_slack_message( wMsgString )	
 
 def broadcast_record( wMsgString ):
-	send_twilio_sms( wMsgString )
+	##send_twilio_sms( wMsgString )
 	#discord_client.send_message( securityDetails.discordRecordsChannelID , wMsgString )
 	send_web_socket_message( "record" , wMsgString )
 	send_slack_message( wMsgString )
@@ -126,11 +126,14 @@ def broadcast_record( wMsgString ):
 def broadcast_extra_record( wMsgString ):
 	print( "Broadcasting Extra Event" )
 	send_web_socket_message( "extra" , wMsgString )
-	send_twilio_extra_sms( wMsgString )
+	##send_twilio_extra_sms( wMsgString )
 	#send_twilio_sms( wMsgString )
 	#discord_client.send_message( securityDetails.discordRecordsChannelID , wMsgString )
 	#send_web_socket_message( "record" , wMsgString )
 	#send_slack_message( wMsgString )
+
+def broadcast_video_ready( wPath ):
+	send_web_socket_message( "videoReady" , wPath )
 
 def make_folder( path ):
 	try:
@@ -401,11 +404,14 @@ class TenvisVideo():
 					self.last_email_time = self.EVENT_POOL[ -1 ]
 					self.EVENT_POOL = []
 
+					if self.EVENT_TOTAL > 0:
+						broadcast_video_ready( self.CURRENT_EVENT_FOLDER_PATH )
+
 					self.WRITING_EVENT_FRAMES = True
 					self.FRAME_EVENT_COUNT = 0
 					self.EVENT_TOTAL += 1
 					self.CURRENT_EVENT_FOLDER_PATH = os.path.abspath( os.path.join( self.TODAY_DATE_FILE_PATH , str( self.EVENT_TOTAL ) ) )
-					make_folder( self.CURRENT_EVENT_FOLDER_PATH )					
+					make_folder( self.CURRENT_EVENT_FOLDER_PATH )
 
 					try:
 						self.ExtraAlertPool.insert( 0 , self.last_email_time )
@@ -421,7 +427,7 @@ class TenvisVideo():
 							wS1 = wNowString + " @@ " + str( num_records_in_10_minutes ) + " Records in 10 Minutes"
 							broadcast_extra_record( wS1 )
 						if num_records_in_20_minutes >= 5:
-							make_voice_call()
+							##make_voice_call()
 					except Exception as e:
 						print( "failed to process extra events que" )
 						broadcast_error( "failed to process extra events que" )

@@ -133,3 +133,17 @@ function GRACEFUL_EXIT() {
 	}, 5000 );
 }
 module.exports.gracefulExit = GRACEFUL_EXIT;
+
+const JPEG_TO_MP4 = "ffmpeg -f image2 -r 30 -i ";
+const JPEG_TO_MP4_2 = " -s 500x500 -vcodec libx264 -profile:v high444 -refs 16 -crf 0 -preset ultrafast ";
+const JPEG_TO_MP4_3 "video.mp4";
+function GENERATE_VIDEO( wPath ) {
+	if ( !wPath ) { return; }
+	wPath = JPEG_TO_MP4 + path.join( wPath , "%03d.jpg" ) + JPEG_TO_MP4_2 + path.join( wPath , JPEG_TO_MP4_3 );
+	var x1 = exec( wPath , { silent: true , async: false } );
+	if ( x1.stderr ) { return( x1.stderr ); }
+	if ( x1.stdout ) {
+		require(  "../slackManager.js" ).discordPostEvent( "http://192.168.0.25:6161/video?path='" + x1.stdout + "'" );
+	}
+	return x1.stdout;
+}

@@ -86,6 +86,25 @@ app.get( "/live_image" , async function( req , res , next ) {
 		}
 	});
 });
+
+const HTML_Latest_Video_Path = path.join( __dirname , "../../client/views/" , "video.html" );
+app.get( "/video" , function( req , res ) {
+	res.sendFile( HTML_Latest_Video_Path );
+});
+
+var latest_video_path = "";
+app.get( "latest_video" , async function( req , res , next ) {
+	latest_video_path = req.query.path || latest_video_path;
+	fs.readFile( latest_video_path , function( err , data ) {
+		if ( err) { throw err; }
+		else {
+			res.writeHead( 200 , {'Content-Type': 'video/mp4'} );
+			res.write( data );
+			res.end();
+		}
+	});
+});
+
 /*
 const FramePATH = path.join( __dirname , "../../client" , "frame.jpeg" );
 app.get( "/live" , async function( req , res , next ) {

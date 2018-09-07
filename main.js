@@ -57,6 +57,9 @@ function LOAD_WEBSOCKET_STUFF() {
 						case "extra":
 							require( "./server/slackManager.js" ).postStill();
 							break;
+						case "videoReady":
+							require( "./server/utils/generic.js" ).generateVideo( message.message );
+							break;							
 						default:
 							break;
 					}
