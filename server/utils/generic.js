@@ -140,10 +140,13 @@ const JPEG_TO_MP4_3 = "video.mp4";
 function GENERATE_VIDEO( wPath ) {
 	if ( !wPath ) { return; }
 	wPath = JPEG_TO_MP4 + path.join( wPath , "%03d.jpg" ) + JPEG_TO_MP4_2 + path.join( wPath , JPEG_TO_MP4_3 );
+	console.log( wPath );
 	var x1 = exec( wPath , { silent: true , async: false } );
 	if ( x1.stderr ) { return( x1.stderr ); }
 	if ( x1.stdout ) {
-		require(  "../slackManager.js" ).discordPostEvent( "http://192.168.0.25:6161/video?path='" + x1.stdout + "'" );
+		const wURL = "http://192.168.0.25:6161/video?path='" + x1.stdout + "'";
+		console.log( wURL );
+		require(  "../slackManager.js" ).discordPostEvent( wURL );
 	}
 	return x1.stdout;
 }
