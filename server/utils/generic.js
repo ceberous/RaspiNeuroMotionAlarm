@@ -186,7 +186,7 @@ function GENERATE_VIDEO( wPath ) {
 	});
 	setTimeout( function () {
 		wFFMPEG_Child.unref();
-		const wURL = "http://192.168.0.25:6161/video?path='" + saved_orig_path + "'";
+		const wURL = "http://192.168.0.25:6161/video?path=" + encodeURIComponent( saved_orig_path );
 		console.log( wURL );		
 		require(  "../slackManager.js" ).discordPostEvent( wURL );
 	} , 3000 );
