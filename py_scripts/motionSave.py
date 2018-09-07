@@ -132,8 +132,10 @@ def broadcast_extra_record( wMsgString ):
 	#send_web_socket_message( "record" , wMsgString )
 	#send_slack_message( wMsgString )
 
-def broadcast_video_ready( wPath ):
-	send_web_socket_message( "videoReady" , wPath )
+def broadcast_video_ready( wTodayDateString , wEventNumber ):
+	print( "Today Date String == " + wPath )
+	print( "Current Event Number == " + wEventNumber )
+	send_web_socket_message( "videoReady" , wTodayDateString + "-" + wEventNumber )
 
 def make_folder( path ):
 	try:
@@ -164,7 +166,8 @@ class TenvisVideo():
 		self.video_index = 0
 		self.last_email_time = None
 
-		self.EMAIL_COOLOFF = 150
+		self.EMAIL_COOLOFF = 1
+		##self.EMAIL_COOLOFF = 150
 		#self.EMAIL_COOLOFF = 20
 		#self.EMAIL_COOLOFF = 10
 		#self.MIN_MOTION_FRAMES = 4
@@ -405,7 +408,7 @@ class TenvisVideo():
 					self.EVENT_POOL = []
 
 					if self.EVENT_TOTAL > 0:
-						broadcast_video_ready( self.CURRENT_EVENT_FOLDER_PATH )
+						broadcast_video_ready( self.TODAY_DATE_STRING , str( self.EVENT_TOTAL ) )
 
 					self.WRITING_EVENT_FRAMES = True
 					self.FRAME_EVENT_COUNT = 0

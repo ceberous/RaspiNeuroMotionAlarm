@@ -58,6 +58,7 @@ function LOAD_WEBSOCKET_STUFF() {
 							require( "./server/slackManager.js" ).postStill();
 							break;
 						case "videoReady":
+							console.log( "WebSocket Master --> " + message.message );
 							require( "./server/utils/generic.js" ).generateVideo( message.message );
 							break;							
 						default:
