@@ -110,7 +110,7 @@ app.get( "latest" , async function( req , res , next ) {
 	// });
 
 	latest_video_path = latest_video_path.split( "-" );
-	var filePath = path.resolve( __dirname , "../../" , "RECORDS" , latest_video_path[ 0 ] , latest_video_path[ 1 ] );
+	var filePath = path.join( __dirname , "../../RECORDS" , latest_video_path[ 0 ] , latest_video_path[ 1 ] );
 	console.log( "Recieved File Path === " );
 	console.log( filePath );
 
