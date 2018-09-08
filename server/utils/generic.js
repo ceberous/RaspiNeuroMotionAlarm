@@ -140,15 +140,12 @@ const JPEG_TO_MP4 = "ffmpeg -f image2 -r 30 -i ";
 const JPEG_TO_MP4_2 = " -s 500x500 -vcodec libx264 -profile:v high444 -refs 16 -crf 0 -preset ultrafast ";
 const JPEG_TO_MP4_3 = "video.mp4";
 
-var latest_path = "";
-module.exports.latestPath = latest_path;
 function GENERATE_VIDEO( wPath ) {
 	
 	console.log( wPath );
 	if ( !wPath ) { return; }
 	const saved_orig_path = wPath;
 	wPath = wPath.split( "-" );
-	latest_path = wPath;
 
 	// wPath = path.join( __dirname , "../../RECORDS" , wPath[ 0 ] , wPath[ 1 ] );
 	// console.log( wPath );

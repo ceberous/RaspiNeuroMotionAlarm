@@ -92,7 +92,7 @@ app.get( "/video" , function( req , res ) {
 	res.sendFile( HTML_Latest_Video_Path );
 });
 
-var latest_video_path = "";
+var latest_video_path = undefined;
 
 app.get( "/latest" , async function( req , res , next ) {
 	
@@ -103,13 +103,14 @@ app.get( "/latest" , async function( req , res , next ) {
 				latest_video_path = latest_video_path.split( "-" );
 				console.log( "Recieved An Update from URL param" );
 				console.log( req.query );
-				console.log( latest_video_path );				
+				console.log( latest_video_path );
 			}
 		}
 	}
 	else {
-		console.log( "Restoring from Last Known Path" );
-		latest_video_path = require( "../utils/generic.js" ).latestPath;
+		//console.log( "Restoring from Last Known Path" );
+		// console.log( "No Video Sent , lo siento for now" );
+		// res.json( { "failed" : "no video specified" } );
 	}
 	
 	console.log( latest_video_path );
