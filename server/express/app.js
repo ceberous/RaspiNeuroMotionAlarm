@@ -93,22 +93,9 @@ app.get( "/video" , function( req , res ) {
 });
 
 var latest_video_path = "";
-function SET_LATEST_VIDEO_PATH( wPath ) {
-	if ( wPath ) {
-		if ( wPath !== null ) {
-			if ( wPath !== "null" ) {
-				console.log( "Setting latest_video_path --> " + wPath );
-				latest_video_path = wPath;
-				latest_video_path = latest_video_path.split( "-" );
-			}
-		}
-	}	
-}
-app.setLatestVideoPath = SET_LATEST_VIDEO_PATH;
 
 app.get( "/latest" , async function( req , res , next ) {
 	
-	console.log( latest_video_path );
 	if ( req.query.path ) {
 		if ( req.query.path !== null ) {
 			if ( req.query.path !== "null" ) {
@@ -120,7 +107,13 @@ app.get( "/latest" , async function( req , res , next ) {
 			}
 		}
 	}
+	else {
+		console.log( "Restoring from Last Known Path" );
+		latest_video_path = require( "../utils/generic.js" ).latestPath;
+	}
 	
+	console.log( latest_video_path );
+
 	// fs.readFileSync( latest_video_path , function( err , data ) {
 	// 	if ( err) { throw err; }
 	// 	else {

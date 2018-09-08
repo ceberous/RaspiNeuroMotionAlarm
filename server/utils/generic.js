@@ -139,12 +139,16 @@ module.exports.gracefulExit = GRACEFUL_EXIT;
 const JPEG_TO_MP4 = "ffmpeg -f image2 -r 30 -i ";
 const JPEG_TO_MP4_2 = " -s 500x500 -vcodec libx264 -profile:v high444 -refs 16 -crf 0 -preset ultrafast ";
 const JPEG_TO_MP4_3 = "video.mp4";
+
+var latest_path = "";
+module.exports.latestPath = latest_path;
 function GENERATE_VIDEO( wPath ) {
 	
 	console.log( wPath );
 	if ( !wPath ) { return; }
 	const saved_orig_path = wPath;
 	wPath = wPath.split( "-" );
+	latest_path = wPath;
 
 	// wPath = path.join( __dirname , "../../RECORDS" , wPath[ 0 ] , wPath[ 1 ] );
 	// console.log( wPath );
@@ -186,8 +190,7 @@ function GENERATE_VIDEO( wPath ) {
 	});
 	setTimeout( function () {
 		const wURL = "http://192.168.1.2:6161/video?path=" + encodeURIComponent( saved_orig_path );
-		console.log( wURL );		
-		require( "../express/app.js" ).setLatestVideoPath( saved_orig_path );
+		console.log( wURL );
 		require(  "../slackManager.js" ).discordPostEvent( wURL );
 		wFFMPEG_Child.unref();
 	} , 3000 );
