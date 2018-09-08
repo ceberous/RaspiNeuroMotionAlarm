@@ -147,50 +147,59 @@ function GENERATE_VIDEO( wPath ) {
 	const saved_orig_path = wPath;
 	wPath = wPath.split( "-" );
 
-	// wPath = path.join( __dirname , "../../RECORDS" , wPath[ 0 ] , wPath[ 1 ] );
-	// console.log( wPath );
-	// wPath = JPEG_TO_MP4 + path.join( wPath , "%03d.jpg" ) + JPEG_TO_MP4_2 + path.join( wPath , JPEG_TO_MP4_3 );
-	// console.log( wPath );
-	// var x1 = exec( wPath , { silent: true , async: false } );
+	wPath = path.join( __dirname , "../../RECORDS" , wPath[ 0 ] , wPath[ 1 ] );
+	console.log( wPath );
+	wPath = JPEG_TO_MP4 + path.join( wPath , "%03d.jpg" ) + JPEG_TO_MP4_2 + path.join( wPath , JPEG_TO_MP4_3 );
+	console.log( wPath );
+	
+	//var x1 = exec( wPath , { silent: true , async: false } );
 	// if ( x1.stderr ) { return( x1.stderr ); }
 	// if ( x1.stdout ) {
 	// 	const wURL = "http://192.168.0.25:6161/video?path='" + x1.stdout + "'";
 	// 	console.log( wURL );
 	// 	require(  "../slackManager.js" ).discordPostEvent( wURL );
 	// }
-	// return x1.stdout;
-
-	wFFMPEG_Child = null;
-	var wArgs = [
-		"-f" , "image2" ,
-		"-r" , "30" ,
-		"-i" , "'" + path.join( __dirname , "../../RECORDS" , wPath[ 0 ] , wPath[ 1 ] , "%03d.jpg" ) + "'" ,
-		"-s" , "500x500" ,
-		"-vcodec" , "libx264" ,
-		"-profile:v" , "high444" ,
-		"-refs" , "16" ,
-		"-crf" , "0" ,
-		"-preset" , "ultrafast" , 
-		"'" + path.join( __dirname , "../../RECORDS" , wPath[ 0 ] , wPath[ 1 ] , "video.mp4" ) + "'"
-	];
-	console.log( wArgs );
-	wFFMPEG_Child = spawn( "ffmpeg" , wArgs , { detached: true, stdio: [ 'ignore' , 'ignore' , 'ignore' ] } );
-	console.log( "launched ffmpeg jpeg conversion" );
-
-	wFFMPEG_Child.on( "error" , function( code ) {
-		require(  "../slackManager.js" ).postError( code );
-		console.log( code );
-	});
-	wFFMPEG_Child.on( "exit" , function(code) {
-		require(  "../slackManager.js" ).postError( code );
-		console.log( code );
-	});
-	setTimeout( function () {
-		const wURL = "http://192.168.1.2:6161/video?path=" + encodeURIComponent( saved_orig_path );
+	// return x1.stdout;	
+	
+	var child = exec( wPath , { async:true });
+	child.stdout.on( 'data' , function(data ) {
+		const wURL = "http://192.168.0.25:6161/video?path=" + saved_orig_path;
 		console.log( wURL );
-		require(  "../slackManager.js" ).discordPostEvent( wURL );
-		wFFMPEG_Child.unref();
-	} , 3000 );
+		require(  "../slackManager.js" ).discordPostEvent( wURL );			
+	});	
+
+
+	// wFFMPEG_Child = null;
+	// var wArgs = [
+	// 	"-f" , "image2" ,
+	// 	"-r" , "30" ,
+	// 	"-i" , "'" + path.join( __dirname , "../../RECORDS" , wPath[ 0 ] , wPath[ 1 ] , "%03d.jpg" ) + "'" ,
+	// 	"-s" , "500x500" ,
+	// 	"-vcodec" , "libx264" ,
+	// 	"-profile:v" , "high444" ,
+	// 	"-refs" , "16" ,
+	// 	"-crf" , "0" ,
+	// 	"-preset" , "ultrafast" , 
+	// 	"'" + path.join( __dirname , "../../RECORDS" , wPath[ 0 ] , wPath[ 1 ] , "video.mp4" ) + "'"
+	// ];
+	// console.log( wArgs );
+	// wFFMPEG_Child = spawn( "ffmpeg" , wArgs , { detached: true, stdio: [ 'ignore' , 'ignore' , 'ignore' ] } );
+	// console.log( "launched ffmpeg jpeg conversion" );
+
+	// wFFMPEG_Child.on( "error" , function( code ) {
+	// 	require(  "../slackManager.js" ).postError( code );
+	// 	console.log( code );
+	// });
+	// wFFMPEG_Child.on( "exit" , function(code) {
+	// 	require(  "../slackManager.js" ).postError( code );
+	// 	console.log( code );
+	// });
+	// setTimeout( function () {
+	// 	const wURL = "http://192.168.1.2:6161/video?path=" + encodeURIComponent( saved_orig_path );
+	// 	console.log( wURL );
+	// 	require(  "../slackManager.js" ).discordPostEvent( wURL );
+	// 	wFFMPEG_Child.unref();
+	// } , 3000 );
 
 }
 module.exports.generateVideo = GENERATE_VIDEO;
