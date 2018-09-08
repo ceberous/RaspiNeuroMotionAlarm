@@ -112,6 +112,7 @@ app.get( "/latest" , async function( req , res , next ) {
 		if ( req.query.path !== null ) {
 			if ( req.query.path !== "null" ) {
 				latest_video_path = req.query.path;
+				latest_video_path = latest_video_path.split( "-" );
 			}
 		}
 	}
@@ -130,8 +131,7 @@ app.get( "/latest" , async function( req , res , next ) {
 	if ( !latest_video_path ) { res.json( { "conversion" : "failed" } ); }
 	if ( !latest_video_path[ 0 ] ) { res.json( { "conversion" : "failed" } ); }
 	if ( !latest_video_path[ 1 ] ) { res.json( { "conversion" : "failed" } ); }
-	
-	latest_video_path = latest_video_path.split( "-" );
+
 	var filePath = path.join( __dirname , "../../RECORDS" , latest_video_path[ 0 ] , latest_video_path[ 1 ] , "video.mp4" );
 	console.log( "Recieved File Path === " );
 	console.log( filePath );
