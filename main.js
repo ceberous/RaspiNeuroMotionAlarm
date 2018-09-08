@@ -38,7 +38,7 @@ function LOAD_WEBSOCKET_STUFF() {
 				socket.on( "message" ,  function( message ) {
 					try { message = JSON.parse( message ); }
 					catch( e ) { var a = message; message = { "type": a }; }
-					// console.log( message );
+					console.log( message );
 					switch( message.type ) {
 						case "pong":
 							//console.log( "inside pong()" );
