@@ -51,7 +51,7 @@ module.exports.getState = GET_STATE;
 
 function CHILD_PID_LOOKUP() {
 	wPIDResultSet = [];
-	ps.lookup( { command: "python" } ,
+	return ps.lookup( { command: "python" } ,
 		function( err , resultList ) {
 			if ( err ) { throw new Error( err ); }
 			resultList.forEach(function( process ){
@@ -64,9 +64,10 @@ function CHILD_PID_LOOKUP() {
 					});
 				}
 			});
+			return wPIDResultSet;
 		}
 	);
-	return wPIDResultSet;
+	//return wPIDResultSet;
 };
 module.exports.childPIDLookup = CHILD_PID_LOOKUP;
 

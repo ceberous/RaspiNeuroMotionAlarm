@@ -97,6 +97,22 @@ function POST_STILL() {
 }
 module.exports.postStill = POST_STILL;
 
+function POST_VIDEO_LINK( wPath ) {
+	return new Promise( async function( resolve , reject ) {
+		try {
+			const timeName = require( "./utils/generic.js" ).time();
+			const still_data = fs.readFileSync( still_path );
+			await discordBot.createMessage( discordCreds.events_channel_id , timeName , {
+				file: still_data ,
+				name: timeName + ".jpeg"
+			});
+			resolve();
+		}
+		catch( error ) { console.log( error ); reject( error ); }
+	});
+}
+module.exports.postVideLink = POST_VIDEO_LINK;
+
 function RESTART_PM2() {
 	return new Promise( function( resolve , reject ) {
 		try {
@@ -219,9 +235,9 @@ function INITIALIZE() {
 				reactionButtonTimeout: 0
 			});
 
-			var fpyCommand = discordBot.registerCommand( "fpy" , ( msg , args ) => {
+			var fpyCommand = discordBot.registerCommand( "fpy" , async ( msg , args ) => {
 				if( args.length === 0 ) {
-					const active_py_procs = require( "./utils/generic.js" ).childPIDLookup();
+					const active_py_procs = await require( "./utils/generic.js" ).childPIDLookup();
 					return "Active PY PID's = " + active_py_procs.join( " , " );
 				}
 			}, {
