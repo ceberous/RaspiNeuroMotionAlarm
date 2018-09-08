@@ -134,12 +134,12 @@ app.get( "/latest" , async function( req , res , next ) {
 		var start = parseInt(partialstart, 10);
 		var end = partialend ? parseInt(partialend, 10) : total - 1;
 		var chunksize = (end - start) + 1;
-		var mimeType = mimeTypes[extension] || 'text/plain; charset=utf-8';
+		//var mimeType = mimeTypes[extension] || 'text/plain; charset=utf-8';
 		res.writeHead( 206, {
 			'Content-Range': 'bytes ' + start + '-' + end + '/' + total,
 			'Accept-Ranges': 'bytes',
 			'Content-Length': chunksize,
-			'Content-Type': mimeType
+			'Content-Type': "video/mp4"
 		});
 		var fileStream = fs.createReadStream(file, {
 			start: start,
@@ -155,7 +155,7 @@ app.get( "/latest" , async function( req , res , next ) {
 				}
 			}
 		});
-		
+
 		return;
 	});
 
