@@ -173,9 +173,8 @@ function GENERATE_VIDEO( wPath ) {
 	];
 	console.log( wArgs );
 	wFFMPEG_Child = spawn( "ffmpeg" , wArgs , { detached: true, stdio: [ 'ignore' , 'ignore' , 'ignore' ] } );
-	console.log( "launched pyscript" );
-	CHILD_PID_LOOKUP();
-	
+	console.log( "launched ffmpeg jpeg conversion" );
+
 	wFFMPEG_Child.on( "error" , function( code ) {
 		require(  "../slackManager.js" ).postError( code );
 		console.log( code );
@@ -185,10 +184,10 @@ function GENERATE_VIDEO( wPath ) {
 		console.log( code );
 	});
 	setTimeout( function () {
-		wFFMPEG_Child.unref();
-		const wURL = "http://192.168.0.25:6161/video?path=" + encodeURIComponent( saved_orig_path );
+		const wURL = "http://192.168.1.2:6161/video?path=" + encodeURIComponent( saved_orig_path );
 		console.log( wURL );		
 		require(  "../slackManager.js" ).discordPostEvent( wURL );
+		wFFMPEG_Child.unref();
 	} , 3000 );
 
 }

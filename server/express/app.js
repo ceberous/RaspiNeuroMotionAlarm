@@ -94,15 +94,69 @@ app.get( "/video" , function( req , res ) {
 
 var latest_video_path = "";
 app.get( "latest_video" , async function( req , res , next ) {
+	
+	console.log( latest_video_path );
 	latest_video_path = req.query.path || latest_video_path;
-	fs.readFile( latest_video_path , function( err , data ) {
-		if ( err) { throw err; }
-		else {
-			res.writeHead( 200 , {'Content-Type': 'video/mp4'} );
-			res.write( data );
-			res.end();
+	console.log( req.query );
+	console.log( latest_video_path );
+	
+	// fs.readFileSync( latest_video_path , function( err , data ) {
+	// 	if ( err) { throw err; }
+	// 	else {
+	// 		res.writeHead( 200 , {'Content-Type': 'video/mp4'} );
+	// 		res.write( data );
+	// 		res.end();
+	// 	}
+	// });
+
+	latest_video_path = latest_video_path.split( "-" );
+	var filePath = path.resolve( __dirname , "../../" , "RECORDS" , latest_video_path[ 0 ] , latest_video_path[ 1 ] );
+	console.log( "Recieved File Path === " );
+	console.log( filePath );
+
+	fs.stat( filePath , function(err, stats) {
+		if ( err ) {
+			if ( err.code === 'ENOENT' ) {
+				// 404 Error if file not found
+				//return res.sendStatus(404);
+				res.end( err ); // I added this
+			}
+			res.end( err );
+		}
+
+		var range = req.headers.range;
+
+		if ( !range ) {
+			// 416 Wrong range
+			//return res.sendStatus(416);
+			console.log('Err: It seems like someone tried to download the video.');
+			res.end( err );
+		}
+		else{
+			var positions   = range.replace(/bytes=/, "").split("-");
+			var start       = parseInt(positions[0], 10);
+			var total       = stats.size;
+			var end         = positions[1] ? parseInt(positions[1], 10) : total - 1;
+			var chunksize   = (end - start) + 1;
+
+			res.writeHead( 206, {
+				"Content-Range": "bytes " + start + "-" + end + "/" + total ,
+				"Accept-Ranges": "bytes" ,
+				"Content-Length": chunksize ,
+				"Content-Type": "video/mp4"
+			});
+
+			var stream = fs.createReadStream( filePath , {
+				start: start,
+				end: end
+			}).on("open", function() {
+				stream.pipe(res);
+			}).on("error", function(err) {
+				res.end(err);
+			});
 		}
 	});
+
 });
 
 /*
