@@ -96,7 +96,11 @@ var latest_video_path = "";
 app.get( "/latest" , async function( req , res , next ) {
 	
 	console.log( latest_video_path );
-	latest_video_path = req.query.path || latest_video_path;
+	if ( req.query.path ) {
+		if ( req.query.path !== null ) {
+			latest_video_path = req.query.path;
+		}
+	}
 	console.log( req.query );
 	console.log( latest_video_path );
 	
