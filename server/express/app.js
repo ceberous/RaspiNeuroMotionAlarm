@@ -114,48 +114,50 @@ app.get( "latest_video" , async function( req , res , next ) {
 	console.log( "Recieved File Path === " );
 	console.log( filePath );
 
-	fs.stat( filePath , function(err, stats) {
-		if ( err ) {
-			if ( err.code === 'ENOENT' ) {
-				// 404 Error if file not found
-				//return res.sendStatus(404);
-				res.end( err ); // I added this
-			}
-			res.end( err );
-		}
+	res.json( { "testing" : filePath } );
 
-		var range = req.headers.range;
+	// fs.stat( filePath , function(err, stats) {
+	// 	if ( err ) {
+	// 		if ( err.code === 'ENOENT' ) {
+	// 			// 404 Error if file not found
+	// 			//return res.sendStatus(404);
+	// 			res.end( err ); // I added this
+	// 		}
+	// 		res.end( err );
+	// 	}
 
-		if ( !range ) {
-			// 416 Wrong range
-			//return res.sendStatus(416);
-			console.log('Err: It seems like someone tried to download the video.');
-			res.end( err );
-		}
-		else{
-			var positions   = range.replace(/bytes=/, "").split("-");
-			var start       = parseInt(positions[0], 10);
-			var total       = stats.size;
-			var end         = positions[1] ? parseInt(positions[1], 10) : total - 1;
-			var chunksize   = (end - start) + 1;
+	// 	var range = req.headers.range;
 
-			res.writeHead( 206, {
-				"Content-Range": "bytes " + start + "-" + end + "/" + total ,
-				"Accept-Ranges": "bytes" ,
-				"Content-Length": chunksize ,
-				"Content-Type": "video/mp4"
-			});
+	// 	if ( !range ) {
+	// 		// 416 Wrong range
+	// 		//return res.sendStatus(416);
+	// 		console.log('Err: It seems like someone tried to download the video.');
+	// 		res.end( err );
+	// 	}
+	// 	else{
+	// 		var positions   = range.replace(/bytes=/, "").split("-");
+	// 		var start       = parseInt(positions[0], 10);
+	// 		var total       = stats.size;
+	// 		var end         = positions[1] ? parseInt(positions[1], 10) : total - 1;
+	// 		var chunksize   = (end - start) + 1;
 
-			var stream = fs.createReadStream( filePath , {
-				start: start,
-				end: end
-			}).on("open", function() {
-				stream.pipe(res);
-			}).on("error", function(err) {
-				res.end(err);
-			});
-		}
-	});
+	// 		res.writeHead( 206, {
+	// 			"Content-Range": "bytes " + start + "-" + end + "/" + total ,
+	// 			"Accept-Ranges": "bytes" ,
+	// 			"Content-Length": chunksize ,
+	// 			"Content-Type": "video/mp4"
+	// 		});
+
+	// 		var stream = fs.createReadStream( filePath , {
+	// 			start: start,
+	// 			end: end
+	// 		}).on("open", function() {
+	// 			stream.pipe(res);
+	// 		}).on("error", function(err) {
+	// 			res.end(err);
+	// 		});
+	// 	}
+	// });
 
 });
 
