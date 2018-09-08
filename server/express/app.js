@@ -100,7 +100,7 @@ function SET_LATEST_VIDE_PATH( wPath ) {
 		}
 	}	
 }
-module.exports.setLatestVideoPath = SET_LATEST_VIDE_PATH;
+app.setLatestVideoPath = SET_LATEST_VIDE_PATH;
 
 app.get( "/latest" , async function( req , res , next ) {
 	
