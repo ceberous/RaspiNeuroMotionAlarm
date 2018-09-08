@@ -118,7 +118,7 @@ def broadcast_event( wMsgString ):
 	send_slack_message( wMsgString )	
 
 def broadcast_record( wMsgString ):
-	##send_twilio_sms( wMsgString )
+	send_twilio_sms( wMsgString )
 	#discord_client.send_message( securityDetails.discordRecordsChannelID , wMsgString )
 	send_web_socket_message( "record" , wMsgString )
 	send_slack_message( wMsgString )
@@ -126,7 +126,7 @@ def broadcast_record( wMsgString ):
 def broadcast_extra_record( wMsgString ):
 	print( "Broadcasting Extra Event" )
 	send_web_socket_message( "extra" , wMsgString )
-	##send_twilio_extra_sms( wMsgString )
+	send_twilio_extra_sms( wMsgString )
 	#send_twilio_sms( wMsgString )
 	#discord_client.send_message( securityDetails.discordRecordsChannelID , wMsgString )
 	#send_web_socket_message( "record" , wMsgString )
@@ -166,8 +166,8 @@ class TenvisVideo():
 		self.video_index = 0
 		self.last_email_time = None
 
-		self.EMAIL_COOLOFF = 20
-		##self.EMAIL_COOLOFF = 150
+		self.EMAIL_COOLOFF = 150
+		#self.EMAIL_COOLOFF = 20
 		#self.EMAIL_COOLOFF = 20
 		#self.EMAIL_COOLOFF = 10
 		#self.MIN_MOTION_FRAMES = 4
