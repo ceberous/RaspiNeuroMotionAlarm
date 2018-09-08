@@ -93,14 +93,14 @@ app.get( "/video" , function( req , res ) {
 });
 
 var latest_video_path = "";
-function set_latest_video_path( wPath ) {
+function SET_LATEST_VIDE_PATH( wPath ) {
 	if ( req.query.path ) {
 		if ( req.query.path !== null ) {
 			latest_video_path = wPath;
 		}
 	}	
 }
-module.exports.setLatestVideoPath = set_latest_video_path;
+module.exports.setLatestVideoPath = SET_LATEST_VIDE_PATH;
 
 app.get( "/latest" , async function( req , res , next ) {
 	
