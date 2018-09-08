@@ -408,7 +408,7 @@ class TenvisVideo():
 					self.EVENT_POOL = []
 
 					if self.EVENT_TOTAL > 0:
-						broadcast_video_ready( self.TODAY_DATE_STRING , str( self.EVENT_TOTAL ) )
+						broadcast_video_ready( self.TODAY_DATE_STRING , str( self.EVENT_TOTAL - 1 ) )
 
 					self.WRITING_EVENT_FRAMES = True
 					self.FRAME_EVENT_COUNT = 0

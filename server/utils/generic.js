@@ -151,23 +151,31 @@ function GENERATE_VIDEO( wPath ) {
 	console.log( wPath );
 	wPath = JPEG_TO_MP4 + path.join( wPath , "%03d.jpg" ) + JPEG_TO_MP4_2 + path.join( wPath , JPEG_TO_MP4_3 );
 	console.log( wPath );
-	
-	//var x1 = exec( wPath , { silent: true , async: false } );
+
+	// var x1 = exec( wPath , { silent: true , async: false } );
 	// if ( x1.stderr ) { return( x1.stderr ); }
 	// if ( x1.stdout ) {
-	// 	const wURL = "http://192.168.0.25:6161/video?path='" + x1.stdout + "'";
+	// 	const wURL = "http://192.168.0.25:6161/video?path=" + saved_orig_path;
 	// 	console.log( wURL );
 	// 	require(  "../slackManager.js" ).discordPostEvent( wURL );
 	// }
-	// return x1.stdout;	
+	// return x1.stdout;
 	
-	var child = exec( wPath , { async:true });
-	child.stdout.on( 'data' , function(data ) {
+	// var child = exec( wPath , { async:true });
+	// child.stdout.on( 'data' , function( data ) {
+	// 	const wURL = "http://192.168.0.25:6161/video?path=" + saved_orig_path;
+	// 	console.log( wURL );
+	// 	require(  "../slackManager.js" ).discordPostEvent( wURL );
+	// });
+
+	exec( wPath , function( code, stdout, stderr) {
+		console.log('Exit code:', code);
+		console.log('Program output:', stdout);
+		console.log('Program stderr:', stderr);
 		const wURL = "http://192.168.0.25:6161/video?path=" + saved_orig_path;
 		console.log( wURL );
-		require(  "../slackManager.js" ).discordPostEvent( wURL );			
-	});	
-
+		require(  "../slackManager.js" ).discordPostEvent( wURL );
+	});
 
 	// wFFMPEG_Child = null;
 	// var wArgs = [
