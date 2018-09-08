@@ -141,7 +141,7 @@ app.get( "/latest" , async function( req , res , next ) {
 			'Content-Length': chunksize,
 			'Content-Type': "video/mp4"
 		});
-		var fileStream = fs.createReadStream(file, {
+		var fileStream = fs.createReadStream( filePath , {
 			start: start,
 			end: end
 		});
