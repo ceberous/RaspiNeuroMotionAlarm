@@ -136,13 +136,13 @@ app.get( "/latest" , async function( req , res , next ) {
 
 		var range = req.headers.range;
 
-		if ( !range ) {
-			// 416 Wrong range
-			//return res.sendStatus(416);
-			console.log('Err: It seems like someone tried to download the video.');
-			res.end( err );
-		}
-		else{
+		// if ( !range ) {
+		// 	// 416 Wrong range
+		// 	//return res.sendStatus(416);
+		// 	console.log('Err: It seems like someone tried to download the video.');
+		// 	res.end( err );
+		// }
+		// else{
 			var positions   = range.replace(/bytes=/, "").split("-");
 			var start       = parseInt(positions[0], 10);
 			var total       = stats.size;
