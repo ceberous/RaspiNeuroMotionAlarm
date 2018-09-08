@@ -123,7 +123,8 @@ class TenvisVideo():
 		self.video_index = 0
 		self.last_email_time = None
 
-		self.EMAIL_COOLOFF = 100
+		##self.EMAIL_COOLOFF = 100
+		self.EMAIL_COOLOFF = 30
 
 		#self.MIN_MOTION_FRAMES = 4
 		self.MIN_MOTION_FRAMES = 2
@@ -206,9 +207,10 @@ class TenvisVideo():
 
 					self.WRITING_EVENT_FRAMES = False
 					self.FRAME_EVENT_COUNT = 0
-					#self.EVENT_TOTAL += 1
-					#self.CURRENT_EVENT_FOLDER_PATH = os.path.abspath( os.path.join( self.TODAY_DATE_FILE_PATH , str( self.EVENT_TOTAL ) ) )
-					#make_folder( self.CURRENT_EVENT_FOLDER_PATH )
+					self.EVENT_TOTAL += 1
+					self.CURRENT_EVENT_FOLDER_PATH = os.path.abspath( os.path.join( self.TODAY_DATE_FILE_PATH , str( self.EVENT_TOTAL ) ) )
+					make_folder( self.CURRENT_EVENT_FOLDER_PATH )
+
 			sleep( .1 )
 
 			if self.last_email_time is not None:

@@ -177,6 +177,8 @@ function GENERATE_VIDEO( wPath ) {
 		//console.log('Program stderr:', stderr);
 		const wURL = "http://192.168.1.2:6161/video?path=" + saved_orig_path;
 		console.log( wURL );
+		console.log( "Attempting to Save --> " + LATEST_VIDEO_FP );
+		console.log( saved_orig_path );
 		fs.writeFileSync( LATEST_VIDEO_FP , saved_orig_path );
 		require(  "../slackManager.js" ).discordPostEvent( wURL );
 		//require( "../slackManager.js" ).postVideo( path.join( wBasePath , JPEG_TO_MP4_3 ) )
