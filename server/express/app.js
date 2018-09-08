@@ -124,41 +124,55 @@ app.get( "/latest" , async function( req , res , next ) {
 	console.log( "Recieved File Path === " );
 	console.log( filePath );
 
-	fs.stat( filePath , function( err , stats ) {
+	if ( !filePath ) { res.json( { "CanNotLocate" : "canf find path" } ); return; }
 
-		var range = req.headers.range;
-		var parts = range.replace(/bytes=/, "").split("-");
-		var partialstart = parts[0];
-		var partialend = parts[1];
-		var total = stats.size;
-		var start = parseInt(partialstart, 10);
-		var end = partialend ? parseInt(partialend, 10) : total - 1;
-		var chunksize = (end - start) + 1;
-		//var mimeType = mimeTypes[extension] || 'text/plain; charset=utf-8';
-		res.writeHead( 206, {
-			'Content-Range': 'bytes ' + start + '-' + end + '/' + total,
-			'Accept-Ranges': 'bytes',
-			'Content-Length': chunksize,
-			'Content-Type': "video/mp4"
-		});
-		var fileStream = fs.createReadStream( filePath , {
-			start: start,
-			end: end
-		});
-		fileStream.pipe(res);
-		res.on('close', function() {
-			console.log('response closed');
-			if (res.fileStream) {
-				res.fileStream.unpipe(this);
-				if (this.fileStream.fd) {
-					fs.close(this.fileStream.fd);
-				}
-			}
-		});
+	// Option 0
+	fs.readFile( filePath , function( err , data ) {
+		if ( err) { throw err; }
+		else {
+			res.writeHead( 200 , {'Content-Type': 'video/mp4'} );
+			res.write( data );
+			res.end();
+		}
+	});	
 
-		return;
-	});
+	// Option 1
+	// fs.stat( filePath , function( err , stats ) {
 
+	// 	var range = req.headers.range;
+	// 	var parts = range.replace(/bytes=/, "").split("-");
+	// 	var partialstart = parts[0];
+	// 	var partialend = parts[1];
+	// 	var total = stats.size;
+	// 	var start = parseInt(partialstart, 10);
+	// 	var end = partialend ? parseInt(partialend, 10) : total - 1;
+	// 	var chunksize = (end - start) + 1;
+	// 	//var mimeType = mimeTypes[extension] || 'text/plain; charset=utf-8';
+	// 	res.writeHead( 206, {
+	// 		'Content-Range': 'bytes ' + start + '-' + end + '/' + total,
+	// 		'Accept-Ranges': 'bytes',
+	// 		'Content-Length': chunksize,
+	// 		'Content-Type': "video/mp4"
+	// 	});
+	// 	var fileStream = fs.createReadStream( filePath , {
+	// 		start: start,
+	// 		end: end
+	// 	});
+	// 	fileStream.pipe(res);
+	// 	res.on('close', function() {
+	// 		console.log('response closed');
+	// 		if (res.fileStream) {
+	// 			res.fileStream.unpipe(this);
+	// 			if (this.fileStream.fd) {
+	// 				fs.close(this.fileStream.fd);
+	// 			}
+	// 		}
+	// 	});
+
+	// 	return;
+	// });
+
+	// Option 2
 
 	// fs.stat( filePath , function(err, stats) {
 	// 	if ( err ) {
