@@ -179,7 +179,7 @@ function GENERATE_VIDEO( wPath ) {
 		console.log( wURL );
 		console.log( "Attempting to Save --> " + LATEST_VIDEO_FP );
 		console.log( saved_orig_path );
-		fs.writeFileSync( LATEST_VIDEO_FP , saved_orig_path );
+		fs.writeFileSync( LATEST_VIDEO_FP , saved_orig_path , { encoding: "utf8" , flag: "w" } );
 		require(  "../slackManager.js" ).discordPostEvent( wURL );
 		//require( "../slackManager.js" ).postVideo( path.join( wBasePath , JPEG_TO_MP4_3 ) )
 	});

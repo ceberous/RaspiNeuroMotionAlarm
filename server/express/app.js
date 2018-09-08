@@ -108,12 +108,12 @@ app.get( "/latest" , async function( req , res , next ) {
 			}		
 		}
 	}
-	else {
+	
+	if ( latest_video_path === undefined ) {
 		console.log( "Blank URL Params , Reading from File" );
 		latest_video_path = fs.readFileSync( LVID_FP ).toString().split( "\n" )[ 0 ];
-		latest_video_path = latest_video_path.split( "-" );
+		latest_video_path = latest_video_path.split( "-" );		
 	}
-	
 	console.log( latest_video_path );
 
 	if ( !latest_video_path ) { res.json( { "conversion" : "failed" } ); return; }
