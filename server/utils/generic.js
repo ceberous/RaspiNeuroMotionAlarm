@@ -173,8 +173,8 @@ function GENERATE_VIDEO( wPath ) {
 
 	exec( wPath , function( code, stdout, stderr) {
 		console.log('Exit code:', code);
-		console.log('Program output:', stdout);
-		console.log('Program stderr:', stderr);
+		//console.log('Program output:', stdout);
+		//console.log('Program stderr:', stderr);
 		const wURL = "http://192.168.1.2:6161/video?path=" + saved_orig_path;
 		console.log( wURL );
 		fs.writeFileSync( LATEST_VIDEO_FP , saved_orig_path );

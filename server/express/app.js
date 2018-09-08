@@ -92,7 +92,6 @@ app.get( "/video" , function( req , res ) {
 	res.sendFile( HTML_Latest_Video_Path );
 });
 
-const LATEST_VIDEO_PATH_FP = path.join( __dirname , "latest_video_id.txt" );
 app.get( "/latest" , async function( req , res , next ) {
 
 	var latest_video_path = undefined;
@@ -107,7 +106,8 @@ app.get( "/latest" , async function( req , res , next ) {
 		}
 	}
 	else {
-		latest_video_path = fs.readFileSync( LATEST_VIDEO_PATH_FP ).toString().split( "\n" )[ 0 ];
+		console.log( "Blank URL Params , Reading from File" );
+		latest_video_path = fs.readFileSync( "latest_video_id.txt" ).toString().split( "\n" )[ 0 ];
 		latest_video_path = latest_video_path.split( "-" );
 	}
 	
