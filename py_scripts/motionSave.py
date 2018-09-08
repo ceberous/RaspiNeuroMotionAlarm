@@ -83,14 +83,14 @@ def broadcast_event( wMsgString ):
 	send_web_socket_message( "event" , wMsgString )
 
 def broadcast_record( wMsgString ):
-	##send_twilio_sms( wMsgString )
+	send_twilio_sms( wMsgString )
 	send_web_socket_message( "record" , wMsgString )
 
 def broadcast_extra_record( wMsgString ):
 	print( "Broadcasting Extra Event" )
 	send_web_socket_message( "extra" , wMsgString )
 	#send_twilio_sms( wMsgString )
-	##send_twilio_extra_sms( wMsgString )
+	send_twilio_extra_sms( wMsgString )
 
 def broadcast_video_ready( wTodayDateString , wEventNumber ):
 	print( "Today Date String == " + wTodayDateString )
