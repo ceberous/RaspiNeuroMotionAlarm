@@ -164,7 +164,7 @@ function GENERATE_VIDEO( wPath ) {
 	var wArgs = [
 		"-f" , "image2" ,
 		"-r" , "30" ,
-		"-i" , "'" + path.join( __dirname , "../../RECORDS" , wPath[ 0 ] , wPath[ 1 ] ) + "'" ,
+		"-i" , "'" + path.join( __dirname , "../../RECORDS" , wPath[ 0 ] , wPath[ 1 ] , "03d.jpg" ) + "'" ,
 		"-s" , "500x500" ,
 		"-vcodec" , "libx264" ,
 		"-profile:v" , "high444" ,
