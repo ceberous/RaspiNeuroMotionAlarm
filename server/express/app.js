@@ -198,7 +198,7 @@ app.get( "/latest" , async function( req , res , next ) {
 	// 		});
 	// 	}
 
-	});
+	// });
 
 });
 
