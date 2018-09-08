@@ -92,6 +92,7 @@ app.get( "/video" , function( req , res ) {
 	res.sendFile( HTML_Latest_Video_Path );
 });
 
+const LVID_FP = path.join( __dirname , "latest_video_id.txt" );
 app.get( "/latest" , async function( req , res , next ) {
 
 	var latest_video_path = undefined;
@@ -109,15 +110,15 @@ app.get( "/latest" , async function( req , res , next ) {
 	}
 	else {
 		console.log( "Blank URL Params , Reading from File" );
-		latest_video_path = fs.readFileSync( "latest_video_id.txt" ).toString().split( "\n" )[ 0 ];
+		latest_video_path = fs.readFileSync( LVID_FP ).toString().split( "\n" )[ 0 ];
 		latest_video_path = latest_video_path.split( "-" );
 	}
 	
 	console.log( latest_video_path );
 
-	if ( !latest_video_path ) { res.json( { "conversion" : "failed" } ); }
-	if ( !latest_video_path[ 0 ] ) { res.json( { "conversion" : "failed" } ); }
-	if ( !latest_video_path[ 1 ] ) { res.json( { "conversion" : "failed" } ); }
+	if ( !latest_video_path ) { res.json( { "conversion" : "failed" } ); return; }
+	if ( !latest_video_path[ 0 ] ) { res.json( { "conversion" : "failed" } ); return; }
+	if ( !latest_video_path[ 1 ] ) { res.json( { "conversion" : "failed" } ); return; }
 
 	var filePath = path.join( __dirname , "../../RECORDS" , latest_video_path[ 0 ] , latest_video_path[ 1 ] , "video.mp4" );
 	console.log( "Recieved File Path === " );
