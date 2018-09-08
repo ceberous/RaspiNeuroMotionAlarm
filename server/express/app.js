@@ -99,6 +99,7 @@ function SET_LATEST_VIDEO_PATH( wPath ) {
 			if ( wPath !== "null" ) {
 				console.log( "Setting latest_video_path --> " + wPath );
 				latest_video_path = wPath;
+				latest_video_path = latest_video_path.split( "-" );
 			}
 		}
 	}	
@@ -113,11 +114,12 @@ app.get( "/latest" , async function( req , res , next ) {
 			if ( req.query.path !== "null" ) {
 				latest_video_path = req.query.path;
 				latest_video_path = latest_video_path.split( "-" );
+				console.log( "Recieved An Update from URL param" );
+				console.log( req.query );
+				console.log( latest_video_path );				
 			}
 		}
 	}
-	console.log( req.query );
-	console.log( latest_video_path );
 	
 	// fs.readFileSync( latest_video_path , function( err , data ) {
 	// 	if ( err) { throw err; }
