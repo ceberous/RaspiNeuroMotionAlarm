@@ -2,6 +2,7 @@ require("shelljs/global");
 const spawn = require( "child_process" ).spawn;
 const ps = require( "ps-node" );
 const path = require( "path" );
+const fs = require( "fs" );
 
 var arg1 = 1 	// = Minimum Seconds of Continuous Motion
 var arg2 = 4 	// = Total Motion Events Acceptable Before Alert
@@ -136,10 +137,11 @@ function GRACEFUL_EXIT() {
 }
 module.exports.gracefulExit = GRACEFUL_EXIT;
 
+const LATEST_VIDEO_FP = path.join( __dirname , "../express" , "latest_video_id.txt" );
+
 const JPEG_TO_MP4 = "ffmpeg -y -f image2 -r 30 -i ";
 const JPEG_TO_MP4_2 = " -s 500x500 -vcodec libx264 -profile:v high444 -refs 16 -crf 0 -preset ultrafast ";
 const JPEG_TO_MP4_3 = "video.mp4";
-
 function GENERATE_VIDEO( wPath ) {
 	
 	console.log( wPath );
@@ -175,6 +177,7 @@ function GENERATE_VIDEO( wPath ) {
 		console.log('Program stderr:', stderr);
 		const wURL = "http://192.168.1.2:6161/video?path=" + saved_orig_path;
 		console.log( wURL );
+		fs.writeFileSync( LATEST_VIDEO_FP , saved_orig_path );
 		require(  "../slackManager.js" ).discordPostEvent( wURL );
 		//require( "../slackManager.js" ).postVideo( path.join( wBasePath , JPEG_TO_MP4_3 ) )
 	});

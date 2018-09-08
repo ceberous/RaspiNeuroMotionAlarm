@@ -5,22 +5,20 @@ import sys
 import os
 import signal
 import imutils
-from slackclient import SlackClient
+import json
 
 from datetime import datetime , timedelta
 from time import localtime, strftime , sleep
 from pytz import timezone
-from twilio.rest import Client
-import json
-from websocket import create_connection
-
 eastern_tz = timezone( "US/Eastern" )
+
+from twilio.rest import Client
+from websocket import create_connection
 
 
 def signal_handler( signal , frame ):
 	wStr1 = "newMotion.py closed , Signal = " + str( signal )
 	print( wStr1 )
-	#send_slack_error( wStr1 )
 	broadcast_error( wStr1 )
 	sys.exit(0)
 signal.signal( signal.SIGABRT , signal_handler )
@@ -42,48 +40,22 @@ securityDetailsPath = os.path.abspath( os.path.join( __file__ , ".." , ".." ) )
 sys.path.append( securityDetailsPath )
 import securityDetails
 
+ws = create_connection( "ws://localhost:6161" )
+
 TwilioClient = Client( securityDetails.twilio_sid , securityDetails.twilio_auth_token )
 
 def make_voice_call():
 	new_call = TwilioClient.calls.create( url=securityDetails.twilio_response_server_url , to=securityDetails.toSMSExtraNumber , from_=securityDetails.fromSMSNumber , method="POST" )
 
-
-ws = create_connection( "ws://localhost:6161" )
-
-slack_client = SlackClient( securityDetails.slack_token )
-def send_slack_error( wErrString ):
-	try:
-		slack_client.api_call(
-			"chat.postMessage",
-			channel="#raspn-err",
-			text=wErrString
-		)
-	except:
-		print( "failed to send slack error message" )
-
-def send_slack_message( wMsgString ):
-	try:
-		slack_client.api_call(
-			"chat.postMessage",
-			channel="#raspi-neuro",
-			text=wMsgString
-		)
-	except:
-		print( "failed to send slack message" )
-
-
-TwilioClient = Client( securityDetails.twilio_sid , securityDetails.twilio_auth_token )
 def send_twilio_sms( wMsgString ):
 	try:
 		message = TwilioClient.messages.create( securityDetails.toSMSNumber ,
 			body=wMsgString ,
 			from_=securityDetails.fromSMSNumber ,
 		)
-		#send_slack_message( wTimeMsg )
 	except Exception as e:
 		print ( e )
 		print ( "failed to send sms" )
-		#send_slack_error( "failed to send sms" )
 		broadcast_error( "failed to send sms" )
 
 
@@ -93,11 +65,9 @@ def send_twilio_extra_sms( wMsgString ):
 			body=wMsgString ,
 			from_=securityDetails.fromSMSNumber ,
 		)
-		#send_slack_message( wTimeMsg )
 	except Exception as e:
 		print ( e )
 		print ( "failed to send extra sms" )
-		#send_slack_error( "failed to send sms" )
 		broadcast_error( "failed to send extra sms" )
 
 
@@ -106,31 +76,21 @@ def send_web_socket_message( wType , wMsgString ):
 	print ( xJString )
 	ws.send( xJString )
 
-
 def broadcast_error( wMsgString ):
-	#discord_client.send_message( securityDetails.discordErrorChannelID , wMsgString )
 	send_web_socket_message( "error" , wMsgString )
-	send_slack_error( wMsgString )	
 
 def broadcast_event( wMsgString ):
-	#discord_client.send_message( securityDetails.discordEventsChannelID , wMsgString )
 	send_web_socket_message( "event" , wMsgString )
-	send_slack_message( wMsgString )	
 
 def broadcast_record( wMsgString ):
 	send_twilio_sms( wMsgString )
-	#discord_client.send_message( securityDetails.discordRecordsChannelID , wMsgString )
 	send_web_socket_message( "record" , wMsgString )
-	send_slack_message( wMsgString )
 
 def broadcast_extra_record( wMsgString ):
 	print( "Broadcasting Extra Event" )
 	send_web_socket_message( "extra" , wMsgString )
-	send_twilio_extra_sms( wMsgString )
 	#send_twilio_sms( wMsgString )
-	#discord_client.send_message( securityDetails.discordRecordsChannelID , wMsgString )
-	#send_web_socket_message( "record" , wMsgString )
-	#send_slack_message( wMsgString )
+	send_twilio_extra_sms( wMsgString )
 
 def broadcast_video_ready( wTodayDateString , wEventNumber ):
 	print( "Today Date String == " + wTodayDateString )
@@ -155,9 +115,6 @@ class TenvisVideo():
 
 		self.write_thread = None
 
-		#self.FRAME_POOL = [ None ]*1800
-		#wNow = datetime.now( eastern_tz )
-		#self.EVENT_POOL = [ wNow ]*10
 		self.EVENT_TOTAL = -1
 		self.EVENT_POOL = []
 		self.ExtraAlertPool = [ datetime.now( eastern_tz ) ] * 8
@@ -167,9 +124,7 @@ class TenvisVideo():
 		self.last_email_time = None
 
 		self.EMAIL_COOLOFF = 100
-		#self.EMAIL_COOLOFF = 20
-		#self.EMAIL_COOLOFF = 20
-		#self.EMAIL_COOLOFF = 10
+
 		#self.MIN_MOTION_FRAMES = 4
 		self.MIN_MOTION_FRAMES = 2
 
@@ -210,48 +165,8 @@ class TenvisVideo():
 	def cleanup( self ):
 		self.w_Capture.release()
 		cv2.destroyAllWindows()
-		#send_slack_error( "newMotion.py --> cleanup()" )
-		ws.close()
 		broadcast_event( "newMotion.py --> cleanup()" )
-
-	def write_video( self ):
-		# https://www.programcreek.com/python/example/72134/cv2.VideoWriter
-		# https://video.stackexchange.com/questions/7903/how-to-losslessly-encode-a-jpg-image-sequence-to-a-video-in-ffmpeg
-		print ( "starting to write video" )
-		wTMP_COPY = self.FRAME_POOL
-		
-		# try: 
-		# 	os.makedirs( videoImagesPath )
-		# except OSError:
-		# 	pass
-		# # save each frame as an image
-		# for i , frame in enumerate( wTMP_COPY ):
-		# 	w_name_1 = str( i )
-		# 	w_name_1 = w_name_1.zfill( 4 )
-		# 	#cv2.imwrite( os.path.join( videoImagesPath , "frame%d.jpg" % i ) , frame )
-		# 	cv2.imwrite( os.path.join( videoImagesPath , "frame%s.jpg" % w_name_1 ) , frame )
-
-		#fourcc = cv2.cv.CV_FOURCC(*"mp4v")
-		#w_path = os.path.join( videoPath , "latestMotion%d.mp4" % self.video_index )
-		
-		#fourcc = cv2.cv.CV_FOURCC(*'XVID')
-		#fourcc = cv2.cv.CV_FOURCC('i', 'Y', 'U', 'V')
-		
-		#fourcc = cv2.cv.CV_FOURCC(*"MJPG")
-		fourcc = cv2.cv.CV_FOURCC('M','P','E','G')
-		w_path = os.path.join( videoPath , "latestMotion%d.avi" % self.video_index )
-		print ( w_path )
-		
-		videoWriter = cv2.VideoWriter( w_path , fourcc , 30 , ( 500 , 500 ) )		
-		for i , frame in enumerate( wTMP_COPY ):
-			videoWriter.write( frame )
-		videoWriter.release()
-
-		self.video_index += 1
-		wTMP_COPY = None
-		del wTMP_COPY
-		print ( "done writing video" )
-		return
+		ws.close()
 
 	def motionTracking( self ):
 
@@ -286,6 +201,9 @@ class TenvisVideo():
 					cv2.imwrite( cur_path , frame )
 					self.FRAME_EVENT_COUNT += 1
 				else:
+					if self.EVENT_TOTAL > 0:
+						broadcast_video_ready( self.TODAY_DATE_STRING , str( self.EVENT_TOTAL - 1 ) )
+
 					self.WRITING_EVENT_FRAMES = False
 					self.FRAME_EVENT_COUNT = 0
 					#self.EVENT_TOTAL += 1
@@ -298,15 +216,9 @@ class TenvisVideo():
 				self.nowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )
 				self.elapsedTimeFromLastEmail = int( ( wNow - self.last_email_time ).total_seconds() )
 				if self.elapsedTimeFromLastEmail < self.EMAIL_COOLOFF:
-					#wSleepDuration = ( self.EMAIL_COOLOFF - self.elapsedTimeFromLastEmail )
-					#print "inside email cooloff - sleeping( " + str( wSleepDuration ) + " )"
 					#print "sleeping"
 					pass
-					#send_slack_message( self.nowString + " === inside email cooloff - sleeping( " + str( wSleepDuration ) + " )" )
-					#sleep( wSleepDuration )
 				else:
-					#print "done sleeping"
-					#send_slack_message( self.nowString + " === done sleeping" )
 					broadcast_event( self.nowString + " === done sleeping" )
 					self.last_email_time = None
 				continue
@@ -336,15 +248,12 @@ class TenvisVideo():
 					continue
 				wNow = datetime.now( eastern_tz )
 				self.nowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )
-				#print self.nowString + " === motion record"
-				#send_slack_message( self.nowString + " === motion record" )
 				motionCounter += 1
 
 			# If Movement Is Greater than Threshold , create motion record
 			if motionCounter >= self.MIN_MOTION_FRAMES:
 				wNow = datetime.now( eastern_tz )
 				self.nowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )
-				#send_slack_message( self.nowString + " === Motion Counter > MIN_MOTION_FRAMES" )
 				broadcast_event( self.nowString + " === Motion Counter > MIN_MOTION_FRAMES" )
 				#print "setting new motion record"
 
@@ -352,8 +261,6 @@ class TenvisVideo():
 				if len( self.EVENT_POOL ) > 1:
 					wElapsedTime_x = int( ( self.EVENT_POOL[ -1 ] - self.EVENT_POOL[ -2 ] ).total_seconds() )
 					if wElapsedTime_x > ( self.MAX_TIME_ACCEPTABLE_STAGE_2 * 2 ):
-						#print "Not Fresh , Resetting to 1st Event === " + str( wElapsedTime_x )
-						#send_slack_message( "Not Fresh , Resetting to 1st Event === " + str( wElapsedTime_x ) )
 						broadcast_event( "Not Fresh , Resetting to 1st Event === " + str( wElapsedTime_x ) )
 						self.EVENT_POOL = []
 						self.total_motion = 0
@@ -366,23 +273,14 @@ class TenvisVideo():
 
 			# Once Total Motion Events Reach Threshold , create alert if timing conditions are met
 			if self.total_motion >= self.MOTION_EVENTS_ACCEPTABLE:
-				#print self.nowString + " === self.total_motion >= self.MOTION_EVENTS_ACCEPTABLE"
-				#send_slack_message( self.nowString + " === Total Motion >= MOTION_EVENTS_ACCEPTABLE" )
 				broadcast_event( self.nowString + " === Total Motion >= MOTION_EVENTS_ACCEPTABLE" )
 				self.total_motion = 0
-
-				#print ""
-				#for i , val in enumerate( self.EVENT_POOL ):
-					#print str(i) + " === " + val.strftime( "%Y-%m-%d %H:%M:%S" )
-				#print ""
 
 				wNeedToAlert = False
 				
 				# Condition 1.) Check Elapsed Time Between Last 2 Motion Events
 				wElapsedTime_1 = int( ( self.EVENT_POOL[ -1 ] - self.EVENT_POOL[ 0 ] ).total_seconds() )
 				if wElapsedTime_1 <= self.MAX_TIME_ACCEPTABLE:
-					#print "\n( Stage-1-Check ) === PASSED || Elapsed Time === " + str( wElapsedTime_1 )
-					#send_slack_message( "( Stage-1-Check ) === PASSED || Elapsed Time === " + str( wElapsedTime_1 ) )
 					broadcast_event( "( Stage-1-Check ) === PASSED || Elapsed Time === " + str( wElapsedTime_1 ) )
 					wNeedToAlert = True
 				
@@ -390,13 +288,9 @@ class TenvisVideo():
 				elif len( self.EVENT_POOL ) >= 3:
 					wElapsedTime_2 = int( ( self.EVENT_POOL[ -1 ] - self.EVENT_POOL[ -3 ] ).total_seconds() )
 					if wElapsedTime_2 <= self.MAX_TIME_ACCEPTABLE_STAGE_2:
-						#print "\n( Stage-2-Check ) === PASSED || Elapsed Time === " + str( wElapsedTime_2 )
-						#send_slack_message( "( Stage-2-Check ) === PASSED || Elapsed Time === " + str( wElapsedTime_2 ) )
 						broadcast_event( "( Stage-2-Check ) === PASSED || Elapsed Time === " + str( wElapsedTime_2 ) )
 						wNeedToAlert = True
 					else:
-						#print "\n( Stage-2-Check ) === FAILED || Elapsed Time === " + str( wElapsedTime_2 )
-						#send_slack_message( "( Stage-2-Check ) === FAILED || Elapsed Time === " + str( wElapsedTime_2 ) )
 						broadcast_event( "( Stage-2-Check ) === FAILED || Elapsed Time === " + str( wElapsedTime_2 ) )
 
 				if wNeedToAlert == True:
@@ -406,9 +300,6 @@ class TenvisVideo():
 					broadcast_record( wTimeMsg )
 					self.last_email_time = self.EVENT_POOL[ -1 ]
 					self.EVENT_POOL = []
-
-					if self.EVENT_TOTAL > 0:
-						broadcast_video_ready( self.TODAY_DATE_STRING , str( self.EVENT_TOTAL - 1 ) )
 
 					self.WRITING_EVENT_FRAMES = True
 					self.FRAME_EVENT_COUNT = 0
@@ -436,17 +327,6 @@ class TenvisVideo():
 						broadcast_error( "failed to process extra events que" )
 						broadcast_error( e )
 
-					#print ""
-			
-			# self.FRAME_POOL.insert( 0 , frame )
-			# self.FRAME_POOL.pop()
-			# self.FRAME_POOL.append( frame )
-			# if len( self.FRAME_POOL ) > 900:
-			# 	self.FRAME_POOL.pop( 0 )
-
-			# ret , GLOBAL_ACTIVE_FRAME_JPEG = cv2.imencode( '.jpg' , frame )
-			# GLOBAL_ACTIVE_FRAME_JPEG = GLOBAL_ACTIVE_FRAME_JPEG.tobytes()
-			# GLOBAL_ACTIVE_FRAME_JPEG = (b'--frame\r\n'b'Content-Type: image/jpeg\r\n\r\n' + GLOBAL_ACTIVE_FRAME_JPEG + b'\r\n\r\n')
 
 			#cv2.imshow( "frame" , frame )
 			#cv2.imshow( "Thresh" , thresh )

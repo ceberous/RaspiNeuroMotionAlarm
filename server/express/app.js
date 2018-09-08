@@ -92,37 +92,26 @@ app.get( "/video" , function( req , res ) {
 	res.sendFile( HTML_Latest_Video_Path );
 });
 
-var latest_video_path = undefined;
-
+const LATEST_VIDEO_PATH_FP = path.join( __dirname , "latest_video_id.txt" );
 app.get( "/latest" , async function( req , res , next ) {
-	
+
+	var latest_video_path = undefined;
+		
 	if ( req.query.path ) {
 		if ( req.query.path !== null ) {
 			if ( req.query.path !== "null" ) {
 				latest_video_path = req.query.path;
 				latest_video_path = latest_video_path.split( "-" );
 				console.log( "Recieved An Update from URL param" );
-				console.log( req.query );
-				console.log( latest_video_path );
 			}
 		}
 	}
 	else {
-		//console.log( "Restoring from Last Known Path" );
-		// console.log( "No Video Sent , lo siento for now" );
-		// res.json( { "failed" : "no video specified" } );
+		latest_video_path = fs.readFileSync( LATEST_VIDEO_PATH_FP ).toString().split( "\n" )[ 0 ];
+		latest_video_path = latest_video_path.split( "-" );
 	}
 	
 	console.log( latest_video_path );
-
-	// fs.readFileSync( latest_video_path , function( err , data ) {
-	// 	if ( err) { throw err; }
-	// 	else {
-	// 		res.writeHead( 200 , {'Content-Type': 'video/mp4'} );
-	// 		res.write( data );
-	// 		res.end();
-	// 	}
-	// });
 
 	if ( !latest_video_path ) { res.json( { "conversion" : "failed" } ); }
 	if ( !latest_video_path[ 0 ] ) { res.json( { "conversion" : "failed" } ); }
@@ -131,8 +120,6 @@ app.get( "/latest" , async function( req , res , next ) {
 	var filePath = path.join( __dirname , "../../RECORDS" , latest_video_path[ 0 ] , latest_video_path[ 1 ] , "video.mp4" );
 	console.log( "Recieved File Path === " );
 	console.log( filePath );
-
-	//res.json( { "testing" : filePath } );
 
 	fs.stat( filePath , function(err, stats) {
 		if ( err ) {
@@ -178,32 +165,5 @@ app.get( "/latest" , async function( req , res , next ) {
 	});
 
 });
-
-/*
-const FramePATH = path.join( __dirname , "../../client" , "frame.jpeg" );
-app.get( "/live" , async function( req , res , next ) {
-	console.log( "begin" );
-	res.writeHead( 200 , {'Content-Type': 'image/jpeg'} );
-	wTimeout = false;
-	setTimeout( function() {
-		console.log( "end timeout" );
-		wTimeout = true;
-	} , 30000 );
-	console.log( "start while()" );
-	while( !wTimeout ) {
-		fs.readFile( FramePATH , function( err , data ) {
-			if ( err) { throw err; }
-			else {
-				res.write( data );
-				next();
-			}
-		});
-		await W_SLEEP( 300 );
-	}
-	console.log( "end" );
-	res.end();
-
-});
-*/
 
 module.exports = app;
