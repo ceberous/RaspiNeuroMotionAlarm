@@ -96,13 +96,15 @@ app.get( "/latest" , async function( req , res , next ) {
 
 	var latest_video_path = undefined;
 		
-	if ( req.query.path ) {
-		if ( req.query.path !== null ) {
-			if ( req.query.path !== "null" ) {
-				latest_video_path = req.query.path;
-				latest_video_path = latest_video_path.split( "-" );
-				console.log( "Recieved An Update from URL param" );
-			}
+	if ( req.query ) {
+		if ( req.query.path ) {
+			if ( req.query.path !== null ) {
+				if ( req.query.path !== "null" ) {
+					latest_video_path = req.query.path;
+					latest_video_path = latest_video_path.split( "-" );
+					console.log( "Recieved An Update from URL param" );
+				}
+			}		
 		}
 	}
 	else {
