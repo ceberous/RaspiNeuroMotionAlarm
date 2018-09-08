@@ -93,7 +93,7 @@ app.get( "/video" , function( req , res ) {
 });
 
 var latest_video_path = "";
-app.get( "latest" , async function( req , res , next ) {
+app.get( "/latest" , async function( req , res , next ) {
 	
 	console.log( latest_video_path );
 	latest_video_path = req.query.path || latest_video_path;
