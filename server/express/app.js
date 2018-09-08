@@ -96,7 +96,9 @@ var latest_video_path = "";
 function SET_LATEST_VIDEO_PATH( wPath ) {
 	if ( wPath ) {
 		if ( wPath !== null ) {
-			latest_video_path = wPath;
+			if ( wPath !== "null" ) {
+				latest_video_path = wPath;
+			}
 		}
 	}	
 }
@@ -107,7 +109,9 @@ app.get( "/latest" , async function( req , res , next ) {
 	console.log( latest_video_path );
 	if ( req.query.path ) {
 		if ( req.query.path !== null ) {
-			latest_video_path = req.query.path;
+			if ( req.query.path !== "null" ) {
+				latest_video_path = req.query.path;
+			}
 		}
 	}
 	console.log( req.query );
@@ -123,6 +127,9 @@ app.get( "/latest" , async function( req , res , next ) {
 	// });
 
 	latest_video_path = latest_video_path.split( "-" );
+	if ( !latest_video_path ) { res.json( { "conversion" : "failed" } ); }
+	if ( !latest_video_path[ 0 ] ) { res.json( { "conversion" : "failed" } ); }
+	if ( !latest_video_path[ 1 ] ) { res.json( { "conversion" : "failed" } ); }
 	var filePath = path.join( __dirname , "../../RECORDS" , latest_video_path[ 0 ] , latest_video_path[ 1 ] , "video.mp4" );
 	console.log( "Recieved File Path === " );
 	console.log( filePath );
