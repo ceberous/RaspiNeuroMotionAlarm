@@ -182,7 +182,6 @@ class TenvisVideo():
 		while( self.w_Capture.isOpened() ):
 
 			( grabbed , frame ) = self.w_Capture.read()
-			#text = "No Motion"
 
 			if not grabbed:
 				broadcast_error( "Can't Connect to PI Camera" )
