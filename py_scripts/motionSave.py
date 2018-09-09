@@ -185,6 +185,7 @@ class TenvisVideo():
 			#text = "No Motion"
 
 			if not grabbed:
+				broadcast_error( "Can't Connect to PI Camera" )
 				break
 
 			frame = imutils.resize( frame , width = 500 )
