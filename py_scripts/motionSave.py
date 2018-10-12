@@ -124,7 +124,7 @@ class TenvisVideo():
 
 		self.EVENT_TOTAL = -1
 		self.EVENT_POOL = []
-		self.ExtraAlertPool = [ datetime.now( eastern_tz ) - datetime.timedelta(minutes=59) ] * 8
+		self.ExtraAlertPool = [ datetime.now( eastern_tz ) - timedelta(minutes=59) ] * 8
 
 		self.total_motion = 0
 		self.video_index = 0
@@ -337,12 +337,12 @@ class TenvisVideo():
 							broadcast_extra_record( wS1 )
 						if num_records_in_20_minutes >= 4:
 							voice_call_me()
-							self.ExtraAlertPool = [ datetime.now( eastern_tz ) - datetime.timedelta( minutes=59 ) ] * 8
+							self.ExtraAlertPool = [ datetime.now( eastern_tz ) - timedelta( minutes=59 ) ] * 8
 						if num_records_in_30_minutes >= 7:
-							self.ExtraAlertPool = [ datetime.now( eastern_tz ) - datetime.timedelta( minutes=59 ) ] * 8
+							self.ExtraAlertPool = [ datetime.now( eastern_tz ) - timedelta( minutes=59 ) ] * 8
 							#voice_call_dad()
 						if num_records_in_30_minutes >= 9:
-							self.ExtraAlertPool = [ datetime.now( eastern_tz ) - datetime.timedelta( minutes=59 ) ] * 8
+							self.ExtraAlertPool = [ datetime.now( eastern_tz ) - timedelta( minutes=59 ) ] * 8
 							#voice_call_house()
 					except Exception as e:
 						print( "failed to process extra events que" )
