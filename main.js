@@ -23,7 +23,7 @@ startTime.minute = 30;
 var stopTime = new schedule.RecurrenceRule();
 stopTime.dayOfWeek = [ new schedule.Range( 0 , 6 ) ];
 stopTime.hour = 9;
-stopTime.minute = 00;
+stopTime.minute = 0;
 
 var startEvent = null;
 var stopEvent = null;
@@ -60,7 +60,7 @@ function LOAD_WEBSOCKET_STUFF() {
 						case "videoReady":
 							console.log( "WebSocket Master --> " + message.message );
 							require( "./server/utils/generic.js" ).generateVideo( message.message );
-							break;							
+							break;
 						default:
 							break;
 					}
@@ -93,7 +93,7 @@ LIVE_HTML_PAGE = LIVE_HTML_PAGE + " + new Date().getTime()},500)}());</script>";
 	app = require( "./server/express/app.js" );
 	server = require( "http" ).createServer( app );
 	wss = new WebSocket.Server({ server });
-	
+
 	await require( "./server/slackManager.js" ).initialize();
 	console.log( "LOADED Slack-Client" );
 	require( "./server/slackManager.js" ).post( "main.js restarted" );
@@ -121,7 +121,7 @@ LIVE_HTML_PAGE = LIVE_HTML_PAGE + " + new Date().getTime()},500)}());</script>";
 	startEvent = schedule.scheduleJob( startTime , function(){
 		console.log( "scheduled start" );
 		const cur_state = GenericUtils.getState();
-		if ( !cur_state.state ) { GenericUtils.startPYProcess(); } 
+		if ( !cur_state.state ) { GenericUtils.startPYProcess(); }
 		else { GenericUtils.restartPYProcess(); }
 		require( "./server/slackManager.js" ).post( "motionSave.py scheduled start" );
 	});

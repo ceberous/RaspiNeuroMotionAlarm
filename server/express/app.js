@@ -23,8 +23,8 @@ app.get( "/" , function( req , res ) {
 app.get( "/state" , function( req , res ) {
 	const cur_state = GenericUtils.getState();
 	res.json( cur_state );
-	// res.json({ 
-	// 	"state" : wState , "arg1": arg1 , "arg2": arg2 , "arg3": arg3, "arg4": arg4, 
+	// res.json({
+	// 	"state" : wState , "arg1": arg1 , "arg2": arg2 , "arg3": arg3, "arg4": arg4,
 	// 	"sHour" : startTime.hour, "sMinute": startTime.minute, "eHour" : stopTime.hour, "eMinute": stopTime.minute
 	// });
 });
@@ -78,7 +78,7 @@ app.get( "/live" , function( req , res ) {
 const FramePATH = path.join( __dirname , "../../client" , "frame.jpeg" );
 app.get( "/live_image" , async function( req , res , next ) {
 	fs.readFile( FramePATH , function( err , data ) {
-		if ( err) { throw err; }
+		if ( err ) { res.json( { "error" : err } ); }
 		else {
 			res.writeHead( 200 , {'Content-Type': 'image/jpeg'} );
 			res.write( data );
@@ -96,7 +96,7 @@ const LVID_FP = path.join( __dirname , "latest_video_id.txt" );
 app.get( "/latest" , async function( req , res , next ) {
 
 	var latest_video_path = undefined;
-		
+
 	if ( req.query ) {
 		if ( req.query.path ) {
 			if ( req.query.path !== null ) {
@@ -105,14 +105,14 @@ app.get( "/latest" , async function( req , res , next ) {
 					latest_video_path = latest_video_path.split( "-" );
 					console.log( "Recieved An Update from URL param" );
 				}
-			}		
+			}
 		}
 	}
-	
+
 	if ( latest_video_path === undefined ) {
 		console.log( "Blank URL Params , Reading from File" );
 		latest_video_path = fs.readFileSync( LVID_FP ).toString().split( "\n" )[ 0 ];
-		latest_video_path = latest_video_path.split( "-" );		
+		latest_video_path = latest_video_path.split( "-" );
 	}
 	console.log( latest_video_path );
 
@@ -134,7 +134,7 @@ app.get( "/latest" , async function( req , res , next ) {
 			res.write( data );
 			res.end();
 		}
-	});	
+	});
 
 	// Option 1
 	// fs.stat( filePath , function( err , stats ) {
