@@ -335,7 +335,7 @@ class TenvisVideo():
 						if num_records_in_10_minutes >= 3:
 							wS1 = wNowString + " @@ " + str( num_records_in_10_minutes ) + " Records in 10 Minutes"
 							broadcast_extra_record( wS1 )
-						if num_records_in_20_minutes >= 4:
+						if num_records_in_20_minutes >= 5:
 							voice_call_me()
 							self.ExtraAlertPool = [ datetime.now( eastern_tz ) - timedelta( minutes=59 ) ] * 8
 						if num_records_in_30_minutes >= 7:
