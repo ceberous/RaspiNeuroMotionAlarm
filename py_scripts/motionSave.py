@@ -337,6 +337,7 @@ class TenvisVideo():
 							broadcast_extra_record( wS1 )
 						if num_records_in_20_minutes >= 4:
 							voice_call_me()
+							self.ExtraAlertPool = []
 						if num_records_in_30_minutes >= 7:
 							voice_call_dad()
 						if num_records_in_30_minutes >= 9:
