@@ -198,7 +198,7 @@ function INITIALIZE() {
 					OS_COMMAND( "/usr/local/bin/callHouse" );
 					return;
 				}
-				
+
 				if ( args[ 0 ] === "mom" ) {
 					OS_COMMAND( "/usr/local/bin/callMom" );
 					return;
@@ -206,7 +206,11 @@ function INITIALIZE() {
 				if ( args[ 0 ] === "me" || args[ 0 ] === "test" ) {
 					OS_COMMAND( "/usr/local/bin/callMe" );
 					return;
-				}				
+				}
+				if ( args[ 0 ] === "dad" ) {
+					OS_COMMAND( "/usr/local/bin/callDad" );
+					return;
+				}
 			}, {
 				description: "Makes Voice Call to Number",
 				fullDescription: "Makes Voice Call to Number",
@@ -224,7 +228,7 @@ function INITIALIZE() {
 				fullDescription: "Stops PY Process",
 				usage: "<text>" ,
 				reactionButtonTimeout: 0
-			});			
+			});
 
 			var restartCommand = discordBot.registerCommand( "restart" , ( msg , args ) => {
 				if( args.length === 0 ) {
@@ -261,7 +265,7 @@ function INITIALIZE() {
 				fullDescription: "Returns Running PY Processes",
 				usage: "<text>" ,
 				reactionButtonTimeout: 0
-			});			
+			});
 
 			await discordBot.connect();
 			setTimeout( function() {

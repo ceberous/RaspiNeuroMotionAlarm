@@ -32,7 +32,7 @@ videoPath = os.path.abspath( os.path.join( __file__ , ".." , ".." , "videos" ) )
 framePathBase = os.path.abspath( os.path.join( __file__ , ".." , ".." , "client" ) )
 frameLiveImagePath = os.path.abspath( os.path.join( framePathBase , "frame.jpeg" ) )
 
-try: 
+try:
 	os.makedirs( videoPath )
 except OSError:
 	pass
@@ -44,8 +44,15 @@ ws = create_connection( "ws://localhost:6161" )
 
 TwilioClient = Client( securityDetails.twilio_sid , securityDetails.twilio_auth_token )
 
-def make_voice_call():
+def voice_call_me():
 	new_call = TwilioClient.calls.create( url=securityDetails.twilio_response_server_url , to=securityDetails.toSMSExtraNumber , from_=securityDetails.fromSMSNumber , method="POST" )
+
+def voice_call_dad():
+	new_call = TwilioClient.calls.create( url=securityDetails.twilio_response_server_url , to=securityDetails.toSMSNumber , from_=securityDetails.fromSMSNumber , method="POST" )
+
+def voice_call_house():
+	new_call = TwilioClient.calls.create( url=securityDetails.twilio_response_server_url , to=securityDetails.toHouseNumber , from_=securityDetails.fromSMSNumber , method="POST" )
+
 
 def send_twilio_sms( wMsgString ):
 	try:
@@ -146,11 +153,11 @@ class TenvisVideo():
 
 
 		## Setup Video Saving Folders
-		
+
 		# five seconds of video ?
 		self.TOTAL_RECORDING_EVENT_FRAMES = 149
 		self.FRAME_EVENT_COUNT = 0
-		self.WRITING_EVENT_FRAMES = False		
+		self.WRITING_EVENT_FRAMES = False
 		make_folder( os.path.abspath( os.path.join( __file__ , ".." , ".." , "RECORDS" )  ) )
 
 		self.TODAY_DATE_STRING = datetime.now( eastern_tz ).strftime( "%d%b%Y" ).upper()
@@ -280,13 +287,13 @@ class TenvisVideo():
 				self.total_motion = 0
 
 				wNeedToAlert = False
-				
+
 				# Condition 1.) Check Elapsed Time Between Last 2 Motion Events
 				wElapsedTime_1 = int( ( self.EVENT_POOL[ -1 ] - self.EVENT_POOL[ 0 ] ).total_seconds() )
 				if wElapsedTime_1 <= self.MAX_TIME_ACCEPTABLE:
 					broadcast_event( "( Stage-1-Check ) === PASSED || Elapsed Time === " + str( wElapsedTime_1 ) )
 					wNeedToAlert = True
-				
+
 				# Condition 2.) Check if there are multiple events in a greater window
 				elif len( self.EVENT_POOL ) >= 3:
 					wElapsedTime_2 = int( ( self.EVENT_POOL[ -1 ] - self.EVENT_POOL[ -3 ] ).total_seconds() )
@@ -299,7 +306,7 @@ class TenvisVideo():
 				if wNeedToAlert == True:
 					#print "ALERT !!!!"
 					wNowString = self.EVENT_POOL[ -1 ].strftime( "%Y-%m-%d %H:%M:%S" )
-					wTimeMsg = "Motion @@ " + wNowString					
+					wTimeMsg = "Motion @@ " + wNowString
 					broadcast_record( wTimeMsg )
 					self.last_email_time = self.EVENT_POOL[ -1 ]
 					self.EVENT_POOL = []
@@ -315,16 +322,25 @@ class TenvisVideo():
 						self.ExtraAlertPool.pop()
 						num_records_in_10_minutes = 0
 						num_records_in_20_minutes = 0
+						num_records_in_30_minutes = 0
 						for i , record in enumerate( self.ExtraAlertPool ):
-							if int( ( self.last_email_time - record ).total_seconds() ) < 600:
-								num_records_in_10_minutes = num_records_in_10_minutes + 1
-							elif int( ( self.last_email_time - record ).total_seconds() ) < 1200:
+							time_diff = int( ( self.last_email_time - record ).total_seconds() )
+							if time_diff < 1800:
+								num_records_in_30_minutes = num_records_in_30_minutes + 1
+							if time_diff < 1200:
 								num_records_in_20_minutes = num_records_in_20_minutes + 1
+							if time_diff < 600:
+								num_records_in_10_minutes = num_records_in_10_minutes + 1
+
 						if num_records_in_10_minutes >= 3:
 							wS1 = wNowString + " @@ " + str( num_records_in_10_minutes ) + " Records in 10 Minutes"
 							broadcast_extra_record( wS1 )
-						if num_records_in_20_minutes >= 5:
-							make_voice_call()
+						if num_records_in_20_minutes >= 4:
+							voice_call_me()
+						if num_records_in_30_minutes >= 7:
+							voice_call_dad()
+						if num_records_in_30_minutes >= 9:
+							voice_call_house()
 					except Exception as e:
 						print( "failed to process extra events que" )
 						broadcast_error( "failed to process extra events que" )
