@@ -59,7 +59,10 @@ function LOAD_WEBSOCKET_STUFF() {
 							break;
 						case "videoReady":
 							console.log( "WebSocket Master --> " + message.message );
-							require( "./server/utils/generic.js" ).generateVideo( message.message );
+							//require( "./server/utils/generic.js" ).generateVideo( message.message );
+							break;
+						case "tdReady":
+							require( "./server/slackManager.js" ).postTDReady();
 							break;
 						default:
 							break;

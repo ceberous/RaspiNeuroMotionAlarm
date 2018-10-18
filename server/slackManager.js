@@ -105,14 +105,14 @@ function POST_THRESH() {
 			const thresh_data = fs.readFileSync( thresh_path );
 			await discordBot.createMessage( discordCreds.events_channel_id , timeName , {
 				file: thresh_data ,
-				name: timeName + ".jpeg"
+				name: "THRESH - " + timeName + ".jpeg"
 			});
 			resolve();
 		}
 		catch( error ) { console.log( error ); reject( error ); }
 	});
 }
-module.exports.postStill = POST_STILL;
+module.exports.postThresh = POST_THRESH;
 
 function POST_DELTA() {
 	return new Promise( async function( resolve , reject ) {
@@ -121,14 +121,26 @@ function POST_DELTA() {
 			const delta_data = fs.readFileSync( delta_path );
 			await discordBot.createMessage( discordCreds.events_channel_id , timeName , {
 				file: delta_data ,
-				name: timeName + ".jpeg"
+				name: "DELTA - " + timeName + ".jpeg"
 			});
 			resolve();
 		}
 		catch( error ) { console.log( error ); reject( error ); }
 	});
 }
-module.exports.postStill = POST_STILL;
+module.exports.postDelta = POST_DELTA;
+
+function POST_TD_READY(){
+	return new Promise( async function( resolve , reject ) {
+		try {
+			await POST_THRESH();
+			await POST_DELTA();
+			resolve();
+		}
+		catch( error ) { console.log( error ); reject( error ); }
+	});
+}
+module.exports.postTDReady = POST_TD_READY;
 
 // function POST_VIDEO( wPath ) {
 // 	return new Promise( async function( resolve , reject ) {

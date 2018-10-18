@@ -106,6 +106,7 @@ def broadcast_video_ready( wTodayDateString , wEventNumber ):
 	print( "Current Event Number == " + wEventNumber )
 	send_web_socket_message( "videoReady" , wTodayDateString + "-" + wEventNumber )
 
+
 def make_folder( path ):
 	try:
 		print( "Trying to Make Folder Path --> " )
@@ -292,6 +293,7 @@ class TenvisVideo():
 				self.total_motion = 0
 				cv2.imwrite( frameThreshLiveImagePath , thresh )
 				cv2.imwrite( frameDeltaLiveImagePath , frameDelta )
+				send_web_socket_message( "tdReady" )
 				wNeedToAlert = False
 
 				# Condition 1.) Check Elapsed Time Between Last 2 Motion Events
