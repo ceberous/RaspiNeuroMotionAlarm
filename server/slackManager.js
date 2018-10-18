@@ -206,8 +206,9 @@ function INITIALIZE() {
 				usage: "<text>" ,
 				reactionButtonTimeout: 0
 			});
-			discordBot.registerCommandAlias( "frame" , "still" );
+			discordBot.registerCommandAlias( "s" , "still" );
 			discordBot.registerCommandAlias( "f" , "still" );
+			discordBot.registerCommandAlias( "frame" , "still" );
 
 			var threshCommand = discordBot.registerCommand( "thresh" , ( msg , args ) => {
 				if( args.length === 0 ) {
