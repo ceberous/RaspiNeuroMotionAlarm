@@ -134,7 +134,7 @@ function POST_TD_READY(){
 	return new Promise( async function( resolve , reject ) {
 		try {
 			await POST_THRESH();
-			await POST_DELTA();
+			//await POST_DELTA();
 			resolve();
 		}
 		catch( error ) { console.log( error ); reject( error ); }
