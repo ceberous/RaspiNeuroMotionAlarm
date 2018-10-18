@@ -105,7 +105,7 @@ function POST_THRESH() {
 			const stats = fs.statSync( thresh_path );
 			let seconds = ( new Date().getTime() - stats.mtime ) / 1000;
 			const thresh_data = fs.readFileSync( thresh_path );
-			await discordBot.createMessage( discordCreds.events_channel_id , "THRESH - " + seconds.toString() + " seconds ago" , {
+			await discordBot.createMessage( discordCreds.events_channel_id , timeName + "\n" + "THRESH - " + seconds.toString() + " seconds ago" , {
 				file: thresh_data ,
 				name: "THRESH - " + timeName + ".jpeg"
 			});
@@ -123,7 +123,7 @@ function POST_DELTA() {
 			const stats = fs.statSync( delta_path );
 			let seconds = ( new Date().getTime() - stats.mtime ) / 1000;
 			const delta_data = fs.readFileSync( delta_path );
-			await discordBot.createMessage( discordCreds.events_channel_id , "DELTA - " + seconds.toString() + " seconds ago" , {
+			await discordBot.createMessage( discordCreds.events_channel_id , timeName + "\n" + "DELTA - " + seconds.toString() + " seconds ago" , {
 				file: delta_data ,
 				name: "DELTA - " + timeName + ".jpeg"
 			});
