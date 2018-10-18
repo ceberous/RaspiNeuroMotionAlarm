@@ -207,6 +207,7 @@ function INITIALIZE() {
 				reactionButtonTimeout: 0
 			});
 			discordBot.registerCommandAlias( "frame" , "still" );
+			discordBot.registerCommandAlias( "f" , "still" );
 
 			var threshCommand = discordBot.registerCommand( "thresh" , ( msg , args ) => {
 				if( args.length === 0 ) {
@@ -219,6 +220,7 @@ function INITIALIZE() {
 				usage: "<text>" ,
 				reactionButtonTimeout: 0
 			});
+			discordBot.registerCommandAlias( "t" , "thresh" );
 
 			var deltaCommand = discordBot.registerCommand( "delta" , ( msg , args ) => {
 				if( args.length === 0 ) {
@@ -231,6 +233,7 @@ function INITIALIZE() {
 				usage: "<text>" ,
 				reactionButtonTimeout: 0
 			});
+			discordBot.registerCommandAlias( "d" , "delta" );
 
 
 			var smsCommand = discordBot.registerCommand( "sms" , ( msg , args ) => {
