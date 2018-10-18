@@ -6,7 +6,8 @@ require( "shelljs/global" );
 const fs = require( "fs" );
 const path = require( "path" );
 const still_path = path.join( __dirname , ".." , "client" , "frame.jpeg" );
-console.log( still_path );
+const thresh_path = path.join( __dirname , ".." , "client" , "frameThresh.jpeg" );
+const delta_path = path.join( __dirname , ".." , "client" , "frameDelta.jpeg" );
 const Eris = require("eris");
 var discordBot = null;
 var discordCreds = require( "../personal.js" ).discord_creds;
@@ -97,6 +98,38 @@ function POST_STILL() {
 }
 module.exports.postStill = POST_STILL;
 
+function POST_THRESH() {
+	return new Promise( async function( resolve , reject ) {
+		try {
+			const timeName = require( "./utils/generic.js" ).time();
+			const thresh_data = fs.readFileSync( thresh_path );
+			await discordBot.createMessage( discordCreds.events_channel_id , timeName , {
+				file: thresh_data ,
+				name: timeName + ".jpeg"
+			});
+			resolve();
+		}
+		catch( error ) { console.log( error ); reject( error ); }
+	});
+}
+module.exports.postStill = POST_STILL;
+
+function POST_DELTA() {
+	return new Promise( async function( resolve , reject ) {
+		try {
+			const timeName = require( "./utils/generic.js" ).time();
+			const delta_data = fs.readFileSync( delta_path );
+			await discordBot.createMessage( discordCreds.events_channel_id , timeName , {
+				file: delta_data ,
+				name: timeName + ".jpeg"
+			});
+			resolve();
+		}
+		catch( error ) { console.log( error ); reject( error ); }
+	});
+}
+module.exports.postStill = POST_STILL;
+
 // function POST_VIDEO( wPath ) {
 // 	return new Promise( async function( resolve , reject ) {
 // 		try {
@@ -174,6 +207,31 @@ function INITIALIZE() {
 				reactionButtonTimeout: 0
 			});
 			discordBot.registerCommandAlias( "frame" , "still" );
+
+			var threshCommand = discordBot.registerCommand( "thresh" , ( msg , args ) => {
+				if( args.length === 0 ) {
+					POST_THRESH();
+				}
+				return;
+			}, {
+				description: "Posts Latest Event Threshold",
+				fullDescription: "Posts Latest Event Threshold",
+				usage: "<text>" ,
+				reactionButtonTimeout: 0
+			});
+
+			var deltaCommand = discordBot.registerCommand( "delta" , ( msg , args ) => {
+				if( args.length === 0 ) {
+					POST_DELTA();
+				}
+				return;
+			}, {
+				description: "Posts Latest Event Delta",
+				fullDescription: "Posts Latest Event Delta",
+				usage: "<text>" ,
+				reactionButtonTimeout: 0
+			});
+
 
 			var smsCommand = discordBot.registerCommand( "sms" , ( msg , args ) => {
 				if( args.length === 0 ) {

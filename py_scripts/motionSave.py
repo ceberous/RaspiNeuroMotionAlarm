@@ -31,6 +31,8 @@ signal.signal( signal.SIGINT , signal_handler )
 videoPath = os.path.abspath( os.path.join( __file__ , ".." , ".." , "videos" ) )
 framePathBase = os.path.abspath( os.path.join( __file__ , ".." , ".." , "client" ) )
 frameLiveImagePath = os.path.abspath( os.path.join( framePathBase , "frame.jpeg" ) )
+frameDeltaLiveImagePath = os.path.abspath( os.path.join( framePathBase , "frameDelta.jpeg" ) )
+frameThreshLiveImagePath = os.path.abspath( os.path.join( framePathBase , "frameThresh.jpeg" ) )
 
 try:
 	os.makedirs( videoPath )
@@ -268,6 +270,8 @@ class TenvisVideo():
 				wNow = datetime.now( eastern_tz )
 				self.nowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )
 				broadcast_event( self.nowString + " === Motion Counter > MIN_MOTION_FRAMES" )
+				# cv2.imwrite( frameThreshLiveImagePath , thresh )
+				# cv2.imwrite( frameDeltaLiveImagePath , frameDelta )
 				#print "setting new motion record"
 
 				# Check if this is "fresh" in a series of new motion records
@@ -352,6 +356,10 @@ class TenvisVideo():
 						broadcast_error( "failed to process extra events que" )
 						broadcast_error( e )
 
+
+
+			cv2.imwrite( frameThreshLiveImagePath , thresh )
+			cv2.imwrite( frameDeltaLiveImagePath , frameDelta )
 
 			#cv2.imshow( "frame" , frame )
 			#cv2.imshow( "Thresh" , thresh )
