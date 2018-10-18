@@ -103,7 +103,7 @@ function POST_THRESH() {
 		try {
 			const timeName = require( "./utils/generic.js" ).time();
 			const thresh_data = fs.readFileSync( thresh_path );
-			await discordBot.createMessage( discordCreds.events_channel_id , timeName , {
+			await discordBot.createMessage( discordCreds.events_channel_id , "THRESH - " + timeName , {
 				file: thresh_data ,
 				name: "THRESH - " + timeName + ".jpeg"
 			});
@@ -119,7 +119,7 @@ function POST_DELTA() {
 		try {
 			const timeName = require( "./utils/generic.js" ).time();
 			const delta_data = fs.readFileSync( delta_path );
-			await discordBot.createMessage( discordCreds.events_channel_id , timeName , {
+			await discordBot.createMessage( discordCreds.events_channel_id , "DELTA - " + timeName , {
 				file: delta_data ,
 				name: "DELTA - " + timeName + ".jpeg"
 			});
