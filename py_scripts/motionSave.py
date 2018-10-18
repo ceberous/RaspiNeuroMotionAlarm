@@ -270,8 +270,8 @@ class TenvisVideo():
 				wNow = datetime.now( eastern_tz )
 				self.nowString = wNow.strftime( "%Y-%m-%d %H:%M:%S" )
 				broadcast_event( self.nowString + " === Motion Counter > MIN_MOTION_FRAMES" )
-				# cv2.imwrite( frameThreshLiveImagePath , thresh )
-				# cv2.imwrite( frameDeltaLiveImagePath , frameDelta )
+				cv2.imwrite( frameThreshLiveImagePath , thresh )
+				cv2.imwrite( frameDeltaLiveImagePath , frameDelta )
 				#print "setting new motion record"
 
 				# Check if this is "fresh" in a series of new motion records
@@ -358,8 +358,8 @@ class TenvisVideo():
 
 
 
-			cv2.imwrite( frameThreshLiveImagePath , thresh )
-			cv2.imwrite( frameDeltaLiveImagePath , frameDelta )
+			# cv2.imwrite( frameThreshLiveImagePath , thresh )
+			# cv2.imwrite( frameDeltaLiveImagePath , frameDelta )
 
 			#cv2.imshow( "frame" , frame )
 			#cv2.imshow( "Thresh" , thresh )
