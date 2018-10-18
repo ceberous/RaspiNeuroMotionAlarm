@@ -102,8 +102,10 @@ function POST_THRESH() {
 	return new Promise( async function( resolve , reject ) {
 		try {
 			const timeName = require( "./utils/generic.js" ).time();
+			const stats = fs.statSync( thresh_path );
+			let seconds = ( new Date().getTime() - stats.mtime ) / 1000;
 			const thresh_data = fs.readFileSync( thresh_path );
-			await discordBot.createMessage( discordCreds.events_channel_id , "THRESH - " + timeName , {
+			await discordBot.createMessage( discordCreds.events_channel_id , "THRESH - " + seconds.toString() + " seconds ago" , {
 				file: thresh_data ,
 				name: "THRESH - " + timeName + ".jpeg"
 			});
@@ -118,8 +120,10 @@ function POST_DELTA() {
 	return new Promise( async function( resolve , reject ) {
 		try {
 			const timeName = require( "./utils/generic.js" ).time();
+			const stats = fs.statSync( delta_path );
+			let seconds = ( new Date().getTime() - stats.mtime ) / 1000;
 			const delta_data = fs.readFileSync( delta_path );
-			await discordBot.createMessage( discordCreds.events_channel_id , "DELTA - " + timeName , {
+			await discordBot.createMessage( discordCreds.events_channel_id , "DELTA - " + seconds.toString() + " seconds ago" , {
 				file: delta_data ,
 				name: "DELTA - " + timeName + ".jpeg"
 			});
