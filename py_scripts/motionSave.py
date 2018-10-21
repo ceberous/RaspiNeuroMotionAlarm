@@ -293,7 +293,7 @@ class TenvisVideo():
 				self.total_motion = 0
 				cv2.imwrite( frameThreshLiveImagePath , thresh )
 				cv2.imwrite( frameDeltaLiveImagePath , frameDelta )
-				send_web_socket_message( "tdReady" )
+				send_web_socket_message( "tdReady" , "1" )
 				wNeedToAlert = False
 
 				# Condition 1.) Check Elapsed Time Between Last 2 Motion Events
