@@ -21,6 +21,7 @@ def signal_handler( signal , frame ):
 	print( wStr1 )
 	broadcast_error( wStr1 )
 	sys.exit(0)
+
 signal.signal( signal.SIGABRT , signal_handler )
 signal.signal( signal.SIGFPE , signal_handler )
 signal.signal( signal.SIGILL , signal_handler )
@@ -58,10 +59,26 @@ def voice_call_house():
 
 def send_twilio_sms( wMsgString ):
 	try:
+		wNow = datetime.now( eastern_tz )
+		if wNow.hour == 22 or wNow.hour == 23 or wNow.hour == 0 or wNow.hour == 1:
+			check = True
+		elif wNow.hour == 2:
+			if wNow.minute >= 30:
+				check = False
+			else:
+				check = True
+		else:
+			check = False
+
+		if check == False:
+			print( "outide of sms window" )
+			return
+
 		message = TwilioClient.messages.create( securityDetails.toSMSNumber ,
 			body=wMsgString ,
 			from_=securityDetails.fromSMSNumber ,
 		)
+		print( "sent sms" )
 	except Exception as e:
 		print ( e )
 		print ( "failed to send sms" )
