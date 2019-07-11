@@ -218,7 +218,11 @@ class TenvisVideo():
 			frame = imutils.resize( frame , width = 500 )
 
 			#temp adjustment for rando corners
-			frame = frame[ 0:250 , 0:350 ]
+			# (0,0) = TOP LEFT
+			# X = LEFT TO RIGHT
+			# Y = TOP TO BOTTOM
+			# [ y1:y2 , x1:x2 ]
+			frame = frame[ 0:250 , 0:500 ]
 
 			# https://stackoverflow.com/questions/39622281/capture-one-frame-from-a-video-file-after-every-10-seconds
 			cv2.imwrite( frameLiveImagePath , frame )
