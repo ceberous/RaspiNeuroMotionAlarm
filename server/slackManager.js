@@ -88,11 +88,14 @@ function POST_STILL() {
 		try {
 			const timeName = require( "./utils/generic.js" ).time();
 			const still_data = fs.readFileSync( still_path );
-			await discordBot.createMessage( discordCreds.events_channel_id , timeName , {
+			discordBot.createMessage( discordCreds.events_channel_id , timeName , {
 				file: still_data ,
 				name: timeName + ".jpeg"
 			});
-			resolve();
+			setTimeout( ()=> {
+				resolve();
+				return;
+			} , 5000 );
 		}
 		catch( error ) { console.log( error ); resolve( "failed to post" ); }
 	});
@@ -106,11 +109,14 @@ function POST_THRESH() {
 			const stats = fs.statSync( thresh_path );
 			let seconds = ( new Date().getTime() - stats.mtime ) / 1000;
 			const thresh_data = fs.readFileSync( thresh_path );
-			await discordBot.createMessage( discordCreds.events_channel_id , timeName + "\n" + "THRESH - " + seconds.toString() + " seconds ago" , {
+			discordBot.createMessage( discordCreds.events_channel_id , timeName + "\n" + "THRESH - " + seconds.toString() + " seconds ago" , {
 				file: thresh_data ,
 				name: "THRESH - " + timeName + ".jpeg"
 			});
-			resolve();
+			setTimeout( ()=> {
+				resolve();
+				return;
+			} , 5000 );
 		}
 		catch( error ) { console.log( error ); resolve( "failed to post" ); }
 	});
@@ -124,11 +130,14 @@ function POST_DELTA() {
 			const stats = fs.statSync( delta_path );
 			let seconds = ( new Date().getTime() - stats.mtime ) / 1000;
 			const delta_data = fs.readFileSync( delta_path );
-			await discordBot.createMessage( discordCreds.events_channel_id , timeName + "\n" + "DELTA - " + seconds.toString() + " seconds ago" , {
+			discordBot.createMessage( discordCreds.events_channel_id , timeName + "\n" + "DELTA - " + seconds.toString() + " seconds ago" , {
 				file: delta_data ,
 				name: "DELTA - " + timeName + ".jpeg"
 			});
-			resolve();
+			setTimeout( ()=> {
+				resolve();
+				return;
+			} , 5000 );
 		}
 		catch( error ) { console.log( error ); resolve( "failed to post" ); }
 	});
@@ -214,7 +223,10 @@ function INITIALIZE() {
 			});
 			var stillCommand = discordBot.registerCommand( "still" , ( msg , args ) => {
 				if( args.length === 0 ) {
-					POST_STILL();
+					try {
+						POST_STILL();
+					}
+					catch( error ) { console.log( error ); }
 				}
 				return;
 			}, {
@@ -229,7 +241,10 @@ function INITIALIZE() {
 
 			var threshCommand = discordBot.registerCommand( "thresh" , ( msg , args ) => {
 				if( args.length === 0 ) {
-					POST_THRESH();
+					try {
+						POST_THRESH();
+					}
+					catch( error ) { console.log( error ); }
 				}
 				return;
 			}, {
@@ -242,7 +257,10 @@ function INITIALIZE() {
 
 			var deltaCommand = discordBot.registerCommand( "delta" , ( msg , args ) => {
 				if( args.length === 0 ) {
-					POST_DELTA();
+					try {
+						POST_DELTA();();
+					}
+					catch( error ) { console.log( error ); }
 				}
 				return;
 			}, {
