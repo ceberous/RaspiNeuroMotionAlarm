@@ -3,6 +3,8 @@ const ip = require("ip");
 const fs = require( "fs" );
 const path = require( "path" );
 
+function sleep( ms ) { return new Promise( resolve => setTimeout( resolve , ms ) ); }
+
 process.on( "unhandledRejection" , function( reason , p ) {
     console.error( reason, "Unhandled Rejection at Promise" , p );
     console.trace();
@@ -99,6 +101,7 @@ LIVE_HTML_PAGE = LIVE_HTML_PAGE + " + new Date().getTime()},500)}());</script>";
 
 	await require( "./server/slackManager.js" ).initialize();
 	console.log( "LOADED Slack-Client" );
+	await sleep( 2000 );
 	require( "./server/slackManager.js" ).post( "main.js restarted" );
 
 	server.listen( wPORT , async function() {
