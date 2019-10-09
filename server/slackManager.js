@@ -346,7 +346,7 @@ function INITIALIZE() {
 				reactionButtonTimeout: 0
 			});
 
-			await discordBot.connect();
+			discordBot.connect();
 			setTimeout( function() {
 				resolve();
 			} , 2000 );
