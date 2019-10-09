@@ -345,11 +345,11 @@ function INITIALIZE() {
 				usage: "<text>" ,
 				reactionButtonTimeout: 0
 			});
-
+			discordBot.on("ready", () => { // When the bot is ready
+			    console.log("Eris Bot Ready!"); // Log "Ready!"
+			    resolve();
+			});
 			discordBot.connect();
-			setTimeout( function() {
-				resolve();
-			} , 2000 );
 		}
 		catch( error ) { console.log( error ); reject( error ); }
 	});
