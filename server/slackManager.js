@@ -18,7 +18,7 @@ function DISCORD_POST_ERROR( wMessage ) {
 			await discordBot.createMessage( discordCreds.error_channel_id , wMessage );
 			resolve();
 		}
-		catch( error ) { console.log( error ); reject( error ); }
+		catch( error ) { console.log( error ); resolve( "failed to post" ); }
 	});s
 }
 module.exports.discordPostError = DISCORD_POST_ERROR;
@@ -29,7 +29,7 @@ function DISCORD_POST_EVENT( wMessage ) {
 			await discordBot.createMessage( discordCreds.events_channel_id , wMessage );
 			resolve();
 		}
-		catch( error ) { console.log( error ); reject( error ); }
+		catch( error ) { console.log( error ); resolve( "failed to post" ); }
 	});s
 }
 module.exports.discordPostEvent = DISCORD_POST_EVENT;
@@ -40,7 +40,7 @@ function DISCORD_POST_RECORD( wMessage ) {
 			await discordBot.createMessage( discordCreds.records_channel_id , wMessage );
 			resolve();
 		}
-		catch( error ) { console.log( error ); reject( error ); }
+		catch( error ) { console.log( error ); resolve( "failed to post" ); }
 	});s
 }
 module.exports.discordPostRecord = DISCORD_POST_RECORD;
@@ -60,7 +60,7 @@ function POST_MESSAGE( wMessage , wChannel ) {
 			}
 			resolve();
 		}
-		catch( error ) { console.log( error ); reject( error ); }
+		catch( error ) { console.log( error ); resolve( "failed to post" ); }
 	});
 }
 module.exports.post = POST_MESSAGE;
@@ -93,7 +93,7 @@ function POST_STILL() {
 			});
 			resolve();
 		}
-		catch( error ) { console.log( error ); reject( error ); }
+		catch( error ) { console.log( error ); resolve( "failed to post" ); }
 	});
 }
 module.exports.postStill = POST_STILL;
@@ -111,7 +111,7 @@ function POST_THRESH() {
 			});
 			resolve();
 		}
-		catch( error ) { console.log( error ); reject( error ); }
+		catch( error ) { console.log( error ); resolve( "failed to post" ); }
 	});
 }
 module.exports.postThresh = POST_THRESH;
@@ -129,7 +129,7 @@ function POST_DELTA() {
 			});
 			resolve();
 		}
-		catch( error ) { console.log( error ); reject( error ); }
+		catch( error ) { console.log( error ); resolve( "failed to post" ); }
 	});
 }
 module.exports.postDelta = POST_DELTA;
@@ -173,7 +173,7 @@ function POST_VIDEO_LINK( wPath ) {
 			});
 			resolve();
 		}
-		catch( error ) { console.log( error ); reject( error ); }
+		catch( error ) { console.log( error ); resolve( "failed to post" ); }
 	});
 }
 module.exports.postVideLink = POST_VIDEO_LINK;
