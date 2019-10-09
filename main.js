@@ -102,7 +102,7 @@ LIVE_HTML_PAGE = LIVE_HTML_PAGE + " + new Date().getTime()},500)}());</script>";
 	await require( "./server/slackManager.js" ).initialize();
 	console.log( "LOADED Slack-Client" );
 	await sleep( 2000 );
-	require( "./server/slackManager.js" ).post( "main.js restarted" );
+	//require( "./server/slackManager.js" ).post( "main.js restarted" );
 
 	server.listen( wPORT , async function() {
 		console.log( "\thttp://localhost:" + wPORT.toString() );
