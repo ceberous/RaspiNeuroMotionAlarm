@@ -47,24 +47,39 @@ function LOAD_WEBSOCKET_STUFF() {
 							this.isAlive = true;
 							break;
 						case "error":
-							require( "./server/slackManager.js" ).discordPostError( message.message );
+							try{
+								require( "./server/slackManager.js" ).discordPostError( message.message );
+							}
+							catch( error ) { console.log( error ); }
 							break;
 						case "event":
-							require( "./server/slackManager.js" ).discordPostEvent( message.message );
+							try{
+								require( "./server/slackManager.js" ).discordPostEvent( message.message );
+							}
+							catch( error ) { console.log( error ); }
 							break;
 						case "record":
-							require( "./server/slackManager.js" ).discordPostRecord( message.message );
 							//require( "./server/slackManager.js" ).postStill();
+							try{
+								require( "./server/slackManager.js" ).discordPostRecord( message.message );
+							}
+							catch( error ) { console.log( error ); }
 							break;
 						case "extra":
-							require( "./server/slackManager.js" ).postStill();
+							try{
+								require( "./server/slackManager.js" ).postStill();
+							}
+							catch( error ) { console.log( error ); }
 							break;
 						case "videoReady":
 							console.log( "WebSocket Master --> " + message.message );
 							//require( "./server/utils/generic.js" ).generateVideo( message.message );
 							break;
 						case "tdReady":
-							require( "./server/slackManager.js" ).postTDReady();
+							try{
+								require( "./server/slackManager.js" ).postTDReady();
+							}
+							catch( error ) { console.log( error ); }
 							break;
 						default:
 							break;
