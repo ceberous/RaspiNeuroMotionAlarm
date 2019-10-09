@@ -258,7 +258,7 @@ function INITIALIZE() {
 			var deltaCommand = discordBot.registerCommand( "delta" , ( msg , args ) => {
 				if( args.length === 0 ) {
 					try {
-						POST_DELTA();();
+						POST_DELTA();
 					}
 					catch( error ) { console.log( error ); }
 				}
