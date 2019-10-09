@@ -11,6 +11,7 @@ const delta_path = path.join( __dirname , ".." , "client" , "frameDelta.jpeg" );
 const Eris = require("eris");
 var discordBot = null;
 var discordCreds = require( "../personal.js" ).discord_creds;
+console.log( discordCreds );
 
 function DISCORD_POST_ERROR( wMessage ) {
 	return new Promise( async function( resolve , reject ) {
